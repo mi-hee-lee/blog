@@ -60,7 +60,7 @@ export default function GNB() {
           height: 64px;
           max-width: 960px;
           margin: 0 auto;
-          padding: 0 16px;
+          padding: 0px;
           display: flex;
           align-items: center;
           justify-content: space-between;

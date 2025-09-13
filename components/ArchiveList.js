@@ -1,6 +1,5 @@
 // components/ArchiveList.js
 import Link from 'next/link';
-
 export default function ArchiveList({ posts = [] }) {
   if (!posts.length) return <div style={{ color: '#999' }}>아직 글이 없어요.</div>;
 
