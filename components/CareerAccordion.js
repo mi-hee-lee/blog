@@ -170,7 +170,7 @@ export default function CareerAccordion({ posts = [] }) {
         .career-title {
           font-family: "Bricolage Grotesque", sans-serif;
           font-size: 24px;
-          font-weight: 500;
+          font-weight: 400;
           color: #fff;
           margin: 0;
           text-align: left;
@@ -187,7 +187,7 @@ export default function CareerAccordion({ posts = [] }) {
         .career-period {
           font-family: "Bricolage Grotesque", sans-serif;
           font-size: 24px;
-          font-weight: 500;
+          font-weight: 400;
           color: #fff;
           justify-self: start; /* 왼쪽 정렬 보장 */
           white-space: nowrap;
@@ -274,7 +274,7 @@ export default function CareerAccordion({ posts = [] }) {
         }
 
         /* ===== 데스크탑(>=720px) — 한 줄 레이아웃, 우측 정렬 ===== */
-        @media (min-width: 720px) {
+        @media (min-width: 600px) {
           .career-header {
             flex-direction: row;
             align-items: center;
@@ -283,10 +283,10 @@ export default function CareerAccordion({ posts = [] }) {
           }
           .career-title {
             font-size: 40px;
-            flex: 1;               /* 왼쪽 공간 채움 */
+            flex: 1;
           }
           .career-meta {
-            display: flex;         /* period+arrow 묶음 */
+            display: flex;
             align-items: center;
             gap: 16px;
             width: auto;

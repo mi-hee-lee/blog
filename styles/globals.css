@@ -120,3 +120,11 @@ img, video, canvas {
   transform: none !important;
   contain: none !important;
 }
+
+/* 전역 리셋 */
+figure { margin: 20px 0; }
+
+.n-figure img {
+  border-radius: 12px;
+  display: block;
+}

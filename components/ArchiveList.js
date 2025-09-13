@@ -12,7 +12,7 @@ export default function ArchiveList({ posts = [] }) {
             {p.cover && <img src={p.cover} alt={p.title} className="thumb" />}
             <h3 className="title">{p.title}</h3>
 
-            {/* 여기 부분만 수정 */}
+            {/* Working Duration 속성값 사용 */}
             {p.plain?.["Working Duration"] && (
               <span className="duration">{p.plain["Working Duration"]}</span>
             )}
@@ -41,6 +41,9 @@ export default function ArchiveList({ posts = [] }) {
           display: block;
           text-decoration: none;
           color: inherit;
+        }
+        .card:hover, .card:active, .card:focus {
+          text-decoration: none;
         }
         .thumb {
           width: 100%;
