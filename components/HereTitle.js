@@ -12,7 +12,7 @@ export default function HereTitle() {
           wordBreak: 'keep-all',
           textAlign: 'left',
           maxWidth: '960px',
-          margin: '200px 0 80px'
+          margin: '160px 0 80px'
         }}
       >
         I{" "}
