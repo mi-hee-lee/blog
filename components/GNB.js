@@ -19,101 +19,95 @@ export default function GNB() {
   return (
     <>
       <header className="gnb">
-        {/* 전체폭 라인: border를 header 자체에 둔다 */}
+        {/* 라인 오버레이 */}
+        <div className="gnb-line" aria-hidden />
+
         <div className="inner">
           <Link href="/" className="brand">Designer Mihee</Link>
 
-          {/* Desktop */}
           <nav className="nav desktop">
             <a href="/#career" className="link">Career</a>
             <a href="/#archive" className="link">Project Archive</a>
           </nav>
 
-          {/* Mobile */}
-          <button className="hamburger" onClick={() => setOpen(v => !v)} aria-label="menu">
-            ☰
-          </button>
+          <button className="hamburger" onClick={() => setOpen(v => !v)} aria-label="menu">☰</button>
         </div>
 
         {open && (
           <nav className="nav mobile">
             <a href="/#career" className="link" onClick={() => setOpen(false)}>Career</a>
             <a href="/#archive" className="link" onClick={() => setOpen(false)}>Project Archive</a>
+            <NavLink href="/about" label="About" exact />
           </nav>
         )}
       </header>
 
-      {/* 헤더 높이만큼 상단 패딩(고정 헤더가 콘텐츠를 가리지 않게) */}
-      <div style={{ height: 64 }} />
-
       <style jsx>{`
-        .gnb {
-          position: sticky;
+      .gnb {
+          position: fixed;
           top: 0;
-          z-index: 50;
-
-          width: 100vw;
-          margin-left: calc(50% - 50vw);
-
+          left: 0; right: 0;
+          z-index: 1000;
           backdrop-filter: blur(6px);
-          background: rgba(30,30,30,0.6);
+          background: rgba(30,30,30,.6);
+          border-bottom: #ffffff10 solid 1px;
+        }
 
-          border-bottom: 1px solid rgba(255,255,255,0.08);
+        .gnb-line {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: rgba(255,255,255,0.08);
+          pointer-events: none;
+          z-index: -1;
         }
 
         .inner {
           height: 80px;
+          max-width: 960px;
+          margin: 0 auto;
+          padding: 0;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          
-          max-width: 960px;
-          margin: 0 auto;
+          font-size: 20px;
+          font-weight: 400; 
         }
 
-        .brand {
-          font-weight: 600;
-          letter-spacing: .02em;
-          color: #fff;
-          text-decoration: none;
-        }
+        .brand { 
+          letter-spacing: .02em; 
+          color: #fff; 
+          text-decoration: none; }
 
-        .nav {
-          display: flex;
-          gap: 16px;
-          align-items: center;
-        }
+        .nav { display: flex; gap: 16px; align-items: center; }
 
         .link {
-          color: #e5e7eb;
-          text-decoration: none;
-          font-size: 14px;
-          padding: 8px 10px;
-          border-radius: 10px;
+          color: #e5e7eb; text-decoration: none;
+          padding: 8px 10px; border-radius: 10px;
           transition: background .15s ease, color .15s ease;
         }
         .link:hover { background: rgba(255,255,255,0.06); color: #fff; }
+
         .active { color: #fff; background: rgba(255,255,255,0.1); }
 
-        .hamburger {
-          display: none;
-          background: transparent;
-          color: #fff;
-          border: 0;
-          font-size: 22px;
-          line-height: 1;
-          padding: 8px;
+        .hamburger { 
+          display: none; 
+          background: transparent; 
+          color: #fff; 
+          border: 0; 
+          font-size: 32px; 
+          line-height: 1; 
+          padding: 8px; 
           border-radius: 8px;
-        }
+          }
 
-        /* Mobile dropdown */
         .mobile {
           display: none;
           flex-direction: column;
           padding: 8px 16px 16px;
           gap: 8px;
-
-          /* dropdown도 header 배경과 자연스럽게 */
           background: rgba(30,30,30,0.6);
           backdrop-filter: blur(6px);
         }
@@ -122,7 +116,11 @@ export default function GNB() {
           .desktop { display: none; }
           .hamburger { display: block; }
           .mobile { display: flex; }
+          .inner {
+            padding: 0 16px;
+          }
         }
+
       `}</style>
     </>
   );

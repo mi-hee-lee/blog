@@ -1,17 +1,18 @@
 // components/HereTitle.js
 export default function HereTitle() {
   return (
-    <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 80 }}>
+    <div style={{ display: 'flex', justifyContent: 'flex-start'}}>
       <h1
         style={{
           fontFamily: '"Bricolage Grotesque", sans-serif',
           fontWeight: 400,
-          fontSize: '120px',
-          lineHeight: '152px',
+          fontSize: '8em',
+          lineHeight: '1.2em',
           color: '#fff',
           wordBreak: 'keep-all',
           textAlign: 'left',
-          maxWidth: '900px'
+          maxWidth: '960px',
+          margin: '200px 0 80px'
         }}
       >
         I{" "}

@@ -10,18 +10,15 @@ export default function SectionHeader({ section, label }) {
           -webkit-tap-highlight-color: transparent;
           -webkit-font-smoothing: antialiased;
           font-synthesis: none;
-
-          font-family: "Bricolage Grotesque", sans-serif;
           font-variation-settings: "opsz" 14, "wdth" 100;
-          font-weight: 500;
+          font-weight: 400;
 
           word-break: break-word;
           line-height: normal;
           white-space: pre-wrap;
 
           color: #fff;
-          margin: 0 0 20px 0;
-          font-size: 18px;
+          font-size: 16px;
 
           display: block;
           box-sizing: border-box;

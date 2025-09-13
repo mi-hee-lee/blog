@@ -65,8 +65,11 @@ export default function CareerAccordion({ posts = [] }) {
               onClick={() => toggle(i)}
               aria-expanded={open}
             >
+              {/* 제목 */}
               <h2 className="career-title">{post.title}</h2>
-              <div className="career-period-wrap">
+
+              {/* 메타줄: 모바일(기본)은 period 왼쪽/arrow 오른쪽, 데스크탑은 묶어서 우측 */}
+              <div className="career-meta">
                 <Maybe value={period}>
                   {(v) => <span className="career-period">{v}</span>}
                 </Maybe>
@@ -81,6 +84,7 @@ export default function CareerAccordion({ posts = [] }) {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   className={`chevron ${open ? "open" : ""}`}
+                  aria-hidden="true"
                 >
                   <path d="m18 15-6-6-6 6" />
                 </svg>
@@ -149,47 +153,56 @@ export default function CareerAccordion({ posts = [] }) {
           flex-direction: column;
           width: 100%;
         }
+
+        /* ===== 모바일(기본) — 두 줄 레이아웃 ===== */
         .career-header {
           display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 20px;
+          flex-direction: column; /* 제목 1줄, 메타 1줄 */
+          align-items: stretch;
+          gap: 12px;
           width: 100%;
-          padding: 40px 0;
+          padding: 32px 0;
           background: transparent;
           border: none;
           appearance: none;
           cursor: pointer;
-          flex-wrap: wrap;
         }
         .career-title {
           font-family: "Bricolage Grotesque", sans-serif;
-          font-size: 40px;
+          font-size: 24px;
           font-weight: 500;
           color: #fff;
           margin: 0;
+          text-align: left;
         }
-        .career-period-wrap {
-          display: flex;
+
+        /* period(왼쪽) + arrow(오른쪽) */
+        .career-meta {
+          display: grid;
+          grid-template-columns: 1fr auto; /* 왼쪽 1fr, 오른쪽 auto */
           align-items: center;
-          gap: 20px;
+          gap: 8px;
+          width: 100%;
         }
         .career-period {
           font-family: "Bricolage Grotesque", sans-serif;
-          font-size: 40px;
+          font-size: 24px;
           font-weight: 500;
           color: #fff;
+          justify-self: start; /* 왼쪽 정렬 보장 */
+          white-space: nowrap;
         }
         .chevron {
           color: #fff;
-          width: 24px;
-          height: 24px;
+          width: 20px;
+          height: 20px;
           transform: rotate(180deg);
           transition: transform 0.3s ease;
+          justify-self: end; /* 오른쪽 끝 */
         }
-        .chevron.open {
-          transform: rotate(0deg);
-        }
+        .chevron.open { transform: rotate(0deg); }
+
+        /* ===== 펼침 영역 ===== */
         .career-panel {
           display: flex;
           flex-direction: column;
@@ -221,22 +234,9 @@ export default function CareerAccordion({ posts = [] }) {
           gap: 40px;
           padding: 0 24px;
         }
-        .career-project {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-        .project-header {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-        .project-title {
-          font-family: Pretendard, sans-serif;
-          font-size: 18px;
-          color: #fff;
-          margin: 0;
-        }
+        .career-project { display: flex; flex-direction: column; gap: 12px; }
+        .project-header { display: flex; align-items: center; gap: 12px; }
+        .project-title { font-family: Pretendard, sans-serif; font-size: 18px; color: #fff; margin: 0; }
         .project-period {
           background: rgba(255, 255, 255, 0.06);
           border-radius: 8px;
@@ -246,7 +246,7 @@ export default function CareerAccordion({ posts = [] }) {
           color: #fff;
         }
         .project-details {
-          list-style: none; /* 기본 불릿 제거 */
+          list-style: none;
           padding-left: 0;
           margin: 0;
           font-family: Pretendard, sans-serif;
@@ -255,46 +255,45 @@ export default function CareerAccordion({ posts = [] }) {
           color: rgba(255, 255, 255, 0.6);
         }
         .project-details li {
-        position: relative;
-        padding-left: 16px; /* 불릿과 텍스트 사이 여백 */
-        margin-bottom: 8px;
+          position: relative;
+          padding-left: 16px;
+          margin-bottom: 8px;
         }
-
         .project-details li::before {
-        content: "•"; /* ← 직접 불릿 추가 */
-        position: absolute;
-        left: 0;
-        color: rgba(255, 255, 255, 0.6); /* 불릿 색상 */
-        font-size: 18px;
-        line-height: 1.6;
-       }
+          content: "•";
+          position: absolute;
+          left: 0;
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 18px;
+          line-height: 1.6;
+        }
 
         @keyframes fadeSlide {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
+          from { opacity: 0; transform: translateY(-10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== 데스크탑(>=720px) — 한 줄 레이아웃, 우측 정렬 ===== */
+        @media (min-width: 720px) {
+          .career-header {
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
+            padding: 40px 0;
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
+          .career-title {
+            font-size: 40px;
+            flex: 1;               /* 왼쪽 공간 채움 */
           }
+          .career-meta {
+            display: flex;         /* period+arrow 묶음 */
+            align-items: center;
+            gap: 16px;
+            width: auto;
+          }
+          .career-period { font-size: 40px; }
+          .chevron { width: 24px; height: 24px; }
         }
-
-          @media (max-width: 640px) {
-        .career-header {
-          flex-direction: column; /* 모바일에서는 세로 정렬 */
-          align-items: flex-start; /* 왼쪽 정렬 */
-          gap: 8px;
-        }
-
-        .career-title {
-          font-size: 24px; /* 모바일 폰트 크기 줄이기 */
-        }
-
-        .career-period {
-          font-size: 24px; /* 모바일 폰트 크기 줄이기 */
-        }
-      }
       `}</style>
     </div>
   );

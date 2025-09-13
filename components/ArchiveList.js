@@ -1,57 +1,99 @@
 // components/ArchiveList.js
 import Link from 'next/link';
 
-export default function ArchiveList({ posts=[] }) {
-  if (!posts?.length) return <div style={{ color: '#999' }}>아직 글이 없어요.</div>;
+export default function ArchiveList({ posts = [] }) {
+  if (!posts.length) return <div style={{ color: '#999' }}>아직 글이 없어요.</div>;
 
-  
   return (
-    <ul style={{ listStyle: 'none', padding: 0 }}>
+    <ul className="archive-list">
       {posts.map((p) => (
-        <li
-          key={p.slug}
-          style={{
-            padding: '32px 0',
-            display: 'grid',
-            gridTemplateColumns: '1fr auto',
-            gap: 12,
-            alignItems: 'baseline'
-          }}
-  >
-          <Link
-            href={`/posts/${p.slug}`}
-            style={{ fontSize: 18, fontWeight: 600, color: '#ffffff', textDecoration: 'none' }}
-          >
-            {p.title}
+        <li key={p.slug} className="archive-item">
+          <Link href={`/posts/${p.slug}`} className="card">
+            {p.cover && <img src={p.cover} alt={p.title} className="thumb" />}
+            <h3 className="title">{p.title}</h3>
+
+            {/* 여기 부분만 수정 */}
+            {p.plain?.["Working Duration"] && (
+              <span className="duration">{p.plain["Working Duration"]}</span>
+            )}
+
+            {p.tags?.length ? (
+              <div className="tags">
+                {p.tags.map((t) => (
+                  <span key={t} className="tag">{t}</span>
+                ))}
+              </div>
+            ) : null}
           </Link>
-          <time style={{ fontSize: 12, color: '#9ca3af' }}>{formatDate(p.date)}</time>
-          {p.tags?.length ? (
-            <div style={{ gridColumn: '1 / -1', marginTop: 6, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {p.tags.map((t) => (
-                <span
-                  key={t}
-                  style={{
-                    fontSize: 12,
-                    padding: '2px 12px',
-                    borderRadius: 999,
-                    background: '#ffffff10',
-                    color: '#ffffff'
-                  }}
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
-          ) : null}
         </li>
       ))}
+
+      <style jsx>{`
+        .archive-list {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+          gap: 64px 28px;
+          padding: 0;
+          list-style: none;
+        }
+        .archive-item { margin: 0; }
+        .card {
+          display: block;
+          text-decoration: none;
+          color: inherit;
+        }
+        .thumb {
+          width: 100%;
+          aspect-ratio: 5/3;
+          object-fit: cover;
+          border-radius: 12px;
+          margin-bottom: 12px;
+          background: #222;
+        }
+        .title {
+          font-size: 20px;
+          line-height: 1.5;
+          font-weight: 600;
+          margin: 0 6px 8px;
+          color: #fff;
+        }
+        .duration {
+          display: block;
+          font-size: 14px;
+          color: #9ca3af;
+          margin: 0 6px 12px;
+        }
+        .tags {
+          margin: 0 6px 8px;
+          display: flex;
+          gap: 6px;
+          flex-wrap: wrap;
+        }
+        .tag {
+          font-size: 12px;
+          padding: 2px 6px;
+          border-radius: 4px;
+          background: #ffffff10;
+          color: #ffffff;
+        }
+        .archive-thumb {
+          width: 100%;
+          aspect-ratio: 4/3;   /* 썸네일 박스 비율 고정 */
+          object-fit: cover;   /* 이미지가 꽉 차도록 */
+          border-radius: 12px;
+          margin-bottom: 12px;
+          transition: transform 0.4s ease;
+        }
+
+        .archive-item {
+          overflow: hidden;    /* 박스 넘치는 부분 잘라냄 */
+          border-radius: 12px; /* 이미지 둥근 모서리 유지 */
+        }
+
+        .archive-item:hover .archive-thumb {
+          transform: scale(1.1);  /* 이미지 확대 */
+        }
+      `}</style>
     </ul>
   );
 }
-
-function formatDate(iso) {
-  if (!iso) return '';
-  const d = new Date(iso);
-  return new Intl.DateTimeFormat('ko', { year: 'numeric', month: 'long', day: 'numeric' }).format(d);
-}
-

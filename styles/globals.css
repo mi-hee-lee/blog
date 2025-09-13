@@ -21,7 +21,7 @@ a:hover { text-decoration: underline; }
 }
 
 /* 모바일에서 좌우 여백 */
-@media (max-width: 600px) {
+@media (max-width: 360px) {
   .wrap {
     margin: 0 16px;
     max-width: 100%; /* 작은 화면은 꽉 차게 */
@@ -71,50 +71,6 @@ a:hover {
   color: #ccc;
 }
 
-.footer {
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  color: #fff;
-  border-top: 1px solid rgba(255,255,255,0.2);
-  display: flex;
-  justify-content: flex-start;
-}
-
-.footer-inner {
-  max-width: 960px !important;
-  padding: 64px 0px 120px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin: 0 auto;
-  width:100%;
-}
-.footer-item {
-  font-size: 28px;
-  font-weight: 500;
-  line-height: 1.6;
-}
-
-.footer-link {
-  text-decoration: underline;
-  transition: opacity 0.2s ease;
-  font-size: 28px;
-  font-weight: 500;
-  line-height: 1.6;
-}
-
-.footer-link:hover {
-  opacity: 0.8;
-}
-
-.gnb{
-  position: sticky;
-  top: env(safe-area-inset-top, 0);
-  z-index: 1000;
-  backdrop-filter: blur(6px);
-  background: rgba(30,30,30,.6);
-}
-
 /* ===== 기본: 뷰포트 전체를 기준으로 ===== */
 html, body, #__next {
   width: 100%;
@@ -137,10 +93,11 @@ img, video, canvas {
   max-width: 960px;            /* 데스크탑 최대 폭 */
   margin: 0 auto;               /* 가운데 정렬 */
   width: 100%;
+  margin-bottom:200px;
 }
 
 /* ===== 모바일/태블릿: 폭 제한 풀고 좌우 16px만 ===== */
-@media (max-width: 960px) {
+@media (max-width: 600px) {
   .page {
     max-width: 100% !important;
     margin: 0 !important;
@@ -155,4 +112,11 @@ img, video, canvas {
 .fullbleed {
   width: 100vw;
   margin-left: calc(50% - 50vw);
+}
+
+/* sticky가 깨지는 부모 속성 방지 */
+#__next, main, .page {
+  overflow: visible !important;
+  transform: none !important;
+  contain: none !important;
 }

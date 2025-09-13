@@ -6,7 +6,7 @@ export default function ResponsiveImage({ desktop, mobile, alt = '' }) {
   // 모바일만 있는 경우, 데스크톱만 있는 경우도 자연스럽게 처리
   return (
     <picture>
-      {mobile && <source media="(max-width: 768px)" srcSet={mobile} />}
+      {mobile && <source media="(max-width: 600px)" srcSet={mobile} />}
       <img
         src={desktop || mobile}
         alt={alt}
