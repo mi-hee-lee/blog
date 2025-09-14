@@ -100,13 +100,28 @@ function renderChildren(children = [], highlightColor) {
 
 export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' }) {
   useEffect(() => {
-    // 콜럼 높이 맞춤 함수
-    const adjustColumnHeights = () => {
+    // 이미지 로드 대기 및 콜럼 높이 맞춤 함수
+    const adjustColumnHeights = async () => {
       const columnContainers = document.querySelectorAll('.n-cols');
-      columnContainers.forEach(container => {
+
+      for (const container of columnContainers) {
         const columns = container.querySelectorAll('.n-col');
         if (columns.length > 1) {
-          // 모든 콜럼의 높이 초기화
+          // 모든 이미지가 로드될 때까지 대기
+          const allImages = container.querySelectorAll('.n-figure img');
+          const imageLoadPromises = Array.from(allImages).map(img => {
+            if (img.complete) {
+              return Promise.resolve();
+            }
+            return new Promise((resolve) => {
+              img.onload = resolve;
+              img.onerror = resolve;
+            });
+          });
+
+          await Promise.all(imageLoadPromises);
+
+          // 콜아웃 높이 맞춤
           columns.forEach(col => {
             const callouts = col.querySelectorAll('.n-as-is-card, .n-to-be-card, .n-callout, .n-step-arrow');
             callouts.forEach(callout => {
@@ -114,26 +129,59 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
             });
           });
 
-          // 최대 높이 찾기
-          let maxHeight = 0;
+          let maxCalloutHeight = 0;
           columns.forEach(col => {
             const callouts = col.querySelectorAll('.n-as-is-card, .n-to-be-card, .n-callout, .n-step-arrow');
             callouts.forEach(callout => {
-              maxHeight = Math.max(maxHeight, callout.offsetHeight);
+              maxCalloutHeight = Math.max(maxCalloutHeight, callout.offsetHeight);
             });
           });
 
-          // 모든 콜럼의 콜아웃을 최대 높이로 설정
-          if (maxHeight > 0) {
+          if (maxCalloutHeight > 0) {
             columns.forEach(col => {
               const callouts = col.querySelectorAll('.n-as-is-card, .n-to-be-card, .n-callout, .n-step-arrow');
               callouts.forEach(callout => {
-                callout.style.height = maxHeight + 'px';
+                callout.style.height = maxCalloutHeight + 'px';
+              });
+            });
+          }
+
+          // 이미지 높이 맞춤 (로드 완료 후)
+          columns.forEach(col => {
+            const images = col.querySelectorAll('.n-figure img');
+            images.forEach(img => {
+              img.style.height = 'auto';
+              img.style.width = 'auto';
+              img.style.maxWidth = '100%';
+            });
+          });
+
+          let maxImageHeight = 0;
+          columns.forEach(col => {
+            const images = col.querySelectorAll('.n-figure img');
+            images.forEach(img => {
+              maxImageHeight = Math.max(maxImageHeight, img.offsetHeight);
+            });
+          });
+
+          if (maxImageHeight > 0) {
+            columns.forEach(col => {
+              const images = col.querySelectorAll('.n-figure img');
+              images.forEach(img => {
+                // 원본 비율 계산
+                const aspectRatio = img.naturalWidth / img.naturalHeight;
+                // 높이를 기준으로 너비 계산
+                const newWidth = maxImageHeight * aspectRatio;
+
+                img.style.height = maxImageHeight + 'px';
+                img.style.width = newWidth + 'px';
+                img.style.maxWidth = 'none';
+                img.style.objectFit = 'contain';
               });
             });
           }
         }
-      });
+      }
     };
 
     // 컴포넌트 마운트 후 높이 조정
@@ -559,6 +607,40 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
               );
             }
 
+            // #linkBlock callout 처리 (DownloadBlock 스타일의 링크 블록)
+            if (iconText === '#linkBlock' || iconText === '#LinkBlock') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#linkBlock' && text !== '#LinkBlock';
+              }) || [];
+
+              // 콜아웃 텍스트에서 링크 추출
+              const linkItem = filteredText.find(t => t.href);
+              const linkUrl = linkItem?.href || '#';
+              const linkText = linkItem?.plain_text || filteredText.map(t => t.plain_text).join('');
+
+              return (
+                <div key={b.id} className="n-link-block">
+                  <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="link-block-item">
+                    <div className="left">
+                      <p className="title">{linkText || 'Link'}</p>
+                    </div>
+                    <div className="icon">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        width="24"
+                        height="24"
+                        fill="#fff"
+                      >
+                        <path d="M4 0V2H16.59L0 18.59L1.41 20L18 3.41V16H20V0H4Z" />
+                      </svg>
+                    </div>
+                  </a>
+                </div>
+              );
+            }
+
             // 일반 콜아웃
             return (
               <div key={b.id} className="n-callout">
@@ -638,9 +720,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
         .n-p { font-size: 14px; font-family: "Bricolage Grotesque", Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 12px 0; }
         .n-p--empty { height: .75rem; }
         .n-h1,.n-h2,.n-h3 { color:#fff; margin: 36px 0 16px; line-height:1.35; }
-        .n-h1 { font-size: 32px; font-weight:600; }
-        .n-h2 { font-size: 24px; font-weight:600; }
-        .n-h3 { font-size: 20px; font-weight:600; }
+        .n-h1 { font-size: 32px; font-weight:400; }
+        .n-h2 { font-size: 24px; font-weight:400; }
+        .n-h3 { font-size: 18px; font-weight:400; }
 
         .n-ul, .n-ol { margin: 8px 0 16px 20px; color:#cfcfcf; }
         .n-ul li { list-style: disc; margin: 6px 0; }
@@ -792,6 +874,71 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           margin-bottom: 120px;
         }
 
+        /* Link Block 스타일 (DownloadBlock과 동일) */
+        .n-link-block {
+          margin: 24px 0;
+        }
+
+        .link-block-item {
+          -webkit-text-size-adjust: 100%;
+          -webkit-tap-highlight-color: transparent;
+          -webkit-font-smoothing: antialiased;
+          font-synthesis: none;
+
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          gap: 12px;
+          position: relative;
+
+          width: 100%;
+          padding: 32px 40px 28px;
+          box-sizing: border-box;
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(255, 255, 255, 0.2);
+          border-radius: 16px;
+
+          cursor: pointer;
+          text-decoration: none;
+          transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .link-block-item:hover {
+          background: rgba(144, 163, 255, 0.2);
+          border: 0px solid rgba(144, 163, 255, 0.5);
+          transform: translateY(-2px);
+        }
+
+        .link-block-item .left {
+          flex: 1;
+          display: grid;
+          gap: 4px;
+        }
+
+        .link-block-item .title {
+          font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
+          font-size: 18px;
+          font-weight: 600;
+          color: #fff;
+          margin: 0;
+        }
+
+        .link-block-item .icon {
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+          .link-block-item {
+            padding: 24px 20px;
+          }
+          .link-block-item .title {
+            font-size: 16px;
+          }
+        }
+
         /* Small image 제한 */
         .n-small-image .n-figure {
           max-width: 640px;
@@ -937,7 +1084,10 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           object-fit: cover;
         }
         .n-figure .n-cap {
-          font-size: 10px; color:#9aa0a6; margin-top: 6px;
+          font-size: 14px;
+          color:#9aa0a6;
+          margin-top: 12px;
+          line-height: 1.5;
           text-align: center;
         }
 
