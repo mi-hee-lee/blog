@@ -144,6 +144,6 @@ img, video, canvas {
 figure { margin: 20px 0; }
 
 .n-figure img {
-  border-radius: 12px;
+  border-radius: 0px;
   display: block;
 }
