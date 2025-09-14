@@ -158,6 +158,50 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           case 'image':
             return <FigureImage key={b.id} block={b} />;
 
+          // ===== 비디오 =====
+          case 'video': {
+            const videoUrl =
+              b.video?.file?.url ||
+              b.video?.external?.url ||
+              '';
+
+            if (!videoUrl) return null;
+
+            // YouTube URL 처리
+            if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+              let embedUrl = videoUrl;
+              if (videoUrl.includes('watch?v=')) {
+                const videoId = videoUrl.split('watch?v=')[1]?.split('&')[0];
+                embedUrl = `https://www.youtube.com/embed/${videoId}`;
+              } else if (videoUrl.includes('youtu.be/')) {
+                const videoId = videoUrl.split('youtu.be/')[1]?.split('?')[0];
+                embedUrl = `https://www.youtube.com/embed/${videoId}`;
+              }
+
+              return (
+                <div key={b.id} className="n-embed">
+                  <iframe
+                    src={embedUrl}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+              );
+            }
+
+            // 기타 비디오 (HTML5 video 태그)
+            return (
+              <div key={b.id} className="n-video">
+                <video controls style={{ width: '100%', maxWidth: '100%' }}>
+                  <source src={videoUrl} />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            );
+          }
+
           // ===== 임베드 (동영상 등) =====
           case 'embed': {
             const url = b.embed?.url;
@@ -180,6 +224,27 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
                     src={embedUrl}
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+              );
+            }
+
+            // Vimeo 임베드 최적화
+            if (url.includes('vimeo.com')) {
+              let embedUrl = url;
+              const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+              if (vimeoMatch) {
+                embedUrl = `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+              }
+
+              return (
+                <div key={b.id} className="n-embed">
+                  <iframe
+                    src={embedUrl}
+                    frameBorder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
                     allowFullScreen
                     loading="lazy"
                   />
@@ -496,6 +561,17 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           width: 100%;
           height: 100%;
           border: none;
+        }
+
+        /* ==== 비디오 (HTML5) ==== */
+        .n-video {
+          margin: 24px 0;
+          border-radius: 12px;
+          overflow: hidden;
+          background: #111;
+        }
+        .n-video video {
+          border-radius: 12px;
         }
 
         /* ==== 동기화 블록 ==== */
