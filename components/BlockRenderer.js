@@ -435,7 +435,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
         .n-as-is-card .n-content,
         .n-to-be-card .n-content,
         .n-col .n-content { margin: 0; }
-        .n-p { font-family: "Bricolage Grotesque", Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 12px 0; }
+        .n-p { font-size: 14px; font-family: "Bricolage Grotesque", Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 12px 0; }
         .n-p--empty { height: .75rem; }
         .n-h1,.n-h2,.n-h3 { color:#fff; margin: 36px 0 16px; line-height:1.35; }
         .n-h1 { font-size: 32px; font-weight:600; }
