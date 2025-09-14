@@ -1,7 +1,7 @@
 // pages/index.js
 import { Bricolage_Grotesque } from "next/font/google";
 import HereTitle from '../components/HereTitle';
-// import SectionHeader from '../components/SectionHeader';
+import SectionHeader from '../components/SectionHeader';
 import CareerAccordion from '../components/CareerAccordion';
 import ArchiveList from '../components/ArchiveList';
 import { getPostsGrouped, getDownloadItems } from '../lib/notion';
@@ -48,7 +48,7 @@ export default function Home({ sections, downloads = null }) {
   };
 
   // 섹션 라벨(표시용)과 앵커 id 매핑
-  // const labelMap = { career: 'Career', archive: 'Project Archive' };
+  const labelMap = { career: 'Career', archive: 'Project Archive' };
   const idMap = { career: 'career', archive: 'archive' };
 
   return (

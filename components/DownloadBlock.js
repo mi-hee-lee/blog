@@ -3,7 +3,8 @@ export default function DownloadBlock({
   title = 'Latest Portfolio (PDF)',
   date = '25.07.31',
   href = '#',
-  accent = '#90A3FF',
+  accent = '#90a3ffff',
+  white = '#ffffffff',
 }) {
   return (
     <>
@@ -18,7 +19,7 @@ export default function DownloadBlock({
             viewBox="0 0 20 20"
             width="24"
             height="24"
-            fill={accent}
+            fill={white}
           >
             <path d="M4 0V2H16.59L0 18.59L1.41 20L18 3.41V16H20V0H4Z" />
           </svg>
@@ -41,9 +42,8 @@ export default function DownloadBlock({
           width: 100%;
           padding: 32px 40px 28px;
           box-sizing: border-box;
-
-          background: rgba(144, 163, 255, 0.2);
-          border: 0px solid rgba(144, 163, 255, 0.5);
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(255, 255, 255, 0.2);
           border-radius: 16px;
 
           cursor: pointer;
@@ -52,8 +52,8 @@ export default function DownloadBlock({
             border-color 0.2s ease;
         }
         .dl:hover {
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(255, 255, 255, 0.2);
+          background: rgba(144, 163, 255, 0.2);
+          border: 0px solid rgba(144, 163, 255, 0.5);
           transform: translateY(-2px);
         }
 

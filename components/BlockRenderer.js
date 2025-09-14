@@ -180,6 +180,43 @@ export default function BlockRenderer({ blocks = [] }) {
           // ===== 콜아웃 =====
           case 'callout': {
             const icon = b.callout?.icon?.emoji || '💡';
+
+            // rich_text에서 첫 번째 텍스트도 확인 (아이콘이 텍스트로 들어있을 수 있음)
+            const firstText = (b.callout?.rich_text?.[0]?.plain_text || '').trim();
+            const iconText = icon === '💡' ? firstText : icon;
+
+            // 반응형 조건부 렌더링: #desktop, #mobile 아이콘 처리
+            if (iconText === '#Desktop' || iconText === '#desktop') {
+              // #Desktop 텍스트 제거
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#Desktop' && text !== '#desktop';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-desktop-only">
+                  <Text rich_text={filteredText} />
+                  {b.children?.length ? renderChildren(b.children) : null}
+                </div>
+              );
+            }
+
+            if (iconText === '#Mobile' || iconText === '#mobile') {
+              // #Mobile 텍스트 제거
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#Mobile' && text !== '#mobile';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-mobile-only">
+                  <Text rich_text={filteredText} />
+                  {b.children?.length ? renderChildren(b.children) : null}
+                </div>
+              );
+            }
+
+            // 일반 콜아웃
             return (
               <div key={b.id} className="n-callout">
                 <span className="n-callout-ico" aria-hidden>{icon}</span>
@@ -272,10 +309,19 @@ export default function BlockRenderer({ blocks = [] }) {
         .n-callout-ico { font-size:18px; line-height:1; }
         .n-callout-body p { margin:0; }
 
+        /* 반응형 조건부 렌더링 */
+        .n-desktop-only { display: block; }
+        .n-mobile-only { display: none; }
+
+        @media (max-width: 600px) {
+          .n-desktop-only { display: none; }
+          .n-mobile-only { display: block; }
+        }
+
         /* ==== 이미지(썸네일) : 여백 제거 + 라운드 + 확대 hover ==== */
         .n-figure { margin: 18px 0; }
         .n-figure .n-imgWrap {
-          border-radius: 12px;
+          border-radius: 0px;
           overflow: hidden;              /* radius가 확실히 적용되도록 */
           background: #111;              /* 로딩 중 배경 */
         }

@@ -21,7 +21,7 @@ a:hover { text-decoration: underline; }
 }
 
 /* 모바일에서 좌우 여백 */
-@media (max-width: 360px) {
+@media (max-width: 600px) {
   .wrap {
     margin: 0 16px;
     max-width: 100%; /* 작은 화면은 꽉 차게 */

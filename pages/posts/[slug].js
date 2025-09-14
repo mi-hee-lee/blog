@@ -136,7 +136,7 @@ export default function PostPage({ meta, blocks }) {
 
       <style jsx>{`
         .back { display: none; }
-        .title { margin: 200px 0 0; font-size: 80px; font-weight: 400; line-height: 1.25; }
+        .title { margin: 160px 0 0; font-size: 80px; font-weight: 400; line-height: 1.25; }
         .date { display:none; }
 
         /* Desc callout */
@@ -153,16 +153,16 @@ export default function PostPage({ meta, blocks }) {
         .overview { margin: 40px 0 48px; }
         .overview-title { color: rgba(255,255,255,0.6); font-size: 16px; margin-bottom: 8px; }
         .overview-text {
-          font-weight: 400;
-          font-size: 48px;
-          line-height: 1.45;
+          font-weight: 300;
+          font-size: 40px;
+          line-height: 1.6;
           color: #fff;
           white-space: pre-wrap;
           margin: 0 0 32px 0;
         }
         .overview-text :global(.hl) {
           --hl: #2189ff99;                /* fallback, 실제 색은 style로 주입 */
-          padding: 0 .12em;
+          padding: 0;
           border-radius: 4px;
           background-image: linear-gradient(var(--hl), var(--hl));
           background-repeat: no-repeat;
@@ -184,6 +184,7 @@ export default function PostPage({ meta, blocks }) {
           .title { font-size: 64px; }
           .overview-text { font-size: 32px; }
           .meta-label { min-width: 140px; }
+          .desc-callout .chev { width: 16px; height: 16px; }
         }
       `}</style>
     </main>
