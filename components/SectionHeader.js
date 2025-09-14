@@ -28,7 +28,7 @@ export default function SectionHeader({ section, label }) {
 
         @media (max-width: 600px) {
           .section-header {
-            font-size: 24px;
+            font-size: 20px;
             margin:0 16px;
           }
         }

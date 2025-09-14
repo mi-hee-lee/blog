@@ -86,7 +86,7 @@ export default function Home({ sections, downloads = null }) {
               id={idMap[section] || section}
               style={{ marginTop: 80 }}
             >
-              {/* <SectionHeader section={section} label={labelMap[section] || section} /> */}
+              {<SectionHeader section={section} label={labelMap[section] || section} />}
               {section === 'career' ? (
                 <CareerAccordion posts={posts} />
               ) : (
