@@ -121,7 +121,7 @@ img, video, canvas {
 
 .n-small-image .n-video video {
   max-width: 640px !important;
-  width: 640px !important;
+  width: 100% !important;
   height: auto !important;
 }
 

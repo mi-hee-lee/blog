@@ -154,7 +154,7 @@ export default function PostPage({ meta, blocks }) {
           background: rgba(255,255,255,0.04);
           margin: 20px 0 32px;
         }
-        .desc-callout .chev { width: 16px; height: 16px; color: #fff; opacity: .9; margin-top: 3px; }
+        .desc-callout .chev { width: 16px !important; height: 16px !important; min-width: 16px !important; min-height: 16px !important; max-width: 16px !important; max-height: 16px !important; color: #fff; opacity: .9; margin-top: 3px; flex-shrink: 0; }
         .desc-callout p { margin: 0; font-family: Pretendard, sans-serif; font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.8); }
 
         /* Overview */

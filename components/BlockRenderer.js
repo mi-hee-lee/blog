@@ -559,7 +559,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           display:flex; gap:12px; align-items:flex-start;
           background: rgba(255,255,255,.04);
           border:1px solid rgba(255,255,255,.06);
-          padding:14px 16px; border-radius: 12px; margin: 16px 0;
+          padding:14px 16px 12px 16px; border-radius: 12px; margin: 16px 0;
         }
         .n-callout-ico { font-size:18px; line-height:1; }
         .n-callout-body p { margin:0; }
@@ -789,7 +789,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           object-fit: cover;
         }
         .n-figure .n-cap {
-          font-size: 12px; color:#9aa0a6; margin-top: 6px;
+          font-size: 10px; color:#9aa0a6; margin-top: 6px;
           text-align: center;
         }
 
@@ -838,7 +838,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
         }
         div.n-small-image div.n-video video {
           max-width: 640px !important;
-          width: 640px !important;
+          width: 100% !important;
           height: auto !important;
           box-sizing: border-box !important;
         }
@@ -888,7 +888,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           background: linear-gradient(transparent, rgba(0,0,0,0.7));
           color: white;
           padding: 20px 16px 16px;
-          font-size: 14px;
+          font-size: 10px;
           text-align: center;
         }
         .carousel-btn {

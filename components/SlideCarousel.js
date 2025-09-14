@@ -216,7 +216,7 @@ export default function SlideCarousel({ id, text, images }) {
           background: linear-gradient(transparent, rgba(0,0,0,0.7));
           color: white;
           padding: 20px 16px 16px;
-          font-size: 14px;
+          font-size: 10px;
           text-align: center;
         }
         .carousel-btn {
