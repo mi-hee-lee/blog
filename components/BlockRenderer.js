@@ -100,6 +100,26 @@ function renderChildren(children = [], highlightColor) {
 
 export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3', isNested = false }) {
   useEffect(() => {
+    // As-Is, To-Be 카드의 strong 요소 체크 및 클래스 추가
+    const handleCardAlignment = () => {
+      const asIsCards = document.querySelectorAll('.n-as-is-card');
+      const toBeCards = document.querySelectorAll('.n-to-be-card');
+
+      asIsCards.forEach(card => {
+        const hasStrong = card.querySelector('strong');
+        if (hasStrong) {
+          card.classList.add('has-strong');
+        }
+      });
+
+      toBeCards.forEach(card => {
+        const hasStrong = card.querySelector('strong');
+        if (hasStrong) {
+          card.classList.add('has-strong');
+        }
+      });
+    };
+
     // 이미지 로드 대기 및 콜럼 높이 맞춤 함수
     const adjustColumnHeights = async () => {
       const columnContainers = document.querySelectorAll('.n-cols');
@@ -184,15 +204,23 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
       }
     };
 
-    // 컴포넌트 마운트 후 높이 조정
-    const timer = setTimeout(adjustColumnHeights, 100);
+    // 컴포넌트 마운트 후 높이 조정 및 카드 정렬 처리
+    const timer = setTimeout(() => {
+      handleCardAlignment();
+      adjustColumnHeights();
+    }, 100);
 
     // 윈도우 리사이즈 시에도 높이 재조정
-    window.addEventListener('resize', adjustColumnHeights);
+    const handleResize = () => {
+      handleCardAlignment();
+      adjustColumnHeights();
+    };
+
+    window.addEventListener('resize', handleResize);
 
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('resize', adjustColumnHeights);
+      window.removeEventListener('resize', handleResize);
     };
   }, [blocks]);
   if (!Array.isArray(blocks) || !blocks.length) return null;
@@ -789,7 +817,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           border-radius: 12px;
           text-align: center;
         }
-        .n-as-is-card:has(strong) {
+        .n-as-is-card.has-strong {
           justify-content: flex-start;
         }
         .n-as-is-card p {
@@ -825,7 +853,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           border-radius: 12px;
           text-align: center;
         }
-        .n-to-be-card:has(strong) {
+        .n-to-be-card.has-strong {
           justify-content: flex-start;
         }
         .n-to-be-card p {
