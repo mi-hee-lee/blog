@@ -55,11 +55,11 @@ function Bullet({ children }) {
   return <li>{children}</li>;
 }
 
-function renderChildren(children = []) {
-  return <BlockRenderer blocks={children} />;
+function renderChildren(children = [], highlightColor) {
+  return <BlockRenderer blocks={children} highlightColor={highlightColor} />;
 }
 
-export default function BlockRenderer({ blocks = [] }) {
+export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' }) {
   if (!Array.isArray(blocks) || !blocks.length) return null;
 
   return (
@@ -106,7 +106,7 @@ export default function BlockRenderer({ blocks = [] }) {
               <ul key={b.id} className="n-ul">
                 <Bullet>
                   <Text rich_text={b.bulleted_list_item?.rich_text} />
-                  {b.children?.length ? renderChildren(b.children) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </Bullet>
               </ul>
             );
@@ -116,7 +116,7 @@ export default function BlockRenderer({ blocks = [] }) {
               <ol key={b.id} className="n-ol">
                 <li>
                   <Text rich_text={b.numbered_list_item?.rich_text} />
-                  {b.children?.length ? renderChildren(b.children) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </li>
               </ol>
             );
@@ -196,7 +196,7 @@ export default function BlockRenderer({ blocks = [] }) {
               return (
                 <div key={b.id} className="n-desktop-only">
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </div>
               );
             }
@@ -211,7 +211,37 @@ export default function BlockRenderer({ blocks = [] }) {
               return (
                 <div key={b.id} className="n-mobile-only">
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                </div>
+              );
+            }
+
+            // #As-Is callout 처리
+            if (iconText === '#As-Is' || iconText === '#as-is') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#As-Is' && text !== '#as-is';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-as-is-card">
+                  <Text rich_text={filteredText} />
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                </div>
+              );
+            }
+
+            // #To-Be callout 처리 (overview highlight 색상 사용)
+            if (iconText === '#To-Be' || iconText === '#to-be') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#To-Be' && text !== '#to-be';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-to-be-card" style={{ '--highlight-color': highlightColor }}>
+                  <Text rich_text={filteredText} />
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </div>
               );
             }
@@ -222,7 +252,7 @@ export default function BlockRenderer({ blocks = [] }) {
                 <span className="n-callout-ico" aria-hidden>{icon}</span>
                 <div className="n-callout-body">
                   <Text rich_text={b.callout?.rich_text} />
-                  {b.children?.length ? renderChildren(b.children) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </div>
               </div>
             );
@@ -234,10 +264,10 @@ export default function BlockRenderer({ blocks = [] }) {
             const cols = (b.children || []).filter((c) => c.type === 'column');
             if (!cols.length) return null;
             return (
-              <div key={b.id} className="n-cols">
+              <div key={b.id} className="n-cols" data-cols={cols.length}>
                 {cols.map((col) => (
                   <div key={col.id} className="n-col">
-                    {col.children?.length ? renderChildren(col.children) : null}
+                    {col.children?.length ? renderChildren(col.children, highlightColor) : null}
                   </div>
                 ))}
               </div>
@@ -249,7 +279,7 @@ export default function BlockRenderer({ blocks = [] }) {
             return (
               <div key={b.id} className="n-cols">
                 <div className="n-col">
-                  {b.children?.length ? renderChildren(b.children) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </div>
               </div>
             );
@@ -260,7 +290,7 @@ export default function BlockRenderer({ blocks = [] }) {
             if (b.synced_block && !b.synced_block.synced_from) {
               return (
                 <div key={b.id} className="n-synced">
-                  {b.children?.length ? renderChildren(b.children) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </div>
               );
             }
@@ -281,6 +311,9 @@ export default function BlockRenderer({ blocks = [] }) {
       <style jsx global>{`
         /* 본문 공통 */
         .n-content { margin: 120px 0 120px; }
+        .n-as-is-card .n-content,
+        .n-to-be-card .n-content,
+        .n-col .n-content { margin: 0; }
         .n-p { font-family: Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 12px 0; }
         .n-p--empty { height: .75rem; }
         .n-h1,.n-h2,.n-h3 { color:#fff; margin: 36px 0 16px; line-height:1.35; }
@@ -316,6 +349,55 @@ export default function BlockRenderer({ blocks = [] }) {
         @media (max-width: 600px) {
           .n-desktop-only { display: none; }
           .n-mobile-only { display: block; }
+        }
+
+        /* As-Is / To-Be 카드 스타일 */
+        .n-as-is-card {
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          padding: 20px 20px;
+          gap: 8px;
+          min-height: 120px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 12px;
+          margin: 16px 0;
+          text-align: center;
+        }
+        .n-as-is-card p {
+          font-family: 'Pretendard', sans-serif;
+          font-weight: 500;
+          font-size: 16px;
+          line-height: 150%;
+          color: #F9FBFB;
+          margin: 0;
+        }
+
+        .n-to-be-card {
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          padding: 20px 20px;
+          gap: 8px;
+          
+          min-height: 120px;
+          background: var(--highlight-color, #00A1F3);
+          border: 1px solid rgba(0, 161, 243, 0.2);
+          border-radius: 12px;
+          margin: 16px 0;
+          text-align: center;
+        }
+        .n-to-be-card p {
+          font-family: 'Pretendard', sans-serif;
+          font-weight: 500;
+          font-size: 16px;
+          line-height: 150%;
+          color: #Ffffff;
+          margin: 0;
         }
 
         /* ==== 이미지(썸네일) : 여백 제거 + 라운드 + 확대 hover ==== */
@@ -379,17 +461,37 @@ export default function BlockRenderer({ blocks = [] }) {
           text-align: center;
         }
 
-        /* ==== 2열 컬럼: 데스크톱 두 칸, 모바일 한 칸 ==== */
+        /* ==== 동적 컬럼: 데스크톱에서 실제 컬럼 수, 모바일 한 칸 ==== */
         .n-cols {
           display: grid;
           gap: 16px;
-          margin: 16px 0;
+          margin: 0;
         }
-        @media (min-width: 860px) {
-          .n-cols {
-            grid-template-columns: 1fr 1fr; /* 2열 */
+        @media (min-width: 960px) {
+          .n-cols[data-cols="2"] {
+            grid-template-columns: 1fr 1fr;
             align-items: start;
           }
+          .n-cols[data-cols="3"] {
+            grid-template-columns: 1fr 1fr 1fr;
+            align-items: start;
+          }
+          .n-cols[data-cols="4"] {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            align-items: start;
+          }
+          /* 5열 이상도 지원 */
+          .n-cols[data-cols="5"] {
+            grid-template-columns: repeat(5, 1fr);
+            align-items: start;
+          }
+          .n-cols[data-cols="6"] {
+            grid-template-columns: repeat(6, 1fr);
+            align-items: start;
+          }
+        }
+        .n-col {
+          width: 100%;
         }
         .n-col > .n-figure:first-child,
         .n-col > .n-p:first-child,

@@ -132,7 +132,7 @@ export default function PostPage({ meta, blocks }) {
       )}
 
       {/* 본문 블록 */}
-      <BlockRenderer blocks={blocks} />
+      <BlockRenderer blocks={blocks} highlightColor={isHex6(highlightHex) ? highlightHex : '#00A1F3'} />
 
       <style jsx>{`
         .back { display: none; }
