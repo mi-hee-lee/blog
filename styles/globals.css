@@ -9,6 +9,23 @@ html, body, #__next {
   color: #fff;
 }
 
+/* 한글 전용 폰트 스타일 */
+:lang(ko) {
+  font-family: Pretendard, ui-sans-serif, system-ui, sans-serif;
+}
+
+/* 영문, 숫자 전용 폰트 스타일 - 유니코드 범위로 지정 */
+@font-face {
+  font-family: 'Mixed';
+  src: local("Bricolage Grotesque");
+  unicode-range: U+0020-007F, U+00A0-00FF, U+0100-017F, U+0180-024F, U+2000-206F, U+20A0-20CF, U+2100-214F;
+}
+
+/* 전역 폰트 스택 재정의 */
+* {
+  font-family: "Bricolage Grotesque", Pretendard, ui-sans-serif, system-ui, sans-serif;
+}
+
 /* 링크 기본색 */
 a { color: #a5b4fc; text-decoration: none; }
 a:hover { text-decoration: underline; }

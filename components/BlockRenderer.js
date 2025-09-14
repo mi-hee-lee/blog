@@ -435,7 +435,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
         .n-as-is-card .n-content,
         .n-to-be-card .n-content,
         .n-col .n-content { margin: 0; }
-        .n-p { font-family: Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 12px 0; }
+        .n-p { font-family: "Bricolage Grotesque", Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 12px 0; }
         .n-p--empty { height: .75rem; }
         .n-h1,.n-h2,.n-h3 { color:#fff; margin: 36px 0 16px; line-height:1.35; }
         .n-h1 { font-size: 32px; font-weight:600; }
@@ -479,12 +479,11 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          padding: 20px 20px;
+          padding: 12px 20px;
           gap: 8px;
           min-height: 120px;
           border: 1px solid rgba(255, 255, 255, 0.2);
           border-radius: 12px;
-          margin: 16px 0;
           text-align: center;
         }
         .n-as-is-card p {
@@ -501,7 +500,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           font-size: 12px;
           line-height: 150%;
           color: #F9FBFB;
-          margin: 0;
+          margin: 0 0 6px;
         }
 
         .n-to-be-card {
@@ -510,14 +509,13 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          padding: 20px 20px;
+          padding: 12px 20px;
           gap: 8px;
           
           min-height: 120px;
           background: var(--highlight-color, #00A1F3);
           border: 1px solid rgba(0, 161, 243, 0.2);
           border-radius: 12px;
-          margin: 16px 0;
           text-align: center;
         }
         .n-to-be-card p {
@@ -534,7 +532,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           font-size: 12px;
           line-height: 150%;
           color: #Ffffff;
-          margin: 0;
+          margin: 0 0 6px;
         }
 
         /* Small image 제한 */
