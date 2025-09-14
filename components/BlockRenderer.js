@@ -523,14 +523,14 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
 
         /* Small image 제한 */
         .n-small-image .n-figure {
-          max-width: 400px;
-          margin: 18px auto;
+          max-width: 640px;
+          margin: 0px auto;
         }
         .n-small-image .n-imgWrap {
-          max-width: 400px;
+          max-width: 640px;
         }
         .n-small-image img {
-          max-width: 400px !important;
+          max-width: 640p !important;
           width: 100%;
           height: auto;
         }
