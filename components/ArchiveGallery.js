@@ -1,6 +1,6 @@
-// components/ArchiveList.js
+// components/ArchiveGallery.js
 import Link from 'next/link';
-export default function ArchiveList({ posts = [] }) {
+export default function ArchiveGallery({ posts = [] }) {
   if (!posts.length) return <div style={{ color: '#999' }}>아직 글이 없어요.</div>;
 
   return (
@@ -8,6 +8,7 @@ export default function ArchiveList({ posts = [] }) {
       {posts.map((p) => (
         <li key={p.slug} className="archive-item">
           <Link href={`/posts/${p.slug}`} className="card">
+            {p.cover && <img src={p.cover} alt={p.title} className="thumb" />}
             <h3 className="title">{p.title}</h3>
 
             {/* Working Duration 속성값 사용 */}
@@ -25,19 +26,16 @@ export default function ArchiveList({ posts = [] }) {
           </Link>
         </li>
       ))}
- 
+
       <style jsx>{`
         .archive-list {
-          display: flex;
-          flex-direction: column;
-          gap: 40px;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+          gap: 64px 28px;
           padding: 0;
           list-style: none;
         }
-        .archive-item {
-          margin: 0;
-          transition: transform 0.2s ease, opacity 0.2s ease;
-        }
+        .archive-item { margin: 0; }
         .card {
           display: block;
           text-decoration: none;
@@ -46,33 +44,29 @@ export default function ArchiveList({ posts = [] }) {
         .card:hover, .card:active, .card:focus {
           text-decoration: none;
         }
-        .archive-item:hover {
-          transform: translateY(-2px);
+        .thumb {
+          width: 100%;
+          aspect-ratio: 5/3;
+          object-fit: cover;
+          border-radius: 12px;
+          margin-bottom: 12px;
+          background: #222;
         }
-        .archive-item:active {
-          transform: translateY(0);
-          opacity: 0.8;
-        }
-
         .title {
-          font-size: 16px;
-          line-height: 1.2;
-          font-weight: 500;
+          font-size: 20px;
+          line-height: 1.5;
+          font-weight: 600;
+          margin: 0 6px 8px;
           color: #fff;
-          margin: 16px 0 16px;
-          transition: color 0.2s ease;
-        }
-        .archive-item:hover .title {
-          color: #90a3ff;
         }
         .duration {
           display: block;
           font-size: 14px;
           color: #9ca3af;
-          margin: 16px 0 12px;
+          margin: 0 6px 12px;
         }
         .tags {
-          margin: 0 0px 8px;
+          margin: 0 6px 8px;
           display: flex;
           gap: 6px;
           flex-wrap: wrap;
@@ -84,11 +78,22 @@ export default function ArchiveList({ posts = [] }) {
           background: #ffffff10;
           color: #ffffff;
         }
+        .archive-thumb {
+          width: 100%;
+          aspect-ratio: 4/3;   /* 썸네일 박스 비율 고정 */
+          object-fit: cover;   /* 이미지가 꽉 차도록 */
+          border-radius: 12px;
+          margin-bottom: 12px;
+          transition: transform 0.4s ease;
+        }
 
-        @media (max-width: 600px) {
-          .archive-list {
-            padding: 0 16px;
-          }
+        .archive-item {
+          overflow: hidden;    /* 박스 넘치는 부분 잘라냄 */
+          border-radius: 12px; /* 이미지 둥근 모서리 유지 */
+        }
+
+        .archive-item:hover .archive-thumb {
+          transform: scale(1.1);  /* 이미지 확대 */
         }
       `}</style>
     </ul>

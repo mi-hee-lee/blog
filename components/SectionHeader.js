@@ -18,7 +18,7 @@ export default function SectionHeader({ section, label }) {
           white-space: pre-wrap;
 
           color: #fff;
-          font-size: 16px;
+          font-size: 12px;
 
           display: block;
           box-sizing: border-box;
@@ -29,7 +29,7 @@ export default function SectionHeader({ section, label }) {
         @media (max-width: 600px) {
           .section-header {
             font-size: 24px;
-            margin:0;
+            margin:0 16px;
           }
         }
       `}</style>

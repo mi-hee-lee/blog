@@ -125,6 +125,47 @@ export default function BlockRenderer({ blocks = [] }) {
           case 'image':
             return <FigureImage key={b.id} block={b} />;
 
+          // ===== 임베드 (동영상 등) =====
+          case 'embed': {
+            const url = b.embed?.url;
+            if (!url) return null;
+
+            // YouTube 임베드 최적화
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+              let embedUrl = url;
+              if (url.includes('watch?v=')) {
+                const videoId = url.split('watch?v=')[1]?.split('&')[0];
+                embedUrl = `https://www.youtube.com/embed/${videoId}`;
+              } else if (url.includes('youtu.be/')) {
+                const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+                embedUrl = `https://www.youtube.com/embed/${videoId}`;
+              }
+
+              return (
+                <div key={b.id} className="n-embed">
+                  <iframe
+                    src={embedUrl}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+              );
+            }
+
+            // 기타 임베드
+            return (
+              <div key={b.id} className="n-embed">
+                <iframe
+                  src={url}
+                  frameBorder="0"
+                  loading="lazy"
+                />
+              </div>
+            );
+          }
+
           // ===== 구분선/인용 =====
           case 'divider':
             return <hr key={b.id} className="n-hr" />;
@@ -176,6 +217,24 @@ export default function BlockRenderer({ blocks = [] }) {
               </div>
             );
 
+          // ===== 동기화 블록 =====
+          case 'synced_block': {
+            // 원본 블록인 경우 children 렌더링
+            if (b.synced_block && !b.synced_block.synced_from) {
+              return (
+                <div key={b.id} className="n-synced">
+                  {b.children?.length ? renderChildren(b.children) : null}
+                </div>
+              );
+            }
+            // 참조 블록인 경우 - API 제약으로 내용 없음
+            return (
+              <div key={b.id} className="n-synced-ref">
+                <p>🔗 동기화된 콘텐츠 (원본 블록 참조)</p>
+              </div>
+            );
+          }
+
           default:
             return null;
         }
@@ -219,6 +278,44 @@ export default function BlockRenderer({ blocks = [] }) {
           border-radius: 12px;
           overflow: hidden;              /* radius가 확실히 적용되도록 */
           background: #111;              /* 로딩 중 배경 */
+        }
+
+        /* ==== 임베드 (동영상 등) ==== */
+        .n-embed {
+          margin: 24px 0;
+          position: relative;
+          width: 100%;
+          height: 0;
+          padding-bottom: 56.25%; /* 16:9 비율 */
+          border-radius: 12px;
+          overflow: hidden;
+          background: #111;
+        }
+        .n-embed iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border: none;
+        }
+
+        /* ==== 동기화 블록 ==== */
+        .n-synced {
+          margin: 16px 0;
+        }
+        .n-synced-ref {
+          margin: 16px 0;
+          padding: 12px 16px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 8px;
+          color: rgba(255,255,255,0.6);
+          font-style: italic;
+        }
+        .n-synced-ref p {
+          margin: 0;
+          font-size: 14px;
         }
         .n-figure img {
           display:block;
