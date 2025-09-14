@@ -24,7 +24,7 @@ const isEmpty = (v) => {
 };
 
 const isHex6 = (s = '') => /^#?[0-9A-Fa-f]{6}$/.test(String(s).trim());
-const hexToRgba = (hex, a = 0.6) => {
+const hexToRgba = (hex, a = 0.3) => {
   const h = hex.replace('#', '');
   const r = parseInt(h.slice(0, 2), 16);
   const g = parseInt(h.slice(2, 4), 16);
@@ -59,7 +59,7 @@ export default function PostPage({ meta, blocks }) {
   // 오타 Overveiw 지원
   const overviewText = isEmpty(p.Overview) ? p.Overveiw : p.Overview;
   const highlightHex = p.OverviewHighlight;
-  const hlRgba = isHex6(highlightHex) ? hexToRgba(highlightHex, 0.6) : 'rgba(33,137,255,0.6)';
+  const hlRgba = isHex6(highlightHex) ? hexToRgba(highlightHex, 0.3) : 'rgba(33,137,255,0.3)';
 
   // 1) Desc
   const descText = p.Desc;
@@ -209,7 +209,7 @@ export default function PostPage({ meta, blocks }) {
           margin: 0 0 32px 0;
         }
         .overview-text :global(.hl) {
-          --hl: #2189ff99;                /* fallback, 실제 색은 style로 주입 */
+          --hl: rgba(33, 137, 255, 0.3);  /* fallback, 실제 색은 style로 주입 */
           padding: 0;
           border-radius: 4px;
           background-image: linear-gradient(var(--hl), var(--hl));
@@ -218,7 +218,6 @@ export default function PostPage({ meta, blocks }) {
           background-position: 0 90%;      /* 수직 위치 */
           box-decoration-break: clone;
           -webkit-box-decoration-break: clone;
-          opacity: 0.3;
         }
 
         /* Meta table */
