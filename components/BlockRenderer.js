@@ -761,7 +761,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         .n-content-root {
           margin: 120px 0 0px;
         }
-        .n-p { font-size: 14px; font-family: "Bricolage Grotesque", Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 4px 0; }
+        .n-p { font-size: 14px; font-family: "Bricolage Grotesque", Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 0px 0 20px; }
         .n-p--empty { height: .75rem; }
         .n-p--empty-last { height: 0; }
         .n-h1,.n-h2 { color:#fff; margin: 80px 0 20px; line-height:1.35; }
