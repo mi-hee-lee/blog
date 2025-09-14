@@ -51,6 +51,10 @@ a:hover { text-decoration: underline; }
     margin: 0 16px;
     max-width: 100%; /* 작은 화면은 꽉 차게 */
   }
+
+  .post-page h1 {
+    margin-top: 48px;
+  }
 }
 
 /* a 태그 기본 스타일 */
@@ -72,7 +76,7 @@ a:hover {
   font-size: 40px;
   font-weight: 500;
   color: #fff;
-  margin: 64px 0 24px;
+  margin: 80px 0 24px;
 }
 
 .post-page h2 {

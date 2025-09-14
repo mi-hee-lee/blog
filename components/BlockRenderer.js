@@ -198,7 +198,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
   if (!Array.isArray(blocks) || !blocks.length) return null;
 
   return (
-    <div className="n-content">
+    <div className="n-content n-content-root">
       {blocks.map((b, index) => {
         const t = b.type;
 
@@ -707,7 +707,6 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
       <style jsx global>{`
         
         .n-content {
-          margin: 120px 0 0px;
           -webkit-user-select: none;
           -moz-user-select: none;
           -ms-user-select: none;
@@ -715,9 +714,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           -webkit-touch-callout: none;
           -webkit-tap-highlight-color: transparent;
         }
-        .n-as-is-card .n-content,
-        .n-to-be-card .n-content,
-        .n-col .n-content { margin: 0; }
+        .n-content-root {
+          margin: 120px 0 0px;
+        }
         .n-p { font-size: 14px; font-family: "Bricolage Grotesque", Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 12px 0; }
         .n-p--empty { height: .75rem; }
         .n-p--empty-last { height: 0; }
@@ -956,7 +955,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
         }
 
         /* ==== 이미지(썸네일) : 여백 제거 + 라운드 + 확대 hover ==== */
-        .n-figure { margin: 18px 0; }
+        .n-figure { margin: 0; }
         .n-figure .n-imgWrap {
           border-radius: 0px;
           overflow: hidden;              /* radius가 확실히 적용되도록 */
