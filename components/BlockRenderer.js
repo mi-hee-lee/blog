@@ -95,10 +95,10 @@ function Bullet({ children }) {
 }
 
 function renderChildren(children = [], highlightColor) {
-  return <BlockRenderer blocks={children} highlightColor={highlightColor} />;
+  return <BlockRenderer blocks={children} highlightColor={highlightColor} isNested={true} />;
 }
 
-export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' }) {
+export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3', isNested = false }) {
   useEffect(() => {
     // 이미지 로드 대기 및 콜럼 높이 맞춤 함수
     const adjustColumnHeights = async () => {
@@ -198,7 +198,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
   if (!Array.isArray(blocks) || !blocks.length) return null;
 
   return (
-    <div className="n-content n-content-root">
+    <div className={`n-content ${!isNested ? 'n-content-root' : ''}`}>
       {blocks.map((b, index) => {
         const t = b.type;
 
