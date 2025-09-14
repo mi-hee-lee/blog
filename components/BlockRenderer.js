@@ -489,8 +489,16 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
         }
         .n-as-is-card p {
           font-family: 'Pretendard', sans-serif;
-          font-weight: 500;
-          font-size: 16px;
+          font-weight: 400;
+          font-size: 12px;
+          line-height: 150%;
+          color: #F9FBFB;
+          margin: 0;
+        }
+          .n-as-is-card p strong {
+          font-family: 'Pretendard', sans-serif;
+          font-weight: 600;
+          font-size: 12px;
           line-height: 150%;
           color: #F9FBFB;
           margin: 0;
@@ -514,8 +522,16 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
         }
         .n-to-be-card p {
           font-family: 'Pretendard', sans-serif;
-          font-weight: 500;
-          font-size: 16px;
+          font-weight: 400;
+          font-size: 12px;
+          line-height: 150%;
+          color: #Ffffff;
+          margin: 0;
+        }
+        .n-to-be-card p strong {
+          font-family: 'Pretendard', sans-serif;
+          font-weight: 600;
+          font-size: 12px;
           line-height: 150%;
           color: #Ffffff;
           margin: 0;
