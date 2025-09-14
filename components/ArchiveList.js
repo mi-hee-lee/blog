@@ -44,7 +44,13 @@ export default function ArchiveList({ posts = [] }) {
           color: inherit;
         }
         .card:hover, .card:active, .card:focus {
-          text-decoration: none;
+          text-decoration: none !important;
+        }
+        .card * {
+          text-decoration: none !important;
+        }
+        .card:hover *, .card:active *, .card:focus * {
+          text-decoration: none !important;
         }
         .archive-item:hover {
           transform: translateY(-2px);
