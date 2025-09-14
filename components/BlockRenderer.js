@@ -1,6 +1,8 @@
 // components/BlockRenderer.js
 // Notion 블록 트리를 받아 화면에 렌더링 (2열 컬럼 지원, 이미지 여백 제거/라운드)
 
+import SlideCarousel from './SlideCarousel';
+
 function rtToHtml(rich = []) {
   // 아주 심플한 rich_text -> HTML 변환 (bold/italic/code 링크 정도만)
   return rich
@@ -197,7 +199,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
             // 기타 비디오 (HTML5 video 태그)
             return (
               <div key={b.id} className="n-video">
-                <video controls style={{ width: '100%', maxWidth: '100%' }}>
+                <video controls>
                   <source src={videoUrl} />
                   Your browser does not support the video tag.
                 </video>
@@ -264,6 +266,82 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
                   loading="lazy"
                 />
               </div>
+            );
+          }
+
+          // ===== 북마크 =====
+          case 'bookmark': {
+            const url = b.bookmark?.url;
+            if (!url) return null;
+
+            // YouTube 북마크 처리
+            if (url.includes('youtube.com') || url.includes('youtu.be')) {
+              let embedUrl = url;
+              if (url.includes('watch?v=')) {
+                const videoId = url.split('watch?v=')[1]?.split('&')[0];
+                embedUrl = `https://www.youtube.com/embed/${videoId}`;
+              } else if (url.includes('youtu.be/')) {
+                const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+                embedUrl = `https://www.youtube.com/embed/${videoId}`;
+              }
+
+              return (
+                <div key={b.id} className="n-embed">
+                  <iframe
+                    src={embedUrl}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+              );
+            }
+
+            // Vimeo 북마크 처리
+            if (url.includes('vimeo.com')) {
+              let embedUrl = url;
+              const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+              if (vimeoMatch) {
+                embedUrl = `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+              }
+
+              return (
+                <div key={b.id} className="n-embed">
+                  <iframe
+                    src={embedUrl}
+                    frameBorder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    loading="lazy"
+                  />
+                </div>
+              );
+            }
+
+            // 기타 북마크는 링크로 표시
+            const title = b.bookmark?.caption?.[0]?.plain_text || url;
+            return (
+              <div key={b.id} className="n-bookmark">
+                <a href={url} target="_blank" rel="noreferrer">
+                  {title}
+                </a>
+              </div>
+            );
+          }
+
+          // ===== 토글 =====
+          case 'toggle': {
+            const toggleId = `toggle-${b.id}`;
+            return (
+              <details key={b.id} className="n-toggle">
+                <summary className="n-toggle-summary">
+                  <Text rich_text={b.toggle?.rich_text} />
+                </summary>
+                <div className="n-toggle-content">
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                </div>
+              </details>
             );
           }
 
@@ -347,7 +425,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
               );
             }
 
-            // #small callout 처리 (이미지 크기 400px 제한)
+            // #small callout 처리 (이미지 크기 640px 제한)
             if (iconText === '#small' || iconText === '#Small') {
               const filteredText = b.callout?.rich_text?.filter(t => {
                 const text = (t.plain_text || '').trim();
@@ -359,6 +437,26 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
                   <Text rich_text={filteredText} />
                   {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </div>
+              );
+            }
+
+            // #slide callout 처리 (이미지 캐러셀)
+            if (iconText === '#slide' || iconText === '#Slide') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#slide' && text !== '#Slide';
+              }) || [];
+
+              // children에서 이미지들 추출
+              const images = (b.children || []).filter(child => child.type === 'image');
+
+              return (
+                <SlideCarousel
+                  key={b.id}
+                  id={b.id}
+                  text={filteredText}
+                  images={images}
+                />
               );
             }
 
@@ -555,7 +653,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           max-width: 640px;
         }
         .n-small-image img {
-          max-width: 640p !important;
+          max-width: 640px !important;
           width: 100%;
           height: auto;
         }
@@ -591,12 +689,16 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
         /* ==== 비디오 (HTML5) ==== */
         .n-video {
           margin: 24px 0;
-          border-radius: 12px;
+          border-radius: 0px;
           overflow: hidden;
           background: #111;
         }
         .n-video video {
-          border-radius: 12px;
+          border-radius: 0px;
+          width: 100%;
+          max-width: 100%;
+          height: auto;
+          display: block;
         }
 
         /* ==== 동기화 블록 ==== */
@@ -615,6 +717,70 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
         .n-synced-ref p {
           margin: 0;
           font-size: 14px;
+        }
+
+        /* ==== 북마크 ==== */
+        .n-bookmark {
+          margin: 16px 0;
+          padding: 12px 16px;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px;
+        }
+        .n-bookmark a {
+          color: #a5b4fc;
+          text-decoration: none;
+          font-size: 14px;
+        }
+        .n-bookmark a:hover {
+          text-decoration: underline;
+        }
+
+        /* ==== 토글 ==== */
+        .n-toggle {
+          margin: 12px 0;
+          border: none;
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 6px;
+        }
+        .n-toggle-summary {
+          padding: 8px 12px;
+          cursor: pointer;
+          font-size: 14px;
+          color: #e5e5e5;
+          list-style: none;
+          background: rgba(255, 255, 255, 0.04);
+          border-radius: 6px;
+          transition: background 0.2s ease;
+          position: relative;
+        }
+        .n-toggle-summary:hover {
+          background: rgba(255, 255, 255, 0.08);
+        }
+        .n-toggle-summary::-webkit-details-marker {
+          display: none;
+        }
+        .n-toggle-summary::before {
+          content: "";
+          position: absolute;
+          left: 12px;
+          transform: translateX(-100%);
+          transition: transform 0.2s ease;
+          width: 10px;
+          height: 16px;
+          background-image: url("data:image/svg+xml,%3Csvg width='10' height='16' viewBox='0 0 10 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1.5 1L8.5 8L1.5 15' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: contain;
+        }
+        .n-toggle[open] .n-toggle-summary::before {
+          transform: translateX(-100%) rotate(90deg);
+        }
+        .n-toggle-content {
+          padding: 12px;
+        }
+        .n-toggle-content .n-content {
+          margin: 0;
         }
         .n-figure img {
           display:block;
@@ -663,6 +829,129 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
         .n-col > .n-p:first-child,
         .n-col > .n-h2:first-child,
         .n-col > .n-h3:first-child { margin-top: 0; }
+
+        /* ==== 비디오에도 이미지와 동일한 스타일 적용 ==== */
+        div.n-small-image div.n-video {
+          max-width: 640px !important;
+          margin: 0px auto !important;
+          width: 100% !important;
+        }
+        div.n-small-image div.n-video video {
+          max-width: 640px !important;
+          width: 640px !important;
+          height: auto !important;
+          box-sizing: border-box !important;
+        }
+
+        /* 모바일에서 비디오 최적화 */
+        @media (max-width: 600px) {
+          .n-video {
+            margin: 16px 0;
+          }
+          .n-video video {
+            width: 100% !important;
+            height: auto !important;
+          }
+        }
+
+        /* ==== Slide Carousel ==== */
+        .n-slide-carousel {
+          margin: 24px 0;
+        }
+        .carousel-container {
+          position: relative;
+          border-radius: 0;
+          overflow: hidden;
+          background: transparent;
+          border: none;
+        }
+        .carousel-track {
+          display: flex;
+          transition: transform 0.3s ease;
+        }
+        .carousel-slide {
+          flex-shrink: 0;
+          width: 100%;
+          position: relative;
+        }
+        .carousel-slide img {
+          width: 100%;
+          height: auto;
+          display: block;
+          border-radius: 0;
+        }
+        .carousel-caption {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: linear-gradient(transparent, rgba(0,0,0,0.7));
+          color: white;
+          padding: 20px 16px 16px;
+          font-size: 14px;
+          text-align: center;
+        }
+        .carousel-btn {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: rgba(0, 0, 0, 0.6);
+          color: white;
+          border: none;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          cursor: pointer;
+          z-index: 2;
+          transition: background 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .carousel-btn:hover {
+          background: rgba(0, 0, 0, 0.8);
+        }
+        .carousel-btn svg {
+          width: 16px;
+          height: 14px;
+        }
+        .carousel-prev {
+          left: 12px;
+        }
+        .carousel-next {
+          right: 12px;
+        }
+        .carousel-dots {
+          position: absolute;
+          bottom: 16px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 12px;
+          z-index: 2;
+        }
+        .carousel-dot {
+          width: 8px;
+          height: 8px;
+          min-width: 8px;
+          min-height: 8px;
+          max-width: 10px;
+          max-height: 10px;
+          border-radius: 50%;
+          border: none;
+          background: rgba(255, 255, 255, 0.4);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+          padding: 0;
+        }
+        .carousel-dot:hover {
+          background: rgba(255, 255, 255, 0.6);
+        }
+        .carousel-dot.active {
+          background: rgba(255, 255, 255, 0.9);
+          transform: scale(1.1);
+        }
       `}</style>
     </div>
   );
