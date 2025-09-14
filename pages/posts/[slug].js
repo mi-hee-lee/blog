@@ -218,7 +218,7 @@ export default function PostPage({ meta, blocks }) {
           background-position: 0 90%;      /* 수직 위치 */
           box-decoration-break: clone;
           -webkit-box-decoration-break: clone;
-          mix-blend-mode: hard-light;
+          opacity: 0.3;
         }
 
         /* Meta table */
