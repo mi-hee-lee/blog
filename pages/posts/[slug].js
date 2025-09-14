@@ -84,7 +84,7 @@ export default function PostPage({ meta, blocks }) {
   const dateText = meta?.formattedDate || ''; // lib/notion.js에서 만들어서 넣어둔 값
 
   return (
-    <main className="wrap" style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}>
+    <main className="wrap">
       <Head>
         <title>{meta.title} | Portfolio</title>
         <meta name="description" content={meta.title} />
@@ -135,6 +135,14 @@ export default function PostPage({ meta, blocks }) {
       <BlockRenderer blocks={blocks} highlightColor={isHex6(highlightHex) ? highlightHex : '#00A1F3'} />
 
       <style jsx>{`
+        .wrap {
+          user-select: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          -webkit-touch-callout: none;
+          -webkit-tap-highlight-color: transparent;
+        }
         .back { display: none; }
         .title { margin: 160px 0 0; font-size: 80px; font-weight: 400; line-height: 1.25; }
         .date { display:none; }
