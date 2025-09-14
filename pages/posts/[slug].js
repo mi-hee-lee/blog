@@ -84,7 +84,7 @@ export default function PostPage({ meta, blocks }) {
   const dateText = meta?.formattedDate || ''; // lib/notion.js에서 만들어서 넣어둔 값
 
   return (
-    <main className="wrap">
+    <main className="wrap" style={{ userSelect: 'none', WebkitUserSelect: 'none', MozUserSelect: 'none', msUserSelect: 'none' }}>
       <Head>
         <title>{meta.title} | Portfolio</title>
         <meta name="description" content={meta.title} />
