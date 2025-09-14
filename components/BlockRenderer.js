@@ -643,32 +643,16 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                 return text !== '#linkBlock' && text !== '#LinkBlock';
               }) || [];
 
-              // 콜아웃 텍스트에서 링크 추출 (하이퍼링크 우선)
+              // 첫 번째 링크 찾기
               const linkItem = filteredText.find(t => t.href);
-              let linkUrl = linkItem?.href || '';
-              let linkText = linkItem?.plain_text || '';
-
-              // 하이퍼링크가 없으면 URL 패턴 자동 감지
-              if (!linkUrl) {
-                const allText = filteredText.map(t => t.plain_text).join('').trim();
-                console.log('linkBlock allText:', allText); // 디버깅용
-                const urlMatch = allText.match(/(https?:\/\/[^\s\n\r]+)/i);
-                if (urlMatch) {
-                  linkUrl = urlMatch[1];
-                  linkText = allText.replace(urlMatch[1], '').trim() || linkUrl;
-                  console.log('URL found:', linkUrl, 'Text:', linkText); // 디버깅용
-                } else {
-                  linkUrl = allText.startsWith('http') ? allText : '#';
-                  linkText = allText || 'Link';
-                  console.log('No URL match, fallback:', linkUrl, linkText); // 디버깅용
-                }
-              }
+              const linkUrl = linkItem?.href || '#';
+              const linkText = linkItem?.plain_text || 'Link';
 
               return (
                 <div key={b.id} className="n-link-block">
                   <a href={linkUrl} target="_blank" rel="noopener noreferrer" className="link-block-item">
                     <div className="left">
-                      <p className="title">{linkText || 'Link'}</p>
+                      <p className="title">{linkText}</p>
                     </div>
                     <div className="icon">
                       <svg
