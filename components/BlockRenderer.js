@@ -809,7 +809,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           align-items: center;
           padding: 20px;
           gap: 8px;
-          min-height: 120px;
+          min-height: 144px;
           border: 1px solid rgba(255, 255, 255, 0.2);
           border-radius: 12px;
           text-align: center;
@@ -844,7 +844,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           padding: 20px;
           gap: 8px;
 
-          min-height: 120px;
+          min-height: 144px;
           background: var(--highlight-color, #00A1F3);
           border: 1px solid rgba(0, 161, 243, 0.2);
           border-radius: 12px;
