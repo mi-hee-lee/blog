@@ -41,10 +41,43 @@ function FigureImage({ block }) {
     .join('');
 
   if (!img) return null;
+
+  // URL에서 width/height 파라미터 추출
+  const extractSizeFromUrl = (url) => {
+    try {
+      const urlObj = new URL(url);
+      const width = urlObj.searchParams.get('width');
+      const height = urlObj.searchParams.get('height');
+      return {
+        width: width ? parseInt(width) : null,
+        height: height ? parseInt(height) : null
+      };
+    } catch {
+      return { width: null, height: null };
+    }
+  };
+
+  const { width, height } = extractSizeFromUrl(img);
+
   return (
     <figure className="n-figure">
-      <div className="n-imgWrap">
-        <img src={img} alt={caption || ''} loading="lazy" />
+      <div
+        className="n-imgWrap"
+        style={{
+          maxWidth: width ? `${width}px` : '100%',
+          ...(height && { aspectRatio: width && height ? `${width}/${height}` : 'auto' })
+        }}
+      >
+        <img
+          src={img}
+          alt={caption || ''}
+          loading="lazy"
+          style={{
+            width: '100%',
+            height: 'auto',
+            ...(width && { maxWidth: `${width}px` })
+          }}
+        />
       </div>
       {caption && <figcaption className="n-cap">{caption}</figcaption>}
     </figure>
