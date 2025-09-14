@@ -30,6 +30,14 @@ html, body, #__next {
 a { color: #a5b4fc; text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+/* ArchiveList 링크는 underline 제거 */
+.archive-list a,
+.archive-list a:hover,
+.archive-list a:active,
+.archive-list a:focus {
+  text-decoration: none !important;
+}
+
 
 /* 컨텐츠 기본 폭 */
 .wrap {

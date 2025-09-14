@@ -32,7 +32,7 @@ export default function GNB() {
           ) : (
             <>
               <Link href="/" className="brand">
-                Designer Mihee
+                Mihee
               </Link>
               <nav className="nav desktop">
                 <a href="/career" className="link">

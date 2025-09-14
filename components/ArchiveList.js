@@ -15,10 +15,6 @@ export default function ArchiveList({ posts = [] }) {
               <span className="duration">{p.plain["Working Duration"]}</span>
             )}
 
-            {/* Order 속성값이 있으면 노출 */}
-            {p.order && (
-              <span className="order">Order: {p.order}</span>
-            )}
 
             {p.tags?.length ? (
               <div className="tags">
@@ -48,13 +44,18 @@ export default function ArchiveList({ posts = [] }) {
           text-decoration: none;
           color: inherit;
         }
-        .card:hover, .card:active, .card:focus {
+        .archive-list a,
+        .archive-list a:hover,
+        .archive-list a:active,
+        .archive-list a:focus,
+        .archive-list a:visited {
           text-decoration: none !important;
         }
-        .card * {
-          text-decoration: none !important;
-        }
-        .card:hover *, .card:active *, .card:focus * {
+        .archive-list a *,
+        .archive-list a:hover *,
+        .archive-list a:active *,
+        .archive-list a:focus *,
+        .archive-list a:visited * {
           text-decoration: none !important;
         }
         .archive-item:hover {
@@ -81,12 +82,6 @@ export default function ArchiveList({ posts = [] }) {
           font-size: 14px;
           color: #9ca3af;
           margin: 16px 0 12px;
-        }
-        .order {
-          display: block;
-          font-size: 14px;
-          color: #9ca3af;
-          margin: 8px 0 12px;
         }
         .tags {
           margin: 0 0px 8px;
