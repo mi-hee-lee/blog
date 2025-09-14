@@ -95,7 +95,7 @@ export default function GNB() {
               <svg
                 className="ext-ic"
                 xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 12 12"
+                viewBox="0 0 20 20"
                 width="12"
                 height="12"
                 aria-hidden="true"
