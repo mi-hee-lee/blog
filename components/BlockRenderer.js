@@ -477,7 +477,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          justify-content: flex-start;
+          justify-content: center;
           align-items: center;
           padding: 20px;
           gap: 8px;
@@ -485,6 +485,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           border: 1px solid rgba(255, 255, 255, 0.2);
           border-radius: 12px;
           text-align: center;
+        }
+        .n-as-is-card:has(strong) {
+          justify-content: flex-start;
         }
         .n-as-is-card p {
           font-family: 'Pretendard', sans-serif;
@@ -508,7 +511,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          justify-content: flex-start;
+          justify-content: center;
           align-items: center;
           padding: 20px;
           gap: 8px;
@@ -518,6 +521,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           border: 1px solid rgba(0, 161, 243, 0.2);
           border-radius: 12px;
           text-align: center;
+        }
+        .n-to-be-card:has(strong) {
+          justify-content: flex-start;
         }
         .n-to-be-card p {
           font-family: 'Pretendard', sans-serif;
