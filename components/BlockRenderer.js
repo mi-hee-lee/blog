@@ -477,9 +477,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          justify-content: center;
+          justify-content: flex-start;
           align-items: center;
-          padding: 12px 20px;
+          padding: 20px;
           gap: 8px;
           min-height: 120px;
           border: 1px solid rgba(255, 255, 255, 0.2);
@@ -500,18 +500,19 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           font-size: 12px;
           line-height: 150%;
           color: #F9FBFB;
-          margin: 0 0 6px;
+          margin-bottom: 6px;
+          display: block;
         }
 
         .n-to-be-card {
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
-          justify-content: center;
+          justify-content: flex-start;
           align-items: center;
-          padding: 12px 20px;
+          padding: 20px;
           gap: 8px;
-          
+
           min-height: 120px;
           background: var(--highlight-color, #00A1F3);
           border: 1px solid rgba(0, 161, 243, 0.2);
@@ -532,7 +533,8 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           font-size: 12px;
           line-height: 150%;
           color: #Ffffff;
-          margin: 0 0 6px;
+          margin-bottom: 6px;
+          display: block;
         }
 
         /* Small image 제한 */
