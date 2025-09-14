@@ -105,17 +105,26 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
       const asIsCards = document.querySelectorAll('.n-as-is-card');
       const toBeCards = document.querySelectorAll('.n-to-be-card');
 
+      console.log('Found as-is cards:', asIsCards.length);
+      console.log('Found to-be cards:', toBeCards.length);
+
       asIsCards.forEach(card => {
         const hasStrong = card.querySelector('strong');
+        console.log('As-Is card has strong:', !!hasStrong);
         if (hasStrong) {
           card.classList.add('has-strong');
+          card.style.setProperty('justify-content', 'flex-start', 'important');
+          console.log('Added has-strong to as-is card');
         }
       });
 
       toBeCards.forEach(card => {
         const hasStrong = card.querySelector('strong');
+        console.log('To-Be card has strong:', !!hasStrong);
         if (hasStrong) {
           card.classList.add('has-strong');
+          card.style.setProperty('justify-content', 'flex-start', 'important');
+          console.log('Added has-strong to to-be card');
         }
       });
     };
@@ -162,6 +171,10 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               const callouts = col.querySelectorAll('.n-as-is-card, .n-to-be-card, .n-callout, .n-step-arrow');
               callouts.forEach(callout => {
                 callout.style.height = maxCalloutHeight + 'px';
+                // has-strong 클래스가 있는 카드는 상단 정렬 유지
+                if (!callout.classList.contains('has-strong')) {
+                  callout.style.justifyContent = 'center';
+                }
               });
             });
           }
@@ -802,7 +815,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           text-align: center;
         }
         .n-as-is-card.has-strong {
-          justify-content: flex-start;
+          justify-content: flex-start !important;
         }
         .n-as-is-card p {
           font-family: 'Pretendard', sans-serif;
@@ -838,7 +851,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           text-align: center;
         }
         .n-to-be-card.has-strong {
-          justify-content: flex-start;
+          justify-content: flex-start !important;
         }
         .n-to-be-card p {
           font-family: 'Pretendard', sans-serif;
