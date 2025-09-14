@@ -280,7 +280,7 @@ export default function BlockRenderer({ blocks = [] }) {
       {/* 스타일 */}
       <style jsx global>{`
         /* 본문 공통 */
-        .n-content { margin: 32px 0 120px; }
+        .n-content { margin: 120px 0 120px; }
         .n-p { font-family: Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 12px 0; }
         .n-p--empty { height: .75rem; }
         .n-h1,.n-h2,.n-h3 { color:#fff; margin: 36px 0 16px; line-height:1.35; }

@@ -150,7 +150,7 @@ export default function PostPage({ meta, blocks }) {
         .desc-callout p { margin: 0; font-family: Pretendard, sans-serif; font-size: 14px; line-height: 1.5; color: rgba(255,255,255,0.8); }
 
         /* Overview */
-        .overview { margin: 40px 0 48px; }
+        .overview { margin: 80px 0 40px; }
         .overview-title { color: rgba(255,255,255,0.6); font-size: 16px; margin-bottom: 8px; }
         .overview-text {
           font-weight: 300;
