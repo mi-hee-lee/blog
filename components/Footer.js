@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="footer-inner">
         <div className="footer-item">miihee.kr@gmail.com</div>
         <div className="footer-item">010.4529.8186</div>
-        <a href="#" className="footer-link">
+        <a href="https://www.linkedin.com/in/mihee-l-911491260/" className="footer-link">
           Linkedin
         </a>
       </div>
