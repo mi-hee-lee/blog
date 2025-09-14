@@ -64,8 +64,8 @@ export default function PostPage({ meta, blocks }) {
   // 1) Desc
   const descText = p.Desc;
 
-  // 2) 메타 박스(제외 목록: Desc / Overview / Overveiw / OverviewHighlight)
-  const HIDE = new Set(['Desc', 'Overview', 'Overveiw', 'OverviewHighlight']);
+  // 2) 메타 박스(제외 목록: Desc / Overview / Overveiw / OverviewHighlight / Slug / Category / Order / Name)
+  const HIDE = new Set(['Desc', 'Overview', 'Overveiw', 'OverviewHighlight', 'Slug', 'Category', 'Order', 'Name']);
   // 표시 순서(필요 속성만 표시, 비어있으면 자동 생략)
   const ORDER = [
     'Working Duration', // ← 요청: 이 값 노출
@@ -76,9 +76,41 @@ export default function PostPage({ meta, blocks }) {
     'Participate',
     'Distribution',
   ];
-  const metaRows = ORDER
-    .map((k) => ({ key: k, value: p[k] }))
+
+  // 속성 값 처리 함수 (Link 타입 체크 포함)
+  const processPropertyValue = (key, rawValue) => {
+    // meta 객체에서 원본 속성 정보 가져오기
+    const rawProperty = meta?.properties?.[key];
+
+    // URL 타입이거나 링크처럼 보이는 값 처리
+    if (rawProperty?.type === 'url' ||
+        (typeof rawValue === 'string' && rawValue.match(/^https?:\/\//))) {
+      return {
+        type: 'link',
+        value: rawValue,
+        display: rawValue
+      };
+    }
+
+    return {
+      type: 'text',
+      value: rawValue,
+      display: rawValue
+    };
+  };
+
+  // 기존 ORDER에 있는 속성들 먼저 처리
+  const orderedRows = ORDER
+    .map((k) => ({ key: k, ...processPropertyValue(k, p[k]) }))
     .filter(({ key, value }) => !HIDE.has(key) && !isEmpty(value));
+
+  // ORDER에 없는 새로운 속성들 자동 추가
+  const newRows = Object.keys(p || {})
+    .filter(key => !HIDE.has(key) && !ORDER.includes(key) && !isEmpty(p[key]))
+    .map(key => ({ key, ...processPropertyValue(key, p[key]) }));
+
+  // 기존 순서 + 새로운 속성들
+  const metaRows = [...orderedRows, ...newRows];
 
   // 날짜(클라이언트에서 포맷하지 않고 서버에서 계산된 문자열 사용)
   const dateText = meta?.formattedDate || ''; // lib/notion.js에서 만들어서 넣어둔 값
@@ -122,10 +154,18 @@ export default function PostPage({ meta, blocks }) {
       {/* 3) 그 밖의 메타 속성들 */}
       {metaRows.length > 0 && (
         <section className="meta-box">
-          {metaRows.map(({ key, value }) => (
+          {metaRows.map(({ key, type, value, display }) => (
             <div className="meta-row" key={key}>
               <div className="meta-label">{key}</div>
-              <div className="meta-value">{value}</div>
+              <div className="meta-value">
+                {type === 'link' ? (
+                  <a href={value} target="_blank" rel="noopener noreferrer">
+                    {display}
+                  </a>
+                ) : (
+                  display
+                )}
+              </div>
             </div>
           ))}
         </section>

@@ -52,7 +52,7 @@ export default function Home({ sections, downloads = null }) {
   const idMap = { career: 'career', archive: 'archive' };
 
   return (
-    <main className={bricolage.variable} style={{ maxWidth: 960, margin: '0 auto', padding: 0 }}>
+    <main className={bricolage.variable} style={{ maxWidth: 960, margin: '0 auto', padding: 0, marginBottom: 120 }}>
       {/* 상단 히어로 타이틀 */}
       <HereTitle />
 

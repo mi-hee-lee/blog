@@ -2,6 +2,7 @@
 // Notion 블록 트리를 받아 화면에 렌더링 (2열 컬럼 지원, 이미지 여백 제거/라운드)
 
 import SlideCarousel from './SlideCarousel';
+import { useEffect } from 'react';
 
 function rtToHtml(rich = []) {
   // 아주 심플한 rich_text -> HTML 변환 (bold/italic/code 링크 정도만)
@@ -98,6 +99,54 @@ function renderChildren(children = [], highlightColor) {
 }
 
 export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' }) {
+  useEffect(() => {
+    // 콜럼 높이 맞춤 함수
+    const adjustColumnHeights = () => {
+      const columnContainers = document.querySelectorAll('.n-cols');
+      columnContainers.forEach(container => {
+        const columns = container.querySelectorAll('.n-col');
+        if (columns.length > 1) {
+          // 모든 콜럼의 높이 초기화
+          columns.forEach(col => {
+            const callouts = col.querySelectorAll('.n-as-is-card, .n-to-be-card, .n-callout, .n-step-arrow');
+            callouts.forEach(callout => {
+              callout.style.height = 'auto';
+            });
+          });
+
+          // 최대 높이 찾기
+          let maxHeight = 0;
+          columns.forEach(col => {
+            const callouts = col.querySelectorAll('.n-as-is-card, .n-to-be-card, .n-callout, .n-step-arrow');
+            callouts.forEach(callout => {
+              maxHeight = Math.max(maxHeight, callout.offsetHeight);
+            });
+          });
+
+          // 모든 콜럼의 콜아웃을 최대 높이로 설정
+          if (maxHeight > 0) {
+            columns.forEach(col => {
+              const callouts = col.querySelectorAll('.n-as-is-card, .n-to-be-card, .n-callout, .n-step-arrow');
+              callouts.forEach(callout => {
+                callout.style.height = maxHeight + 'px';
+              });
+            });
+          }
+        }
+      });
+    };
+
+    // 컴포넌트 마운트 후 높이 조정
+    const timer = setTimeout(adjustColumnHeights, 100);
+
+    // 윈도우 리사이즈 시에도 높이 재조정
+    window.addEventListener('resize', adjustColumnHeights);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', adjustColumnHeights);
+    };
+  }, [blocks]);
   if (!Array.isArray(blocks) || !blocks.length) return null;
 
   return (
@@ -460,6 +509,56 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
               );
             }
 
+            // #stepArrow callout 처리 (단계 화살표)
+            if (iconText === '#stepArrow' || iconText === '#StepArrow') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#stepArrow' && text !== '#StepArrow';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-step-arrow">
+                  <Text rich_text={filteredText} />
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  <svg width="20" height="40" viewBox="0 0 20 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="step-arrow-svg">
+                    <path d="M2 30L10 38L18 30" stroke={highlightColor || '#00A1F3'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path opacity="0.5" d="M2 16L10 24L18 16" stroke={highlightColor || '#00A1F3'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path opacity="0.2" d="M2 2L10 10L18 2" stroke={highlightColor || '#00A1F3'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              );
+            }
+
+            // #fullbleed callout 처리 (전체 화면 너비 이미지)
+            if (iconText === '#fullbleed' || iconText === '#Fullbleed') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#fullbleed' && text !== '#Fullbleed';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-fullbleed">
+                  <Text rich_text={filteredText} />
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                </div>
+              );
+            }
+
+            // #margin-bottom-120 callout 처리 (하단 여백 120px)
+            if (iconText === '#margin-bottom-120' || iconText === '#Margin-Bottom-120') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#margin-bottom-120' && text !== '#Margin-Bottom-120';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-margin-bottom-120">
+                  <Text rich_text={filteredText} />
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                </div>
+              );
+            }
+
             // 일반 콜아웃
             return (
               <div key={b.id} className="n-callout">
@@ -523,9 +622,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
 
       {/* 스타일 */}
       <style jsx global>{`
-        /* 콘텐츠 복사 방지 */
+        
         .n-content {
-          margin: 120px 0 120px;
+          margin: 120px 0 0px;
           -webkit-user-select: none;
           -moz-user-select: none;
           -ms-user-select: none;
@@ -560,6 +659,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           background: rgba(255,255,255,.04);
           border:1px solid rgba(255,255,255,.06);
           padding:14px 16px 12px 16px; border-radius: 12px; margin: 16px 0;
+        }
+        .n-callout:has(strong) {
+          align-items: flex-start;
         }
         .n-callout-ico { font-size:18px; line-height:1; }
         .n-callout-body p { margin:0; }
@@ -642,6 +744,52 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           color: #Ffffff;
           margin-bottom: 6px;
           display: block;
+        }
+
+        /* Step Arrow 스타일 */
+        .n-step-arrow {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin: 32px 0;
+          padding: 0;
+        }
+
+        .step-arrow-svg {
+          margin-top: 16px;
+          flex-shrink: 0;
+        }
+
+        /* Fullbleed 스타일 */
+        .n-fullbleed {
+          width: 100vw;
+          margin-left: calc(50% - 50vw);
+          margin-right: calc(50% - 50vw);
+          margin-top: 32px;
+        }
+
+        .n-fullbleed .n-figure,
+        .n-fullbleed .n-imgWrap,
+        .n-fullbleed img,
+        .n-fullbleed .n-video,
+        .n-fullbleed video {
+          max-width: 100vw !important;
+          width: 100vw !important;
+          margin: 0 !important;
+          border-radius: 0 !important;
+        }
+
+        .n-fullbleed .n-figure img,
+        .n-fullbleed img {
+          display: block;
+          width: 100%;
+          height: auto;
+          object-fit: cover;
+        }
+
+        /* Margin Bottom 120px 스타일 */
+        .n-margin-bottom-120 {
+          margin-bottom: 120px;
         }
 
         /* Small image 제한 */
