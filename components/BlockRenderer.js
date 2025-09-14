@@ -279,6 +279,21 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
               );
             }
 
+            // #small callout 처리 (이미지 크기 400px 제한)
+            if (iconText === '#small' || iconText === '#Small') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#small' && text !== '#Small';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-small-image">
+                  <Text rich_text={filteredText} />
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                </div>
+              );
+            }
+
             // 일반 콜아웃
             return (
               <div key={b.id} className="n-callout">
@@ -439,6 +454,20 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           line-height: 150%;
           color: #Ffffff;
           margin: 0;
+        }
+
+        /* Small image 제한 */
+        .n-small-image .n-figure {
+          max-width: 400px;
+          margin: 18px auto;
+        }
+        .n-small-image .n-imgWrap {
+          max-width: 400px;
+        }
+        .n-small-image img {
+          max-width: 400px !important;
+          width: 100%;
+          height: auto;
         }
 
         /* ==== 이미지(썸네일) : 여백 제거 + 라운드 + 확대 hover ==== */
