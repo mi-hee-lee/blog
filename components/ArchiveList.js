@@ -90,7 +90,7 @@ export default function ArchiveList({ posts = [] }) {
           flex-wrap: wrap;
         }
         .tag {
-          font-size: 12px;
+          font-size: 10px;
           padding: 2px 6px;
           border-radius: 4px;
           background: #ffffff10;
