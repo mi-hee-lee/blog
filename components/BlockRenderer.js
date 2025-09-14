@@ -733,7 +733,8 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         .n-p { font-size: 14px; font-family: "Bricolage Grotesque", Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 12px 0; }
         .n-p--empty { height: .75rem; }
         .n-p--empty-last { height: 0; }
-        .n-h1,.n-h2,.n-h3 { color:#fff; margin: 80px 0 20px; line-height:1.35; }
+        .n-h1,.n-h2 { color:#fff; margin: 80px 0 20px; line-height:1.35; }
+        .n-h3 { color:#fff; margin: 40px 0 20px; line-height:1.35; }
         .n-h1 { font-size: 32px; font-weight:400; }
         .n-h2 { font-size: 24px; font-weight:400; }
         .n-h3 { font-size: 18px; font-weight:400; }
