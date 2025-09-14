@@ -17,6 +17,8 @@ export default function MyApp({ Component, pageProps }) {
       <Head>
         {/* ✅ 모바일 폭 제대로 쓰기 */}
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* 검색엔진 색인 방지 */}
+        <meta name="robots" content="noindex, nofollow" />
       </Head>
 
       <main className={bricolage.variable}>
