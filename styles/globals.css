@@ -168,3 +168,59 @@ figure { margin: 20px 0; }
   border-radius: 0px;
   display: block;
 }
+
+/* ==== 동적 컬럼: 화면 크기에 따른 반응형 ==== */
+.n-cols {
+  display: grid !important;
+  gap: 16px;
+  margin: 0;
+}
+
+/* 2열 */
+.n-cols[data-cols="2"] {
+  grid-template-columns: 1fr 1fr !important;
+  align-items: start;
+}
+
+/* 3열 */
+.n-cols[data-cols="3"] {
+  grid-template-columns: 1fr 1fr 1fr !important;
+  align-items: start;
+}
+
+/* 4열 */
+.n-cols[data-cols="4"] {
+  grid-template-columns: 1fr 1fr 1fr 1fr !important;
+  align-items: start;
+}
+
+/* 5열 이상도 지원 */
+.n-cols[data-cols="5"] {
+  grid-template-columns: repeat(5, 1fr) !important;
+  align-items: start;
+}
+.n-cols[data-cols="6"] {
+  grid-template-columns: repeat(6, 1fr) !important;
+  align-items: start;
+}
+
+/* 모바일에서 1열로 변경 */
+@media (max-width: 600px) {
+  .n-cols[data-cols="2"],
+  .n-cols[data-cols="3"],
+  .n-cols[data-cols="4"],
+  .n-cols[data-cols="5"],
+  .n-cols[data-cols="6"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.n-col {
+  width: 100%;
+}
+.n-col > .n-figure:first-child,
+.n-col > .n-p:first-child,
+.n-col > .n-h2:first-child,
+.n-col > .n-h3:first-child {
+  margin-top: 0;
+}

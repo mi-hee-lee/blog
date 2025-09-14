@@ -793,33 +793,49 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           text-align: center;
         }
 
-        /* ==== 동적 컬럼: 데스크톱에서 실제 컬럼 수, 모바일 한 칸 ==== */
+        /* ==== 동적 컬럼: 화면 크기에 따른 반응형 ==== */
         .n-cols {
           display: grid;
           gap: 16px;
           margin: 0;
         }
-        @media (min-width: 960px) {
-          .n-cols[data-cols="2"] {
-            grid-template-columns: 1fr 1fr;
-            align-items: start;
-          }
-          .n-cols[data-cols="3"] {
-            grid-template-columns: 1fr 1fr 1fr;
-            align-items: start;
-          }
-          .n-cols[data-cols="4"] {
-            grid-template-columns: 1fr 1fr 1fr 1fr;
-            align-items: start;
-          }
-          /* 5열 이상도 지원 */
-          .n-cols[data-cols="5"] {
-            grid-template-columns: repeat(5, 1fr);
-            align-items: start;
-          }
+
+        /* 2열 */
+        .n-cols[data-cols="2"] {
+          grid-template-columns: 1fr 1fr;
+          align-items: start;
+        }
+
+        /* 3열 */
+        .n-cols[data-cols="3"] {
+          grid-template-columns: 1fr 1fr 1fr;
+          align-items: start;
+        }
+
+        /* 4열 */
+        .n-cols[data-cols="4"] {
+          grid-template-columns: 1fr 1fr 1fr 1fr;
+          align-items: start;
+        }
+
+        /* 5열 이상도 지원 */
+        .n-cols[data-cols="5"] {
+          grid-template-columns: repeat(5, 1fr);
+          align-items: start;
+        }
+        .n-cols[data-cols="6"] {
+          grid-template-columns: repeat(6, 1fr);
+          align-items: start;
+        }
+
+        /* 모바일에서 1열로 변경 */
+        @media (max-width: 600px) {
+          .n-cols[data-cols="2"],
+          .n-cols[data-cols="3"],
+          .n-cols[data-cols="4"],
+          .n-cols[data-cols="5"],
           .n-cols[data-cols="6"] {
-            grid-template-columns: repeat(6, 1fr);
-            align-items: start;
+            grid-template-columns: 1fr;
           }
         }
         .n-col {
