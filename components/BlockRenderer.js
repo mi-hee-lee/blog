@@ -623,13 +623,16 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               // 하이퍼링크가 없으면 URL 패턴 자동 감지
               if (!linkUrl) {
                 const allText = filteredText.map(t => t.plain_text).join('').trim();
-                const urlMatch = allText.match(/(https?:\/\/[^\s]+)/);
+                console.log('linkBlock allText:', allText); // 디버깅용
+                const urlMatch = allText.match(/(https?:\/\/[^\s\n\r]+)/i);
                 if (urlMatch) {
                   linkUrl = urlMatch[1];
                   linkText = allText.replace(urlMatch[1], '').trim() || linkUrl;
+                  console.log('URL found:', linkUrl, 'Text:', linkText); // 디버깅용
                 } else {
-                  linkUrl = '#';
+                  linkUrl = allText.startsWith('http') ? allText : '#';
                   linkText = allText || 'Link';
+                  console.log('No URL match, fallback:', linkUrl, linkText); // 디버깅용
                 }
               }
 
