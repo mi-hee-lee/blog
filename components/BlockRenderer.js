@@ -615,10 +615,23 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                 return text !== '#linkBlock' && text !== '#LinkBlock';
               }) || [];
 
-              // 콜아웃 텍스트에서 링크 추출
+              // 콜아웃 텍스트에서 링크 추출 (하이퍼링크 우선)
               const linkItem = filteredText.find(t => t.href);
-              const linkUrl = linkItem?.href || '#';
-              const linkText = linkItem?.plain_text || filteredText.map(t => t.plain_text).join('');
+              let linkUrl = linkItem?.href || '';
+              let linkText = linkItem?.plain_text || '';
+
+              // 하이퍼링크가 없으면 URL 패턴 자동 감지
+              if (!linkUrl) {
+                const allText = filteredText.map(t => t.plain_text).join('').trim();
+                const urlMatch = allText.match(/(https?:\/\/[^\s]+)/);
+                if (urlMatch) {
+                  linkUrl = urlMatch[1];
+                  linkText = allText.replace(urlMatch[1], '').trim() || linkUrl;
+                } else {
+                  linkUrl = '#';
+                  linkText = allText || 'Link';
+                }
+              }
 
               return (
                 <div key={b.id} className="n-link-block">
@@ -720,7 +733,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         .n-p { font-size: 14px; font-family: "Bricolage Grotesque", Pretendard, sans-serif; color:#e5e5e5; line-height:1.8; margin: 12px 0; }
         .n-p--empty { height: .75rem; }
         .n-p--empty-last { height: 0; }
-        .n-h1,.n-h2,.n-h3 { color:#fff; margin: 36px 0 16px; line-height:1.35; }
+        .n-h1,.n-h2,.n-h3 { color:#fff; margin: 80px 0 20px; line-height:1.35; }
         .n-h1 { font-size: 32px; font-weight:400; }
         .n-h2 { font-size: 24px; font-weight:400; }
         .n-h3 { font-size: 18px; font-weight:400; }
