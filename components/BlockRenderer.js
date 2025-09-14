@@ -72,10 +72,13 @@ function FigureImage({ block }) {
           src={img}
           alt={caption || ''}
           loading="lazy"
+          onDragStart={(e) => e.preventDefault()}
+          onContextMenu={(e) => e.preventDefault()}
           style={{
             width: '100%',
             height: 'auto',
-            ...(width && { maxWidth: `${width}px` })
+            ...(width && { maxWidth: `${width}px` }),
+            pointerEvents: 'none'
           }}
         />
       </div>
