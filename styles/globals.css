@@ -159,6 +159,11 @@ img, video, canvas {
   padding:0px !important;
 }
 
+/* fullbleed 내부의 n-content는 top margin 제거 */
+.fullbleed .n-content {
+  margin-top: 0;
+}
+
 /* 전역 리셋 */
 figure { margin: 20px 0; }
 
