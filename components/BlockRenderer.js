@@ -405,7 +405,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
         .n-figure .n-imgWrap {
           border-radius: 0px;
           overflow: hidden;              /* radius가 확실히 적용되도록 */
-          background: #111;              /* 로딩 중 배경 */
+          
         }
 
         /* ==== 임베드 (동영상 등) ==== */
