@@ -309,8 +309,16 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
 
       {/* 스타일 */}
       <style jsx global>{`
-        /* 본문 공통 */
-        .n-content { margin: 120px 0 120px; }
+        /* 콘텐츠 복사 방지 */
+        .n-content {
+          margin: 120px 0 120px;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          -webkit-touch-callout: none;
+          -webkit-tap-highlight-color: transparent;
+        }
         .n-as-is-card .n-content,
         .n-to-be-card .n-content,
         .n-col .n-content { margin: 0; }
@@ -449,12 +457,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3' 
           display:block;
           width:100%;
           height:auto;
-          transform: scale(1);           /* 기본 */
-          transition: transform .5s ease;
           object-fit: cover;
-        }
-        .n-figure:hover img {
-          transform: scale(1.05);        /* 썸네일 안에서 확대 */
         }
         .n-figure .n-cap {
           font-size: 12px; color:#9aa0a6; margin-top: 6px;
