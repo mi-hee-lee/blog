@@ -1,5 +1,6 @@
 // components/SlideCarousel.js
 import { useEffect, useRef } from 'react';
+import { buildProxiedImageUrl } from '../lib/notionImage';
 
 function Text({ rich_text = [] }) {
   function rtToHtml(rich = []) {
@@ -147,9 +148,10 @@ export default function SlideCarousel({ id, text, images }) {
             {images.map((img, index) => {
               const imgUrl = img?.image?.file?.url || img?.image?.external?.url || '';
               const caption = (img?.image?.caption || []).map(c => c.plain_text).join('');
+              const { finalUrl } = buildProxiedImageUrl(imgUrl, img?.id);
               return (
                 <div key={img.id || index} className="carousel-slide">
-                  <img src={imgUrl} alt={caption || `Slide ${index + 1}`} />
+                  <img src={finalUrl} alt={caption || `Slide ${index + 1}`} />
                   {caption && <div className="carousel-caption">{caption}</div>}
                 </div>
               );

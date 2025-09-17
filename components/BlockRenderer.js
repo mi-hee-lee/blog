@@ -3,6 +3,7 @@
 
 import SlideCarousel from './SlideCarousel';
 import { useEffect } from 'react';
+import { buildProxiedImageUrl } from '../lib/notionImage';
 
 function rtToHtml(rich = []) {
   // 아주 심플한 rich_text -> HTML 변환 (bold/italic/code 링크 정도만)
@@ -60,7 +61,9 @@ function FigureImage({ block }) {
     }
   };
 
-  const { width, height } = extractSizeFromUrl(img);
+  const { stableUrl, finalUrl } = buildProxiedImageUrl(img, block?.id);
+
+  const { width, height } = extractSizeFromUrl(stableUrl || img);
 
   return (
     <figure className="n-figure">
@@ -72,7 +75,7 @@ function FigureImage({ block }) {
         }}
       >
         <img
-          src={img}
+          src={finalUrl}
           alt={caption || ''}
           loading="lazy"
           onDragStart={(e) => e.preventDefault()}
