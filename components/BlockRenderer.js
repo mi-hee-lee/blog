@@ -101,6 +101,47 @@ function renderChildren(children = [], highlightColor) {
   return <BlockRenderer blocks={children} highlightColor={highlightColor} isNested={true} />;
 }
 
+function cloneRichTextWithContent(rt, content) {
+  if (!rt) return null;
+  const clone = { ...rt, plain_text: content };
+  if (rt.text && typeof rt.text === 'object') {
+    clone.text = { ...rt.text, content };
+  }
+  return clone;
+}
+
+function splitCircleCalloutRichText(richText = []) {
+  if (!Array.isArray(richText) || !richText.length) {
+    return { title: [], body: [] };
+  }
+
+  const [first, ...rest] = richText;
+  const firstText = first?.plain_text || '';
+  const newlineIndex = firstText.indexOf('\n');
+
+  if (newlineIndex !== -1) {
+    const titleContent = firstText.slice(0, newlineIndex).trim();
+    const bodyContent = firstText.slice(newlineIndex + 1).trim();
+    const titlePart = titleContent ? cloneRichTextWithContent(first, titleContent) : null;
+    const bodyParts = [];
+
+    if (bodyContent) {
+      const bodyClone = cloneRichTextWithContent(first, bodyContent);
+      if (bodyClone) bodyParts.push(bodyClone);
+    }
+
+    return {
+      title: titlePart ? [titlePart] : [],
+      body: [...bodyParts, ...rest]
+    };
+  }
+
+  return {
+    title: [first],
+    body: rest
+  };
+}
+
 export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3', isNested = false }) {
   useEffect(() => {
     // As-Is, To-Be 카드의 strong 요소 체크 및 클래스 추가
@@ -610,6 +651,68 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               );
             }
 
+            // #CircleBorder callout 처리 (겹치는 서클 보더 카드)
+            if (iconText === '#CircleBorder' || iconText === '#circleborder') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#CircleBorder' && text !== '#circleborder';
+              }) || [];
+
+              const { title, body } = splitCircleCalloutRichText(filteredText);
+              const circleColorStyle = { '--circle-color': highlightColor };
+
+              return (
+                <div
+                  key={b.id}
+                  className="n-circle-card n-circle-card--border"
+                  style={circleColorStyle}
+                >
+                  {title.length ? (
+                    <div className="n-circle-card__title">
+                      <Text rich_text={title} />
+                    </div>
+                  ) : null}
+                  {body.length ? (
+                    <div className="n-circle-card__body">
+                      <Text rich_text={body} />
+                    </div>
+                  ) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                </div>
+              );
+            }
+
+            // #CircleFill callout 처리 (겹치는 서클 필 카드)
+            if (iconText === '#CircleFill' || iconText === '#circlefill') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#CircleFill' && text !== '#circlefill';
+              }) || [];
+
+              const { title, body } = splitCircleCalloutRichText(filteredText);
+              const circleColorStyle = { '--circle-color': highlightColor };
+
+              return (
+                <div
+                  key={b.id}
+                  className="n-circle-card n-circle-card--fill"
+                  style={circleColorStyle}
+                >
+                  {title.length ? (
+                    <div className="n-circle-card__title">
+                      <Text rich_text={title} />
+                    </div>
+                  ) : null}
+                  {body.length ? (
+                    <div className="n-circle-card__body">
+                      <Text rich_text={body} />
+                    </div>
+                  ) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                </div>
+              );
+            }
+
             // #slide callout 처리 (이미지 캐러셀)
             if (iconText === '#slide' || iconText === '#Slide') {
               const filteredText = b.callout?.rich_text?.filter(t => {
@@ -1061,6 +1164,64 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
           -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
           pointer-events: none;
+        }
+
+        /* Circle cards (border & fill variants) */
+        .n-circle-card {
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          padding: 0;
+          gap: 20px;
+          width: 400px;
+          height: 400px;
+          border-radius: 2000px;
+          margin: 0 -64px;
+          color: var(--circle-color, #E60012);
+          text-align: center;
+          flex: none;
+          flex-shrink: 0;
+        }
+        .n-circle-card--border {
+          border: 2px solid var(--circle-color, #E60012);
+          background: transparent;
+        }
+        .n-circle-card--fill {
+          background: var(--circle-color, rgba(230, 0, 18, 0.8));
+          color: #FFFFFF;
+          gap: 16px;
+          position: relative;
+        }
+        .n-circle-card__title,
+        .n-circle-card__body {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+        }
+        .n-circle-card__title span,
+        .n-circle-card__body span {
+          display: block;
+          width: 100%;
+          white-space: pre-line;
+        }
+        .n-circle-card__title span {
+          font-family: 'Mark Pro', 'Pretendard', 'Inter', sans-serif;
+          font-weight: 700;
+          font-size: 32px;
+          line-height: 48px;
+          max-width: 198px;
+          margin: 0 auto;
+        }
+        .n-circle-card__body span {
+          font-family: 'Pretendard', 'Inter', sans-serif;
+          font-weight: 600;
+          font-size: 24px;
+          line-height: 36px;
+          max-width: 199px;
+          margin: 0 auto;
         }
 
         /* ==== 이미지(썸네일) : 여백 제거 + 라운드 + 확대 hover ==== */
