@@ -597,6 +597,23 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               );
             }
 
+            // #gradient-bottom callout 처리 (이전 콘텐츠 하단에 그라데이션 오버레이)
+            if (iconText === '#gradient-bottom' || iconText === '#Gradient-Bottom') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#gradient-bottom' && text !== '#Gradient-Bottom';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-gradient-bottom">
+                  <div className="gradient-group">
+                    <div className="gradient-color" />
+                    <div className="gradient-mask" />
+                  </div>
+                </div>
+              );
+            }
+
             // #slide callout 처리 (이미지 캐러셀)
             if (iconText === '#slide' || iconText === '#Slide') {
               const filteredText = b.callout?.rich_text?.filter(t => {
@@ -1026,6 +1043,35 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           max-width: 640px !important;
           width: 100%;
           height: auto;
+        }
+
+        /* Gradient bottom overlay */
+        .n-gradient-bottom {
+          position: relative;
+          height: 240px;
+          margin: -240px 0 0;
+          width: 100%;
+          pointer-events: none;
+          z-index: 5;
+        }
+        .n-gradient-bottom .gradient-group {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 240px;
+          backdrop-filter: blur(20px);
+        }
+        .n-gradient-bottom .gradient-mask {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, #000000 106.73%);
+          border-radius: 4px;
+        }
+        .n-gradient-bottom .gradient-color {
+          position: absolute;
+          inset: 0;
+          background: #1E1E1E;
+          border-radius: 0px;
         }
 
         /* ==== 이미지(썸네일) : 여백 제거 + 라운드 + 확대 hover ==== */
