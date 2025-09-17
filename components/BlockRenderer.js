@@ -1050,7 +1050,17 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           pointer-events: none;
           z-index: 5;
           background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #1E1E1E 106.73%);
+          overflow: hidden;
+        }
+        .n-gradient-bottom::before {
+          content: '';
+          position: absolute;
+          inset: 0;
           backdrop-filter: blur(40px);
+          -webkit-backdrop-filter: blur(40px);
+          mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
+          -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
+          pointer-events: none;
         }
 
         /* ==== 이미지(썸네일) : 여백 제거 + 라운드 + 확대 hover ==== */
