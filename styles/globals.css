@@ -74,21 +74,21 @@ a:hover {
 /* 상세 페이지 전용 헤딩 스타일 */
 .post-page h1 {
   font-size: 40px;
-  font-weight: 500;
+  font-weight: 600;
   color: #fff;
   margin: 80px 0 24px;
 }
 
 .post-page h2 {
   font-size: 28px;
-  font-weight: 500;
+  font-weight: 600;
   color: #eee;
   margin: 40px 0 20px;
 }
 
 .post-page h3 {
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 600;
   color: #ccc;
   margin: 32px 0 16px;
 }

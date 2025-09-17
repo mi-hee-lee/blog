@@ -897,9 +897,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         .n-p--empty-last { height: 0; }
         .n-h1,.n-h2 { color:#fff; margin: 80px 0 20px; line-height:1.35; }
         .n-h3 { color:#fff; margin: 40px 0 20px; line-height:1.35; }
-        .n-h1 { font-size: 32px; font-weight:400; }
-        .n-h2 { font-size: 24px; font-weight:400; }
-        .n-h3 { font-size: 18px; font-weight:400; }
+        .n-h1 { font-size: 32px; font-weight:600; }
+        .n-h2 { font-size: 24px; font-weight:600; }
+        .n-h3 { font-size: 18px; font-weight:600; }
 
         .n-ul, .n-ol { margin: 8px 0 16px 20px; color:#cfcfcf; }
         .n-ul li { list-style: disc; margin: 6px 0; }
