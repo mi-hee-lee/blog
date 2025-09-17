@@ -606,9 +606,6 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
               return (
                 <div key={b.id} className="n-gradient-bottom">
-                  <div className="gradient-group">
-                    <div className="gradient-mask" />
-                  </div>
                 </div>
               );
             }
@@ -1047,24 +1044,13 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         /* Gradient bottom overlay */
         .n-gradient-bottom {
           position: relative;
-          height: 240px;
-          margin: -240px 0 0;
+          height: 400px;
+          margin: -400px 0 0;
           width: 100%;
           pointer-events: none;
           z-index: 5;
-        }
-        .n-gradient-bottom .gradient-group {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 240px;
-        }
-        .n-gradient-bottom .gradient-mask {
-          position: absolute;
-          inset: 0;
           background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #1E1E1E 106.73%);
-          backdrop-filter: blur(20px);
-          border-radius: 4px;
+          backdrop-filter: blur(40px);
         }
 
         /* ==== 이미지(썸네일) : 여백 제거 + 라운드 + 확대 hover ==== */
