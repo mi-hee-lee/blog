@@ -1174,8 +1174,8 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           inset: 0;
           backdrop-filter: blur(40px);
           -webkit-backdrop-filter: blur(40px);
-          mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
-          -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
+          mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 90%);
+          -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 90%);
           pointer-events: none;
         }
 
