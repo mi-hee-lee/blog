@@ -173,6 +173,17 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
       });
     };
 
+    const markCircleCardColumns = () => {
+      const columnContainers = document.querySelectorAll('.n-cols');
+      columnContainers.forEach(container => {
+        if (container.querySelector('.n-circle-card')) {
+          container.classList.add('has-circle-cards');
+        } else {
+          container.classList.remove('has-circle-cards');
+        }
+      });
+    };
+
     // 이미지 로드 대기 및 콜럼 높이 맞춤 함수
     const adjustColumnHeights = async () => {
       const columnContainers = document.querySelectorAll('.n-cols');
@@ -265,12 +276,14 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
     const timer = setTimeout(() => {
       handleCardAlignment();
       adjustColumnHeights();
+      markCircleCardColumns();
     }, 100);
 
     // 윈도우 리사이즈 시에도 높이 재조정
     const handleResize = () => {
       handleCardAlignment();
       adjustColumnHeights();
+      markCircleCardColumns();
     };
 
     window.addEventListener('resize', handleResize);
@@ -1178,7 +1191,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           width: 280px;
           height: 280px;
           border-radius: 2000px;
-          margin: 0 -64px;
+          margin: 0 auto;
           color: var(--circle-color, #E60012);
           text-align: center;
           flex: none;
@@ -1217,6 +1230,31 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           line-height: 150%;
           margin-bottom: 6px;
           display: block;
+        }
+
+        .n-cols.has-circle-cards {
+          gap: 0;
+          justify-items: center;
+        }
+        .n-cols.has-circle-cards .n-col {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+        .n-cols.has-circle-cards .n-circle-card {
+          margin: 0 -64px;
+        }
+        @media (max-width: 600px) {
+          .n-cols.has-circle-cards {
+            gap: 24px;
+          }
+          .n-cols.has-circle-cards .n-col {
+            justify-content: center;
+          }
+          .n-cols.has-circle-cards .n-circle-card {
+            margin: 0 auto;
+          }
         }
 
 
