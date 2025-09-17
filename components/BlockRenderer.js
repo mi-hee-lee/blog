@@ -1175,8 +1175,8 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           align-items: center;
           padding: 0;
           gap: 20px;
-          width: 400px;
-          height: 400px;
+          width: 280px;
+          height: 280px;
           border-radius: 2000px;
           margin: 0 -64px;
           color: var(--circle-color, #E60012);
@@ -1184,45 +1184,41 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           flex: none;
           flex-shrink: 0;
         }
+          
         .n-circle-card--border {
           border: 2px solid var(--circle-color, #E60012);
           background: transparent;
         }
+
         .n-circle-card--fill {
           background: var(--circle-color, rgba(230, 0, 18, 0.8));
           color: #FFFFFF;
           gap: 16px;
           position: relative;
         }
-        .n-circle-card__title,
-        .n-circle-card__body {
+
+        .n-circle-card.has-strong {
+          justify-content: flex-start !important;
+        }
+        .n-circle-card p {
+          font-weight: 400;
+          font-size: 12px;
+          line-height: 150%;
+          margin: 0;
           display: flex;
           justify-content: center;
           align-items: center;
           width: 100%;
+
         }
-        .n-circle-card__title span,
-        .n-circle-card__body span {
-          display: block;
-          width: 100%;
-          white-space: pre-line;
-        }
-        .n-circle-card__title span {
-          font-family: 'Mark Pro', 'Pretendard', 'Inter', sans-serif;
-          font-weight: 700;
-          font-size: 32px;
-          line-height: 48px;
-          max-width: 198px;
-          margin: 0 auto;
-        }
-        .n-circle-card__body span {
-          font-family: 'Pretendard', 'Inter', sans-serif;
+          .n-circle-card p strong {
           font-weight: 600;
-          font-size: 24px;
-          line-height: 36px;
-          max-width: 199px;
-          margin: 0 auto;
+          font-size: 12px;
+          line-height: 150%;
+          margin-bottom: 6px;
+          display: block;
         }
+
 
         /* ==== 이미지(썸네일) : 여백 제거 + 라운드 + 확대 hover ==== */
         .n-figure { margin: 0; }
