@@ -567,7 +567,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               );
             }
 
-            // #small callout 처리 (이미지 크기 640px 제한)
+            // #small callout 처리 (이미지 크기 400px 제한)
             if (iconText === '#small' || iconText === '#Small') {
               const filteredText = b.callout?.rich_text?.filter(t => {
                 const text = (t.plain_text || '').trim();
@@ -576,6 +576,21 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
               return (
                 <div key={b.id} className="n-small-image">
+                  <Text rich_text={filteredText} />
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                </div>
+              );
+            }
+
+            // #medium callout 처리 (이미지 크기 640px 제한)
+            if (iconText === '#medium' || iconText === '#Medium') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#medium' && text !== '#Medium';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-medium-image">
                   <Text rich_text={filteredText} />
                   {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </div>
@@ -987,13 +1002,27 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
         /* Small image 제한 */
         .n-small-image .n-figure {
-          max-width: 640px;
+          max-width: 400px;
           margin: 0px auto;
         }
         .n-small-image .n-imgWrap {
-          max-width: 640px;
+          max-width: 400px;
         }
         .n-small-image img {
+          max-width: 400px !important;
+          width: 100%;
+          height: auto;
+        }
+
+        /* Medium image 제한 */
+        .n-medium-image .n-figure {
+          max-width: 640px;
+          margin: 0px auto;
+        }
+        .n-medium-image .n-imgWrap {
+          max-width: 640px;
+        }
+        .n-medium-image img {
           max-width: 640px !important;
           width: 100%;
           height: auto;
@@ -1192,11 +1221,23 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
         /* ==== 비디오에도 이미지와 동일한 스타일 적용 ==== */
         div.n-small-image div.n-video {
-          max-width: 640px !important;
+          max-width: 400px !important;
           margin: 0px auto !important;
           width: 100% !important;
         }
         div.n-small-image div.n-video video {
+          max-width: 400px !important;
+          width: 100% !important;
+          height: auto !important;
+          box-sizing: border-box !important;
+        }
+
+        div.n-medium-image div.n-video {
+          max-width: 640px !important;
+          margin: 0px auto !important;
+          width: 100% !important;
+        }
+        div.n-medium-image div.n-video video {
           max-width: 640px !important;
           width: 100% !important;
           height: auto !important;
