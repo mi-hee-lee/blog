@@ -2,28 +2,23 @@
 html, body, #__next {
   margin: 0;
   padding: 0;
-  font-family: "Bricolage Grotesque", Pretendard, ui-sans-serif, system-ui, sans-serif;
+  font-family: Pretendard, ui-sans-serif, system-ui, sans-serif; /* 기본은 한글 폰트 */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #1e1e1e; /* 어두운 배경 */
   color: #fff;
 }
 
-/* 한글 전용 폰트 스타일 */
-:lang(ko) {
-  font-family: Pretendard, ui-sans-serif, system-ui, sans-serif;
-}
-
 /* 영문, 숫자 전용 폰트 스타일 - 유니코드 범위로 지정 */
 @font-face {
-  font-family: 'Mixed';
-  src: local("Bricolage Grotesque");
+  font-family: 'EnglishFont';
+  src: local("var(--font-bricolage)");
   unicode-range: U+0020-007F, U+00A0-00FF, U+0100-017F, U+0180-024F, U+2000-206F, U+20A0-20CF, U+2100-214F;
 }
 
-/* 전역 폰트 스택 재정의 */
+/* 전역 폰트 스택 - 영문은 Bricolage, 한글은 Pretendard */
 * {
-  font-family: "Bricolage Grotesque", Pretendard, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-bricolage), Pretendard, ui-sans-serif, system-ui, sans-serif;
 }
 
 /* 링크 기본색 */
