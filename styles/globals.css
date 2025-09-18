@@ -5,7 +5,7 @@ html, body, #__next {
   font-family: Pretendard, ui-sans-serif, system-ui, sans-serif; /* 기본은 한글 폰트 */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #1e1e1e; /* 어두운 배경 */
+  background-color: #26282C; /* 어두운 배경 */
   color: #fff;
 }
 
@@ -100,7 +100,7 @@ html, body, #__next {
   width: 100%;
   min-width: 0;
   overflow-x: hidden;           /* 풀블리드에서 가끔 생기는 가로 스크롤 방지 */
-  background: #1e1e1e;          /* 필요시 */
+  background: #26282C;          /* 필요시 */
   color: #fff;                  /* 필요시 */
 }
 
