@@ -51,6 +51,25 @@ function renderOverview(text, hlColor) {
   return nodes;
 }
 
+/** Title 문자열에서 { … } 구간만 하이라이트 span으로 래핑 */
+function renderTitle(text, hlColor) {
+  const re = /\{([^}]*)\}/g;
+  const nodes = [];
+  let last = 0, m;
+  while ((m = re.exec(text)) !== null) {
+    const [raw, inner] = m;
+    if (m.index > last) nodes.push(text.slice(last, m.index));
+    nodes.push(
+      <span key={m.index} className="title-hl" style={{ ['--title-hl']: hlColor }}>
+        {inner.trim()}
+      </span>
+    );
+    last = m.index + raw.length;
+  }
+  if (last < text.length) nodes.push(text.slice(last));
+  return nodes;
+}
+
 /* ---------- Page ---------- */
 export default function PostPage({ meta, blocks }) {
   // meta.plain 에 노션 속성들이 평문화되어 들어있음
@@ -60,6 +79,7 @@ export default function PostPage({ meta, blocks }) {
   const overviewText = isEmpty(p.Overview) ? p.Overveiw : p.Overview;
   const highlightHex = p.OverviewHighlight;
   const hlRgba = isHex6(highlightHex) ? hexToRgba(highlightHex, 0.3) : 'rgba(33,137,255,0.3)';
+  const hlSolid = isHex6(highlightHex) ? highlightHex : '#4A7BFF';
 
   // 1) Desc
   const descText = p.Desc;
@@ -124,7 +144,7 @@ export default function PostPage({ meta, blocks }) {
 
       <p className="back"><Link href="/">← 목록으로</Link></p>
 
-      <h1 className="title">{meta.title}</h1>
+      <h1 className="title">{renderTitle(meta.title || '', hlSolid)}</h1>
       {dateText && <div className="date">{dateText}</div>}
 
       {/* 1) Desc (속성명 라벨 노출 안 함) */}
@@ -218,6 +238,26 @@ export default function PostPage({ meta, blocks }) {
           background-position: 0 90%;      /* 수직 위치 */
           box-decoration-break: clone;
           -webkit-box-decoration-break: clone;
+        }
+
+        .title :global(.title-hl) {
+          --title-hl: #4A7BFF;  /* fallback, 실제 색은 overviewhighlight 속성에서 주입 */
+          display: inline-flex;
+          flex-direction: row;
+          align-items: center;
+          padding: 0px 32px;
+          gap: 4px;
+          background: var(--title-hl);
+          border-radius: 500px;
+          color: #000000;
+          font-family: 'Bricolage Grotesque';
+          font-style: normal;
+          font-weight: 500;
+          font-size: inherit;  /* title의 기본 폰트 크기를 상속 */
+          line-height: inherit;  /* title의 기본 라인 높이를 상속 */
+          flex: none;
+          order: 1;
+          flex-grow: 0;
         }
 
         /* Meta table */

@@ -1,5 +1,12 @@
 // components/ArchiveList.js
 import Link from 'next/link';
+
+// Archive 리스트에서 {} 브라켓 제거 함수
+function removeBraces(text) {
+  if (!text) return '';
+  return text.replace(/\{([^}]*)\}/g, '$1');
+}
+
 export default function ArchiveList({ posts = [] }) {
   if (!posts.length) return <div style={{ color: '#999' }}>아직 글이 없어요.</div>;
 
@@ -8,7 +15,7 @@ export default function ArchiveList({ posts = [] }) {
       {posts.map((p) => (
         <li key={p.slug} className="archive-item">
           <Link href={`/posts/${p.slug}`} className="card">
-            <h3 className="title">{p.title}</h3>
+            <h3 className="title">{removeBraces(p.title)}</h3>
 
             {/* Working Duration 속성값 사용 */}
             {p.plain?.["Working Duration"] && (
