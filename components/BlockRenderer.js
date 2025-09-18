@@ -651,15 +651,54 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               );
             }
 
-            // #gradient-bottom callout 처리 (이전 콘텐츠 하단에 그라데이션 오버레이)
-            if (iconText === '#gradient-bottom' || iconText === '#Gradient-Bottom') {
+            // #gradient-bottom-md callout 처리 (이전 콘텐츠 하단에 그라데이션 오버레이 - 중간 크기)
+            if (iconText === '#gradient-bottom-md' || iconText === '#Gradient-Bottom-Md') {
               const filteredText = b.callout?.rich_text?.filter(t => {
                 const text = (t.plain_text || '').trim();
-                return text !== '#gradient-bottom' && text !== '#Gradient-Bottom';
+                return text !== '#gradient-bottom-md' && text !== '#Gradient-Bottom-Md';
               }) || [];
 
               return (
-                <div key={b.id} className="n-gradient-bottom">
+                <div key={b.id} className="n-gradient-bottom-md">
+                </div>
+              );
+            }
+
+            // #gradient-bottom-sm callout 처리 (이전 콘텐츠 하단에 그라데이션 오버레이 - 작은 크기)
+            if (iconText === '#gradient-bottom-sm' || iconText === '#Gradient-Bottom-Sm') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#gradient-bottom-sm' && text !== '#Gradient-Bottom-Sm';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-gradient-bottom-sm">
+                </div>
+              );
+            }
+
+            // #gradient-bottom-md-full callout 처리 (이전 콘텐츠 하단에 그라데이션 오버레이 - 중간 크기, 전체 너비)
+            if (iconText === '#gradient-bottom-md-full' || iconText === '#Gradient-Bottom-Md-Full') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#gradient-bottom-md-full' && text !== '#Gradient-Bottom-Md-Full';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-gradient-bottom-md-full">
+                </div>
+              );
+            }
+
+            // #gradient-bottom-sm-full callout 처리 (이전 콘텐츠 하단에 그라데이션 오버레이 - 작은 크기, 전체 너비)
+            if (iconText === '#gradient-bottom-sm-full' || iconText === '#Gradient-Bottom-Sm-Full') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#gradient-bottom-sm-full' && text !== '#Gradient-Bottom-Sm-Full';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-gradient-bottom-sm-full">
                 </div>
               );
             }
@@ -1157,8 +1196,8 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           height: auto;
         }
 
-        /* Gradient bottom overlay */
-        .n-gradient-bottom {
+        /* Gradient bottom overlay - medium size (400px) */
+        .n-gradient-bottom-md {
           position: relative;
           height: 400px;
           margin: -400px 0 0;
@@ -1168,7 +1207,70 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #1E1E1E 90%);
           overflow: hidden;
         }
-        .n-gradient-bottom::before {
+        .n-gradient-bottom-md::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 90%);
+          -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 90%);
+          pointer-events: none;
+        }
+        /* Gradient bottom overlay - small size (200px) */
+        .n-gradient-bottom-sm {
+          position: relative;
+          height: 200px;
+          margin: -200px 0 0;
+          width: 100%;
+          pointer-events: none;
+          z-index: 5;
+          background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #1E1E1E 90%);
+          overflow: hidden;
+        }
+        .n-gradient-bottom-sm::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 90%);
+          -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 90%);
+          pointer-events: none;
+        }
+
+        /* Gradient bottom overlay - medium size full width (400px) */
+        .n-gradient-bottom-md-full {
+          position: relative;
+          height: 400px;
+          margin: -400px 0 0;
+          width: 100vw;
+          margin-left: calc(50% - 50vw);
+          margin-right: calc(50% - 50vw);
+          pointer-events: none;
+          z-index: 5;
+          background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #1E1E1E 90%);
+          overflow: hidden;
+        }
+        .n-gradient-bottom-md-full::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 90%);
+          -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 90%);
+          pointer-events: none;
+        }
+
+        /* Gradient bottom overlay - small size full width (200px) */
+        .n-gradient-bottom-sm-full {
+          position: relative;
+          height: 200px;
+          margin: -200px 0 0;
+          width: 100vw;
+          margin-left: calc(50% - 50vw);
+          margin-right: calc(50% - 50vw);
+          pointer-events: none;
+          z-index: 5;
+          background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #1E1E1E 90%);
+          overflow: hidden;
+        }
+        .n-gradient-bottom-sm-full::before {
           content: '';
           position: absolute;
           inset: 0;
