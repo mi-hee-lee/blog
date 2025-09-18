@@ -1335,6 +1335,10 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         .n-cols.has-circle-cards {
           gap: 0;
           justify-items: center;
+          justify-content: center;
+          max-width: 760px;
+          width: 100%;
+          margin: 0 auto;
         }
         .n-cols.has-circle-cards .n-col {
           display: flex;
