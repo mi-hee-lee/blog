@@ -204,7 +204,7 @@ export default function PostPage({ meta, blocks }) {
           -webkit-tap-highlight-color: transparent;
         }
         .back { display: none; }
-        .title { margin: 160px 0 0; font-size: 80px; font-weight: 400; line-height: 1.25; }
+        .title { margin: 120px 0 0; font-size: 80px; font-weight: 400; line-height: 1.25; }
         .date { display:none; }
 
         /* Desc callout */
