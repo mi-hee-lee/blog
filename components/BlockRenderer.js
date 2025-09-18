@@ -821,6 +821,21 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               );
             }
 
+            // #headline-text-lg callout 처리 (대형 헤드라인 텍스트)
+            if (iconText === '#headline-text-lg' || iconText === '#Headline-Text-Lg') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#headline-text-lg' && text !== '#Headline-Text-Lg';
+              }) || [];
+
+              return (
+                <div key={b.id} className="n-headline-text-lg">
+                  <Text rich_text={filteredText} />
+                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                </div>
+              );
+            }
+
             // #FullBleedDivider callout 처리 (전체 폭 구분선 컴포넌트 렌더)
             if (iconText === '#FullBleedDivider' || iconText === '#fullbleeddivider') {
               const filteredText = b.callout?.rich_text?.filter(t => {
@@ -1317,6 +1332,21 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 90%);
           -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 90%);
           pointer-events: none;
+        }
+
+        .n-headline-text-lg {
+          font-weight: 200;
+          font-size: 80px;
+          line-height: 140%;
+          color: #FFFFFF;
+          margin: 40px 0;
+        }
+
+        @media (max-width: 768px) {
+          .n-headline-text-lg {
+            font-size: 48px;
+            line-height: 130%;
+          }
         }
 
         /* Circle cards (border & fill variants) */
