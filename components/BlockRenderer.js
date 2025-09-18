@@ -1244,7 +1244,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           width: 100%;
           pointer-events: none;
           z-index: 5;
-          background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #1E1E1E 90%);
+          background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #26282C 90%);
           overflow: hidden;
         }
         .n-gradient-bottom-md::before {
@@ -1263,7 +1263,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           width: 100%;
           pointer-events: none;
           z-index: 5;
-          background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #1E1E1E 90%);
+          background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #26282C 90%);
           overflow: hidden;
         }
         .n-gradient-bottom-sm::before {
@@ -1285,7 +1285,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           margin-right: calc(50% - 50vw);
           pointer-events: none;
           z-index: 5;
-          background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #1E1E1E 90%);
+          background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #26282C 90%);
           overflow: hidden;
         }
         .n-gradient-bottom-md-full::before {
@@ -1307,7 +1307,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           margin-right: calc(50% - 50vw);
           pointer-events: none;
           z-index: 5;
-          background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #1E1E1E 90%);
+          background: linear-gradient(180deg, rgba(30, 30, 30, 0) 0%, #26282C 90%);
           overflow: hidden;
         }
         .n-gradient-bottom-sm-full::before {
