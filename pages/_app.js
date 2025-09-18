@@ -19,6 +19,7 @@ export default function MyApp({ Component, pageProps }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         {/* 검색엔진 색인 방지 */}
         <meta name="robots" content="noindex, nofollow" />
+        <title>Product Designer, Lee Mihee</title>
       </Head>
 
       <main className={bricolage.variable}>
