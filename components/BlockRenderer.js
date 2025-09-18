@@ -2,6 +2,7 @@
 // Notion 블록 트리를 받아 화면에 렌더링 (2열 컬럼 지원, 이미지 여백 제거/라운드)
 
 import SlideCarousel from './SlideCarousel';
+import FullBleedDivider from './FullBleedDivider';
 import { useEffect } from 'react';
 import { buildProxiedImageUrl } from '../lib/notionImage';
 
@@ -818,6 +819,45 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                   {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </div>
               );
+            }
+
+            // #FullBleedDivider callout 처리 (전체 폭 구분선 컴포넌트 렌더)
+            if (iconText === '#FullBleedDivider' || iconText === '#fullbleeddivider') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#FullBleedDivider' && text !== '#fullbleeddivider';
+              }) || [];
+
+              const configString = filteredText
+                .map(t => (t.plain_text || '').trim())
+                .join(' ');
+
+              const dividerProps = {};
+
+              configString
+                .split(/\s+/)
+                .filter(Boolean)
+                .forEach(token => {
+                  const [rawKey, rawValue] = token.split('=');
+                  if (!rawKey || !rawValue) return;
+
+                  const key = rawKey.trim();
+                  const value = rawValue.trim();
+
+                  if (key === 'color') {
+                    dividerProps.color = value;
+                    return;
+                  }
+
+                  if (['top', 'bottom', 'height'].includes(key)) {
+                    const parsed = parseInt(value, 10);
+                    if (!Number.isNaN(parsed)) {
+                      dividerProps[key] = parsed;
+                    }
+                  }
+                });
+
+              return <FullBleedDivider key={b.id} {...dividerProps} />;
             }
 
             // #margin-bottom-120 callout 처리 (하단 여백 120px)
