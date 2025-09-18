@@ -1315,7 +1315,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         }
         .n-circle-card p {
           font-weight: 400;
-          font-size: 12px;
+          font-size: 14px;
           line-height: 150%;
           margin: 0;
           display: flex;
@@ -1326,7 +1326,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         }
           .n-circle-card p strong {
           font-weight: 600;
-          font-size: 12px;
+          font-size: 16px;
           line-height: 150%;
           margin-bottom: 6px;
           display: block;
