@@ -4,7 +4,7 @@
 import SlideCarousel from './SlideCarousel';
 import FullBleedDivider from './FullBleedDivider';
 import { useEffect } from 'react';
-import { buildProxiedImageUrl } from '../lib/notionImage';
+import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
 function rtToHtml(rich = []) {
   // 아주 심플한 rich_text -> HTML 변환 (bold/italic/code 링크 정도만)
@@ -394,10 +394,35 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
             }
 
             // 기타 비디오 (HTML5 video 태그)
+            const { stableUrl: notionStableUrl, finalUrl: proxiedUrl } = buildProxiedFileUrl(videoUrl, b.id);
+            const resolvedVideoUrl = notionStableUrl || proxiedUrl || videoUrl;
+
+            const guessMimeType = () => {
+              const mimeFromNotion = b.video?.file?.mime_type;
+              if (mimeFromNotion) return mimeFromNotion;
+              try {
+                const urlObj = new URL(videoUrl);
+                const pathname = urlObj.pathname || '';
+                const ext = pathname.split('.').pop()?.toLowerCase();
+                if (!ext) return undefined;
+                if (ext === 'mp4') return 'video/mp4';
+                if (ext === 'webm') return 'video/webm';
+                if (ext === 'ogg' || ext === 'ogv') return 'video/ogg';
+              } catch (_) {
+                const ext = videoUrl.split('?')[0]?.split('.').pop()?.toLowerCase();
+                if (ext === 'mp4') return 'video/mp4';
+                if (ext === 'webm') return 'video/webm';
+                if (ext === 'ogg' || ext === 'ogv') return 'video/ogg';
+              }
+              return undefined;
+            };
+
+            const mimeType = guessMimeType();
+
             return (
               <div key={b.id} className="n-video">
-                <video controls>
-                  <source src={videoUrl} />
+                <video controls playsInline preload="metadata">
+                  <source src={resolvedVideoUrl} {...(mimeType ? { type: mimeType } : {})} />
                   Your browser does not support the video tag.
                 </video>
               </div>
