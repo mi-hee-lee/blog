@@ -120,7 +120,7 @@ export default function GNB() {
           right: 0;
           z-index: 1000;
           width: 100%;
-          background: rgba(30, 30, 30, 0.6);
+          background: rgb(38 40 44 / 60%);
           backdrop-filter: blur(6px);
           border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
