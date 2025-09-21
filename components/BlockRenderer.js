@@ -585,6 +585,18 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               </blockquote>
             );
 
+          case 'code': {
+            const codeText = (b.code?.rich_text || []).map((t) => t.plain_text || '').join('');
+            const language = (b.code?.language || '').trim();
+            return (
+              <div key={b.id} className="n-code" {...(language ? { 'data-lang': language } : {})}>
+                <pre>
+                  <code>{codeText}</code>
+                </pre>
+              </div>
+            );
+          }
+
           // ===== 콜아웃 =====
           case 'callout': {
             const icon = b.callout?.icon?.emoji || '💡';
@@ -1052,6 +1064,40 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           background: rgba(255,255,255,.03); border-radius: 8px;
         }
 
+        .n-code {
+          position: relative;
+          margin: 24px 0;
+          padding: 20px;
+          background: rgba(255,255,255,0.04);
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 12px;
+          overflow: hidden;
+        }
+        .n-code[data-lang]::before {
+          content: attr(data-lang);
+          position: absolute;
+          top: 12px;
+          right: 16px;
+          font-size: 11px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,0.45);
+        }
+        .n-code pre {
+          margin: 0;
+          font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+          font-size: 13px;
+          line-height: 1.75;
+          color: #f3f4f6;
+          white-space: pre-wrap;
+          word-break: break-word;
+          overflow-x: auto;
+        }
+        .n-code code {
+          font-family: inherit;
+          font-size: inherit;
+        }
+
         .n-callout {
           display:flex; gap:12px; align-items:flex-start;
           background: rgba(255,255,255,.04);
@@ -1498,6 +1544,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           border-radius: 0px;
           overflow: hidden;
           background: #111;
+          position: relative;
         }
         .n-video video {
           border-radius: 0px;
@@ -1505,6 +1552,15 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           max-width: 100%;
           height: auto;
           display: block;
+        }
+        .n-video::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border: 2px solid #26282C;
+          border-radius: inherit;
+          pointer-events: none;
+          box-sizing: border-box;
         }
 
         /* ==== 동기화 블록 ==== */
