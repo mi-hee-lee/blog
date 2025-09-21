@@ -394,8 +394,8 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
             }
 
             // 기타 비디오 (HTML5 video 태그)
-            const { stableUrl: notionStableUrl, finalUrl: proxiedUrl } = buildProxiedFileUrl(videoUrl, b.id);
-            const resolvedVideoUrl = notionStableUrl || proxiedUrl || videoUrl;
+            const { finalUrl: proxiedUrl } = buildProxiedFileUrl(videoUrl);
+            const resolvedVideoUrl = proxiedUrl || videoUrl;
 
             const guessMimeType = () => {
               const mimeFromNotion = b.video?.file?.mime_type;
