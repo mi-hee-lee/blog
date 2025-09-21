@@ -4,6 +4,7 @@ import GNB from '../components/GNB';
 import Footer from '../components/Footer';
 import Head from 'next/head';
 import { Bricolage_Grotesque } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function MyApp({ Component, pageProps }) {
         </div>
         <Footer />
       </main>
+      <Analytics />
     </>
   );
 }
