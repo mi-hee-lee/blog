@@ -1,7 +1,22 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { buildProxiedImageUrl } from '../lib/notionImage';
 
 function SlideRotation({ id, images = [], text = [], children }) {
+  const [viewport, setViewport] = useState('desktop');
+
+  useEffect(() => {
+    const compute = () => {
+      const w = typeof window !== 'undefined' ? window.innerWidth : 1440;
+      if (w < 960) return 'mobile';
+      if (w < 1280) return 'tablet';
+      return 'desktop';
+    };
+    const update = () => setViewport(compute());
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
   const normalizedImages = useMemo(() => {
     return images.map((block, index) => {
       const src = block?.image?.file?.url || block?.image?.external?.url || '';
@@ -17,26 +32,73 @@ function SlideRotation({ id, images = [], text = [], children }) {
   }, [images, id]);
 
   const items = normalizedImages.length ? normalizedImages : [{ id: `${id}-placeholder`, url: '', alt: '' }];
+
+  const layoutPresets = useMemo(() => ({
+    desktop: {
+      height: '520px',
+      items: [
+        { top: '2%', left: '22%', width: '36%', rotate: -2, duration: 18 },
+        { top: '4%', left: '80%', width: '18%', rotate: 5, duration: 22, reverse: true },
+        { top: '28%', left: '10%', width: '22%', rotate: -5, duration: 20 },
+        { top: '4%', left: '60%', width: '20%', rotate: 3, duration: 16 },
+        { top: '60%', left: '64%', width: '26%', rotate: -3, duration: 19, reverse: true },
+        { top: '68%', left: '88%', width: '24%', rotate: 4, duration: 23 }
+      ]
+    },
+    tablet: {
+      height: '520px',
+      items: [
+        { top: '16%', left: '36%', width: '34%', rotate: -2, duration: 18 },
+        { top: '18%', left: '82%', width: '20%', rotate: 5, duration: 22, reverse: true },
+        { top: '32%', left: '10%', width: '26%', rotate: -5, duration: 20 },
+        { top: '18%', left: '66%', width: '22%', rotate: 3, duration: 16 },
+        { top: '72%', left: '70%', width: '28%', rotate: -3, duration: 19, reverse: true },
+        { top: '74%', left: '94%', width: '24%', rotate: 4, duration: 23 }
+      ]
+    },
+    mobile: {
+      height: '560px',
+      items: [
+        { top: '24%', left: '48%', width: '48%', rotate: -2, duration: 18 },
+        { top: '18%', left: '82%', width: '32%', rotate: 5, duration: 22, reverse: true },
+        { top: '12%', left: '12%', width: '34%', rotate: -5, duration: 20 },
+        { top: '48%', left: '76%', width: '28%', rotate: 3, duration: 16 },
+        { top: '72%', left: '64%', width: '40%', rotate: -3, duration: 19, reverse: true },
+        { top: '82%', left: '92%', width: '32%', rotate: 4, duration: 23 }
+      ]
+    }
+  }), []);
+
+  const preset = layoutPresets[viewport] || layoutPresets.desktop;
   const single = items.length === 1;
-  const slotSeconds = 4.8;
-  const totalDuration = Math.max(slotSeconds * items.length, slotSeconds * 2);
 
   return (
     <div className={`rot-stage${single ? ' rot-stage--single' : ''}`}>
-      <div className="rot-stage__viewport">
+      <div className="rot-stage__viewport" style={{ height: preset.height }}>
         {items.map((img, index) => {
-          const style = single
-            ? undefined
-            : {
-                animationDelay: `${index * slotSeconds}s`,
-                animationDuration: `${totalDuration}s`
-              };
+          const fallback = {
+            top: '50%',
+            left: `${50 + (index - (items.length - 1) / 2) * 12}%`,
+            width: '40%',
+            rotate: index % 2 === 0 ? -4 : 3,
+            duration: 20 + index * 2
+          };
+
+          const layout = preset.items[index] || fallback;
+
           return (
             <figure
               key={img.id}
               className="rot-item"
               data-single={single ? 'true' : undefined}
-              style={style}
+              style={{
+                '--rot-top': layout.top,
+                '--rot-left': layout.left,
+                '--rot-width': layout.width,
+                '--rot-initial': `${layout.rotate || 0}deg`,
+                '--rot-duration': `${layout.duration || 18}s`,
+                '--rot-direction': layout.reverse ? 'reverse' : 'normal'
+              }}
             >
               {img.url ? <img src={img.url} alt={img.alt} loading="lazy" /> : null}
               {img.caption ? <figcaption>{img.caption}</figcaption> : null}
@@ -63,24 +125,27 @@ function SlideRotation({ id, images = [], text = [], children }) {
           margin: 48px auto;
           display: flex;
           flex-direction: column;
-          align-items: center;
+          align-items: flex-start;
           gap: 24px;
+          width: 100%;
+          max-width: 960px;
         }
         .rot-stage__viewport {
           position: relative;
-          width: clamp(240px, 72vw, 460px);
-          height: clamp(240px, 72vw, 460px);
+          width: min(680px, 90vw);
         }
         .rot-item {
           margin: 0;
           position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%) scale(0.94) rotate(-4deg);
-          opacity: 0;
-          animation-name: rot-seq;
-          animation-timing-function: ease-in-out;
+          top: var(--rot-top, 50%);
+          left: var(--rot-left, 50%);
+          transform: translate(-50%, -50%) rotate(var(--rot-initial, 0deg));
+          animation-name: rot-spin;
+          animation-duration: var(--rot-duration, 18s);
+          animation-timing-function: linear;
           animation-iteration-count: infinite;
+          animation-direction: var(--rot-direction, normal);
+          opacity: 1;
         }
         .rot-item[data-single='true'] {
           position: relative;
@@ -91,7 +156,7 @@ function SlideRotation({ id, images = [], text = [], children }) {
           animation: none;
         }
         .rot-item img {
-          width: clamp(200px, 65vw, 440px);
+          width: var(--rot-width, clamp(200px, 60vw, 440px));
           height: auto;
           display: block;
           border-radius: 20px;
@@ -105,7 +170,7 @@ function SlideRotation({ id, images = [], text = [], children }) {
           text-align: center;
         }
         .rot-stage__content {
-          text-align: center;
+          text-align: left;
           max-width: clamp(240px, 80vw, 520px);
           color: rgba(229, 229, 229, 0.92);
           font-size: 14px;
@@ -116,7 +181,7 @@ function SlideRotation({ id, images = [], text = [], children }) {
         }
         .rot-stage__text {
           margin: 0;
-          display: inline-flex;
+          display: flex;
           flex-direction: column;
           gap: 4px;
         }
@@ -130,27 +195,9 @@ function SlideRotation({ id, images = [], text = [], children }) {
           transform: none;
         }
 
-        @keyframes rot-seq {
-          0% {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.9) rotate(-6deg);
-          }
-          8% {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1) rotate(-1deg);
-          }
-          40% {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1) rotate(3deg);
-          }
-          52% {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.92) rotate(6deg);
-          }
-          100% {
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.92) rotate(6deg);
-          }
+        @keyframes rot-spin {
+          from { transform: translate(-50%, -50%) rotate(var(--rot-initial, 0deg)); }
+          to { transform: translate(-50%, -50%) rotate(calc(var(--rot-initial, 0deg) + 360deg)); }
         }
 
         @media (max-width: 600px) {
