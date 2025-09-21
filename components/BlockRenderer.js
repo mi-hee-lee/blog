@@ -1423,7 +1423,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           margin: 40px 0;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
           .n-headline-text-lg {
             font-size: 48px;
             line-height: 130%;
@@ -1502,13 +1502,34 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         }
         @media (max-width: 600px) {
           .n-cols.has-circle-cards {
-            gap: 24px;
+            gap: 16px;
           }
           .n-cols.has-circle-cards .n-col {
             justify-content: center;
           }
           .n-cols.has-circle-cards .n-circle-card {
             margin: 0 auto;
+          }
+          .n-cols[data-cols="2"] .n-circle-card,
+          .n-cols[data-cols="3"] .n-circle-card {
+            padding: 12px;
+            gap: 12px;
+          }
+          .n-cols[data-cols="2"] .n-circle-card {
+            width: min(220px, calc((100vw - 48px) / 2));
+            height: min(220px, calc((100vw - 48px) / 2));
+          }
+          .n-cols[data-cols="3"] .n-circle-card {
+            width: min(200px, calc((100vw - 72px) / 3));
+            height: min(200px, calc((100vw - 72px) / 3));
+          }
+          .n-cols[data-cols="2"] .n-circle-card p,
+          .n-cols[data-cols="3"] .n-circle-card p {
+            font-size: 12px;
+          }
+          .n-cols[data-cols="2"] .n-circle-card p strong,
+          .n-cols[data-cols="3"] .n-circle-card p strong {
+            font-size: 13px;
           }
         }
 
@@ -1698,8 +1719,6 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
         /* 모바일에서 1열로 변경 */
         @media (max-width: 600px) {
-          .n-cols[data-cols="2"],
-          .n-cols[data-cols="3"],
           .n-cols[data-cols="4"],
           .n-cols[data-cols="5"],
           .n-cols[data-cols="6"] {
