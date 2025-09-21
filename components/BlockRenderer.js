@@ -1120,13 +1120,13 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           display:flex; gap:12px; align-items:flex-start;
           background: rgba(255,255,255,.04);
           border:1px solid rgba(255,255,255,.06);
-          padding:14px 16px 12px 16px; border-radius: 12px; margin: 16px 0;
+          padding:16px 20px 16px 20px; border-radius: 12px; margin: 16px 0;
         }
         .n-callout:has(strong) {
           align-items: flex-start;
         }
-        .n-callout-ico { font-size:18px; line-height:1; }
-        .n-callout-body p { margin:0; }
+        .n-callout-ico { font-size:20px; line-height:1; }
+        .n-callout-body p { font-size:14px; line-height:1.6; color:#e5e5e5; margin: 4px 0; }
 
         /* 반응형 조건부 렌더링 */
         .n-desktop-only { display: block; }
