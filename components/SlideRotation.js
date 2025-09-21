@@ -35,36 +35,36 @@ function SlideRotation({ id, images = [], text = [], children }) {
 
   const layoutPresets = useMemo(() => ({
     desktop: {
-      height: '520px',
+      height: '620px',
       items: [
-        { top: '2%', left: '22%', width: '36%', rotate: -2, duration: 18 },
-        { top: '4%', left: '80%', width: '18%', rotate: 5, duration: 22, reverse: true },
-        { top: '28%', left: '10%', width: '22%', rotate: -5, duration: 20 },
-        { top: '4%', left: '60%', width: '20%', rotate: 3, duration: 16 },
-        { top: '60%', left: '64%', width: '26%', rotate: -3, duration: 19, reverse: true },
-        { top: '68%', left: '88%', width: '24%', rotate: 4, duration: 23 }
+        { top: '0.014%', bottom: '8.016%', left: '20.156%', right: '45.298%', rotate: 0, delay: 0.5 },
+        { top: '0%', bottom: '56.818%', left: '79.652%', right: '3.075%', rotate: 5, reverse: true, delay: 0.8 },
+        { top: '18.864%', bottom: '35.378%', left: '0%', right: '77.121%', rotate: -5, delay: 1.2 },
+        { top: '0%', bottom: '56.818%', left: '59.297%', right: '23.43%', rotate: 3, delay: 0.3 },
+        { top: '49.844%', bottom: '-6.965%', left: '59.321%', right: '17.801%', rotate: -3, reverse: true, delay: 0.7 },
+        { top: '49.844%', bottom: '-6.965%', left: '85.234%', right: '-8.113%', rotate: 4, delay: 1.5 }
       ]
     },
     tablet: {
-      height: '520px',
+      height: '640px',
       items: [
-        { top: '16%', left: '36%', width: '34%', rotate: -2, duration: 18 },
-        { top: '18%', left: '82%', width: '20%', rotate: 5, duration: 22, reverse: true },
-        { top: '32%', left: '10%', width: '26%', rotate: -5, duration: 20 },
-        { top: '18%', left: '66%', width: '22%', rotate: 3, duration: 16 },
-        { top: '72%', left: '70%', width: '28%', rotate: -3, duration: 19, reverse: true },
-        { top: '74%', left: '94%', width: '24%', rotate: 4, duration: 23 }
+        { top: '12.929%', bottom: '5.32%', left: '34.205%', right: '31.25%', rotate: 2, delay: 0.5 },
+        { top: '12.917%', bottom: '48.699%', left: '87.5%', right: '-10.53%', rotate: 5, reverse: true, delay: 0.8 },
+        { top: '22.913%', bottom: '22.856%', left: '0%', right: '77.121%', rotate: -5, delay: 1.2 },
+        { top: '12.917%', bottom: '48.699%', left: '71.818%', right: '10.909%', rotate: 3, delay: 0.3 },
+        { top: '71.296%', bottom: '-22.071%', left: '64.697%', right: '12.424%', rotate: -3, reverse: true, delay: 0.7 },
+        { top: '71.296%', bottom: '-22.071%', left: '90.625%', right: '-13.504%', rotate: 4, delay: 1.5 }
       ]
     },
     mobile: {
-      height: '560px',
+      height: '680px',
       items: [
-        { top: '24%', left: '48%', width: '48%', rotate: -2, duration: 18 },
-        { top: '18%', left: '82%', width: '32%', rotate: 5, duration: 22, reverse: true },
-        { top: '12%', left: '12%', width: '34%', rotate: -5, duration: 20 },
-        { top: '48%', left: '76%', width: '28%', rotate: 3, duration: 16 },
-        { top: '72%', left: '64%', width: '40%', rotate: -3, duration: 19, reverse: true },
-        { top: '82%', left: '92%', width: '32%', rotate: 4, duration: 23 }
+        { top: '12.929%', bottom: '5.32%', left: '34.205%', right: '31.25%', rotate: 2, delay: 0.5 },
+        { top: '12.917%', bottom: '48.7%', left: '63.415%', right: '-30.82%', rotate: 5, reverse: true, delay: 0.8 },
+        { top: '-29.414%', bottom: '-29.312%', left: '0%', right: '77.121%', rotate: -5, delay: 1.2 },
+        { top: '12.917%', bottom: '48.7%', left: '71.818%', right: '10.909%', rotate: 3, delay: 0.3 },
+        { top: '94.309%', bottom: '-45.083%', left: '64.697%', right: '12.425%', rotate: -3, reverse: true, delay: 0.7 },
+        { top: '94.309%', bottom: '-45.083%', left: '90.625%', right: '-13.504%', rotate: 4, delay: 1.5 }
       ]
     }
   }), []);
@@ -77,11 +77,12 @@ function SlideRotation({ id, images = [], text = [], children }) {
       <div className="rot-stage__viewport" style={{ height: preset.height }}>
         {items.map((img, index) => {
           const fallback = {
-            top: '50%',
-            left: `${50 + (index - (items.length - 1) / 2) * 12}%`,
-            width: '40%',
+            top: '10%',
+            left: `${10 + index * 12}%`,
+            right: `${40 - index * 6}%`,
+            bottom: '20%',
             rotate: index % 2 === 0 ? -4 : 3,
-            duration: 20 + index * 2
+            delay: 0.3 * index
           };
 
           const layout = preset.items[index] || fallback;
@@ -94,10 +95,12 @@ function SlideRotation({ id, images = [], text = [], children }) {
               style={{
                 '--rot-top': layout.top,
                 '--rot-left': layout.left,
-                '--rot-width': layout.width,
+                '--rot-right': layout.right,
+                '--rot-bottom': layout.bottom,
                 '--rot-initial': `${layout.rotate || 0}deg`,
-                '--rot-duration': `${layout.duration || 18}s`,
-                '--rot-direction': layout.reverse ? 'reverse' : 'normal'
+                '--rot-duration': `${layout.duration || 15}s`,
+                '--rot-direction': layout.reverse ? 'reverse' : 'normal',
+                '--rot-delay': `${layout.delay || 0}s`
               }}
             >
               {img.url ? <img src={img.url} alt={img.alt} loading="lazy" /> : null}
@@ -132,19 +135,24 @@ function SlideRotation({ id, images = [], text = [], children }) {
         }
         .rot-stage__viewport {
           position: relative;
-          width: min(680px, 90vw);
+          width: 100%;
+          max-width: 960px;
         }
         .rot-item {
           margin: 0;
           position: absolute;
-          top: var(--rot-top, 50%);
-          left: var(--rot-left, 50%);
-          transform: translate(-50%, -50%) rotate(var(--rot-initial, 0deg));
+          top: var(--rot-top, auto);
+          left: var(--rot-left, auto);
+          right: var(--rot-right, auto);
+          bottom: var(--rot-bottom, auto);
+          transform-origin: center center;
+          transform: rotate(var(--rot-initial, 0deg));
           animation-name: rot-spin;
           animation-duration: var(--rot-duration, 18s);
           animation-timing-function: linear;
           animation-iteration-count: infinite;
           animation-direction: var(--rot-direction, normal);
+          animation-delay: var(--rot-delay, 0s);
           opacity: 1;
         }
         .rot-item[data-single='true'] {
@@ -156,9 +164,10 @@ function SlideRotation({ id, images = [], text = [], children }) {
           animation: none;
         }
         .rot-item img {
-          width: var(--rot-width, clamp(200px, 60vw, 440px));
+          width: 100%;
           height: auto;
           display: block;
+          height: auto;
           border-radius: 20px;
           box-shadow: 0 34px 68px rgba(0, 0, 0, 0.32);
         }
@@ -196,8 +205,8 @@ function SlideRotation({ id, images = [], text = [], children }) {
         }
 
         @keyframes rot-spin {
-          from { transform: translate(-50%, -50%) rotate(var(--rot-initial, 0deg)); }
-          to { transform: translate(-50%, -50%) rotate(calc(var(--rot-initial, 0deg) + 360deg)); }
+          from { transform: rotate(var(--rot-initial, 0deg)); }
+          to { transform: rotate(calc(var(--rot-initial, 0deg) + 360deg)); }
         }
 
         @media (max-width: 600px) {
