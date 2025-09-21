@@ -3,6 +3,7 @@
 
 import SlideCarousel from './SlideCarousel';
 import FullBleedDivider from './FullBleedDivider';
+import SlideRotation from './SlideRotation';
 import { useEffect } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
@@ -845,6 +846,27 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                   text={filteredText}
                   images={images}
                 />
+              );
+            }
+
+            if (iconText === '#slideRotation' || iconText === '#sliderotation') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#slideRotation' && text !== '#sliderotation';
+              }) || [];
+
+              const images = (b.children || []).filter(child => child.type === 'image');
+              const others = (b.children || []).filter(child => child.type !== 'image');
+
+              return (
+                <SlideRotation
+                  key={b.id}
+                  id={b.id}
+                  text={filteredText}
+                  images={images}
+                >
+                  {others.length ? renderChildren(others, highlightColor) : null}
+                </SlideRotation>
               );
             }
 
