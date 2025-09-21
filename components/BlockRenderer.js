@@ -394,8 +394,8 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
             }
 
             // 기타 비디오 (HTML5 video 태그)
-            const { finalUrl: proxiedUrl } = buildProxiedFileUrl(videoUrl);
-            const resolvedVideoUrl = proxiedUrl || videoUrl;
+            const { finalUrl: proxiedUrl, stableUrl: notionStableUrl } = buildProxiedFileUrl(videoUrl, b.id);
+            const resolvedVideoUrl = proxiedUrl || notionStableUrl || videoUrl;
 
             const guessMimeType = () => {
               const mimeFromNotion = b.video?.file?.mime_type;
@@ -430,6 +430,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                   loop
                 >
                   <source src={resolvedVideoUrl} {...(mimeType ? { type: mimeType } : {})} />
+                  {resolvedVideoUrl !== videoUrl ? (
+                    <source src={videoUrl} {...(mimeType ? { type: mimeType } : {})} />
+                  ) : null}
                   Your browser does not support the video tag.
                 </video>
               </div>
