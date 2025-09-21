@@ -63,8 +63,22 @@ function FigureImage({ block }) {
   };
 
   const { stableUrl, finalUrl } = buildProxiedImageUrl(img, block?.id);
+  const fallbackUrl = stableUrl || img;
 
   const { width, height } = extractSizeFromUrl(stableUrl || img);
+
+  const handleImageError = (event) => {
+    const target = event.currentTarget;
+    if (target.dataset.fallbackTried !== '1' && fallbackUrl) {
+      target.dataset.fallbackTried = '1';
+      target.src = fallbackUrl;
+      return;
+    }
+    if (target.dataset.originalTried !== '1' && img) {
+      target.dataset.originalTried = '1';
+      target.src = img;
+    }
+  };
 
   return (
     <figure className="n-figure">
@@ -81,6 +95,7 @@ function FigureImage({ block }) {
           loading="lazy"
           onDragStart={(e) => e.preventDefault()}
           onContextMenu={(e) => e.preventDefault()}
+          onError={handleImageError}
           style={{
             width: '100%',
             height: 'auto',
