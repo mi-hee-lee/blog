@@ -421,7 +421,14 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
             return (
               <div key={b.id} className="n-video">
-                <video controls playsInline preload="metadata">
+                <video
+                  controls
+                  playsInline
+                  preload="metadata"
+                  autoPlay
+                  muted
+                  loop
+                >
                   <source src={resolvedVideoUrl} {...(mimeType ? { type: mimeType } : {})} />
                   Your browser does not support the video tag.
                 </video>
