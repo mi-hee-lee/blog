@@ -714,6 +714,73 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               );
             }
 
+            if (iconText === '#slideRotation' || iconText === '#sliderotation') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#slideRotation' && text !== '#sliderotation';
+              }) || [];
+
+              const imageChildren = (b.children || []).filter(child => child.type === 'image');
+              const otherChildren = (b.children || []).filter(child => child.type !== 'image');
+
+              if (!imageChildren.length) {
+                return (
+                  <div key={b.id} className="n-callout">
+                    <span className="n-callout-ico">{icon}</span>
+                    <div className="n-callout-body">
+                      {filteredText.length > 0 && (
+                        <p>
+                          <Text rich_text={filteredText} />
+                        </p>
+                      )}
+                      {otherChildren.length > 0 ? renderChildren(otherChildren, highlightColor) : null}
+                    </div>
+                  </div>
+                );
+              }
+
+              const isSingle = imageChildren.length === 1;
+              const slotSeconds = 4.8;
+              const totalDuration = Math.max(slotSeconds * imageChildren.length, slotSeconds * 2);
+
+              return (
+                <div key={b.id} className={`n-slide-rotation${isSingle ? ' n-slide-rotation--single' : ''}`}>
+                  <div className="n-slide-rotation__stage">
+                    {imageChildren.map((child, index) => {
+                      const delay = index * slotSeconds;
+                      const style = isSingle
+                        ? undefined
+                        : {
+                            animationDelay: `${delay}s`,
+                            animationDuration: `${totalDuration}s`
+                          };
+                      return (
+                        <div
+                          key={child.id}
+                          className="n-slide-rotation__item"
+                          data-single={isSingle ? 'true' : undefined}
+                          style={style}
+                        >
+                          <FigureImage block={child} />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {(filteredText.length > 0 || otherChildren.length > 0) && (
+                    <div className="n-slide-rotation__content">
+                      {filteredText.length > 0 && (
+                        <p className="n-slide-rotation__text">
+                          <Text rich_text={filteredText} />
+                        </p>
+                      )}
+                      {otherChildren.length > 0 ? renderChildren(otherChildren, highlightColor) : null}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             // #gradient-bottom-md callout 처리 (이전 콘텐츠 하단에 그라데이션 오버레이 - 중간 크기)
             if (iconText === '#gradient-bottom-md' || iconText === '#Gradient-Bottom-Md') {
               const filteredText = b.callout?.rich_text?.filter(t => {
@@ -1771,6 +1838,87 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           width: 100% !important;
           height: auto !important;
           box-sizing: border-box !important;
+        }
+
+        .n-slide-rotation {
+          margin: 48px auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 24px;
+        }
+        .n-slide-rotation__stage {
+          position: relative;
+          width: clamp(240px, 72vw, 460px);
+          height: clamp(240px, 72vw, 460px);
+        }
+        .n-slide-rotation__item {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%) scale(0.94) rotate(-4deg);
+          opacity: 0;
+          animation-name: slide-rotation-sequence;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+        }
+        .n-slide-rotation__item[data-single='true'] {
+          position: relative;
+          top: auto;
+          left: auto;
+          transform: none;
+          opacity: 1;
+          animation: none;
+        }
+        .n-slide-rotation__item figure {
+          margin: 0;
+        }
+        .n-slide-rotation__item img {
+          width: clamp(200px, 65vw, 440px);
+          height: auto;
+          border-radius: 20px;
+          box-shadow: 0 34px 68px rgba(0, 0, 0, 0.32);
+        }
+        .n-slide-rotation__content {
+          text-align: center;
+          max-width: clamp(240px, 80vw, 520px);
+          color: rgba(229, 229, 229, 0.92);
+          font-size: 14px;
+          line-height: 1.7;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .n-slide-rotation__text {
+          margin: 0;
+        }
+        .n-slide-rotation--single .n-slide-rotation__stage {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        @keyframes slide-rotation-sequence {
+          0% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9) rotate(-6deg);
+          }
+          8% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1) rotate(-1deg);
+          }
+          40% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1) rotate(3deg);
+          }
+          52% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.92) rotate(6deg);
+          }
+          100% {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.92) rotate(6deg);
+          }
         }
 
         /* 모바일에서 비디오 최적화 */
