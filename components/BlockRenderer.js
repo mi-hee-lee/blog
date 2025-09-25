@@ -4,6 +4,7 @@
 import SlideCarousel from './SlideCarousel';
 import FullBleedDivider from './FullBleedDivider';
 import SlideRotation from './SlideRotation';
+import ShowcaseCallout from './ShowcaseCallout';
 import { useEffect } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
@@ -826,6 +827,27 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                   ) : null}
                   {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </div>
+              );
+            }
+
+            if (iconText === '#Showcase' || iconText === '#showcase') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#Showcase' && text !== '#showcase';
+              }) || [];
+
+              const images = (b.children || []).filter(child => child.type === 'image');
+              const others = (b.children || []).filter(child => child.type !== 'image');
+
+              return (
+                <ShowcaseCallout
+                  key={b.id}
+                  id={b.id}
+                  richText={filteredText}
+                  images={images}
+                >
+                  {others.length ? renderChildren(others, highlightColor) : null}
+                </ShowcaseCallout>
               );
             }
 
