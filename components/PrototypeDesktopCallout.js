@@ -3,7 +3,6 @@ import React from 'react';
 function resolveEmbedUrl(url = '') {
   if (!url) return '';
 
-  // Normalize YouTube links
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
     let videoId = '';
     if (url.includes('watch?v=')) {
@@ -16,7 +15,6 @@ function resolveEmbedUrl(url = '') {
     }
   }
 
-  // Normalize Vimeo links
   if (url.includes('vimeo.com')) {
     const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
     if (vimeoMatch) {
@@ -27,7 +25,7 @@ function resolveEmbedUrl(url = '') {
   return url;
 }
 
-function PrototypeWebCallout({ id, embeds = [], children }) {
+function PrototypeDesktopCallout({ id, embeds = [], children }) {
   const primaryEmbed = embeds[0];
   const embedUrl = resolveEmbedUrl(primaryEmbed?.embed?.url || '');
   const captionText = Array.isArray(primaryEmbed?.embed?.caption)
@@ -35,34 +33,35 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
     : '';
 
   return (
-    <section className="prototype-web" id={id}>
-      <div className="prototype-web__inner">
+    <section className="prototype-desktop" id={id}>
+      <div className="prototype-desktop__inner">
         {embedUrl ? (
-          <div className="prototype-web__frame">
-            <div className="prototype-web__frame-layer">
+          <div className="prototype-desktop__frame">
+            <div className="prototype-desktop__frame-layer">
               <iframe
                 src={embedUrl}
-                title={captionText || 'prototype-web-embed'}
+                title={captionText || 'prototype-desktop-embed'}
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 allowFullScreen
+                scrolling="no"
               />
             </div>
           </div>
         ) : null}
 
-        {children ? <div className="prototype-web__extra">{children}</div> : null}
+        {children ? <div className="prototype-desktop__extra">{children}</div> : null}
       </div>
 
       <style jsx>{`
-        .prototype-web {
+        .prototype-desktop {
           width: 100%;
-          height: 1280px;
+          padding: 160px 0;
           display: flex;
           justify-content: center;
         }
 
-        .prototype-web__inner {
+        .prototype-desktop__inner {
           width: 100%;
           max-width: 1440px;
           display: flex;
@@ -71,18 +70,16 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
           gap: 40px;
         }
 
-        .prototype-web__frame {
+        .prototype-desktop__frame {
           position: relative;
           width: 100%;
           max-width: 1440px;
           padding-top: calc((1280 / 1440) * 100%);
-          animation: prototype-web-width 10s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-          transition: max-width 0.6s ease-in-out;
           margin: 0 auto;
           overflow: visible;
         }
 
-        .prototype-web__frame-layer {
+        .prototype-desktop__frame-layer {
           position: absolute;
           top: 0;
           left: 50%;
@@ -94,13 +91,15 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
           overflow: hidden;
         }
 
-        .prototype-web__frame-layer iframe {
+        .prototype-desktop__frame-layer iframe {
           width: 100%;
           height: 100%;
           border: none;
+          pointer-events: auto;
+          overflow: hidden;
         }
 
-        .prototype-web__extra {
+        .prototype-desktop__extra {
           width: 100%;
           display: flex;
           flex-direction: column;
@@ -108,7 +107,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
           gap: 24px;
         }
 
-        .prototype-web__extra :global(.prototype-web__text) {
+        .prototype-desktop__extra :global(.prototype-callout__text) {
           margin: 0;
           max-width: 880px;
           font-size: 18px;
@@ -117,34 +116,15 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
           text-align: center;
         }
 
-        @keyframes prototype-web-width {
-          0%,
-          12% { max-width: 1440px; }
-          25% { max-width: 1100px; }
-          38% { max-width: 800px; }
-          48% { max-width: 560px; }
-          52% { max-width: 400px; }
-          62% { max-width: 560px; }
-          72% { max-width: 800px; }
-          85% { max-width: 1100px; }
-          100% { max-width: 1440px; }
-        }
-
         @media (max-width: 960px) {
-          .prototype-web {
+          .prototype-desktop {
             padding: 120px 0;
-          }
-          .prototype-web__frame {
-            animation-duration: 10s;
           }
         }
 
         @media (max-width: 600px) {
-          .prototype-web {
+          .prototype-desktop {
             padding: 100px 0;
-          }
-          .prototype-web__frame {
-            animation-duration: 10s;
           }
         }
       `}</style>
@@ -152,4 +132,4 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
   );
 }
 
-export default PrototypeWebCallout;
+export default PrototypeDesktopCallout;

@@ -5,7 +5,8 @@ import SlideCarousel from './SlideCarousel';
 import FullBleedDivider from './FullBleedDivider';
 import SlideRotation from './SlideRotation';
 import ShowcaseCallout from './ShowcaseCallout';
-import PrototypeWebCallout from './PrototypeWebCallout';
+import PrototypeBreakpointCallout from './PrototypeBreakpointCallout';
+import PrototypeDesktopCallout from './PrototypeDesktopCallout';
 import { useEffect } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
@@ -882,18 +883,14 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
             }
 
             if (
-              iconText === '#prototyeWeb' ||
-              iconText === '#prototyeweb' ||
-              iconText === '#prototypeWeb' ||
-              iconText === '#prototypeweb'
+              iconText === '#PrototypeBreakpoint' ||
+              iconText === '#prototypebreakpoint'
             ) {
               const filteredText = b.callout?.rich_text?.filter(t => {
                 const text = (t.plain_text || '').trim();
                 return (
-                  text !== '#prototyeWeb' &&
-                  text !== '#prototyeweb' &&
-                  text !== '#prototypeWeb' &&
-                  text !== '#prototypeweb'
+                  text !== '#PrototypeBreakpoint' &&
+                  text !== '#prototypebreakpoint'
                 );
               }) || [];
 
@@ -903,18 +900,48 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               const hasExtraContent = filteredText.length || remainingChildren.length;
 
               return (
-                <PrototypeWebCallout key={b.id} id={b.id} embeds={embedBlocks}>
+                <PrototypeBreakpointCallout key={b.id} id={b.id} embeds={embedBlocks}>
                   {hasExtraContent ? (
                     <>
                       {filteredText.length ? (
-                        <p className="prototype-web__text">
+                        <p className="prototype-callout__text">
                           <Text rich_text={filteredText} />
                         </p>
                       ) : null}
                       {remainingChildren.length ? renderChildren(remainingChildren, highlightColor) : null}
                     </>
                   ) : null}
-                </PrototypeWebCallout>
+                </PrototypeBreakpointCallout>
+              );
+            }
+
+            if (
+              iconText === '#PrototypeDesktop' ||
+              iconText === '#prototypedesktop'
+            ) {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#PrototypeDesktop' && text !== '#prototypedesktop';
+              }) || [];
+
+              const embedBlocks = (b.children || []).filter(child => child.type === 'embed');
+              const remainingChildren = (b.children || []).filter(child => child.type !== 'embed');
+
+              const hasExtraContent = filteredText.length || remainingChildren.length;
+
+              return (
+                <PrototypeDesktopCallout key={b.id} id={b.id} embeds={embedBlocks}>
+                  {hasExtraContent ? (
+                    <>
+                      {filteredText.length ? (
+                        <p className="prototype-callout__text">
+                          <Text rich_text={filteredText} />
+                        </p>
+                      ) : null}
+                      {remainingChildren.length ? renderChildren(remainingChildren, highlightColor) : null}
+                    </>
+                  ) : null}
+                </PrototypeDesktopCallout>
               );
             }
 
