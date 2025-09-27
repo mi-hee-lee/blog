@@ -69,28 +69,30 @@ function useViewport() {
 
 const IMAGE_LAYOUTS = {
   desktop: [
-    { top: '0.5%', left: '18%', right: '48%', bottom: '12%', rotate: -2, delay: 0.0 },
-    { top: '2%', left: '76%', right: '4%', bottom: '50%', rotate: 5, delay: 0.4 },
-    { top: '22%', left: '2%', right: '74%', bottom: '36%', rotate: -5, delay: 0.8 },
-    { top: '0%', left: '56%', right: '24%', bottom: '50%', rotate: 3, delay: 1.2 },
-    { top: '48%', left: '56%', right: '18%', bottom: '-6%', rotate: -4, delay: 1.6 },
-    { top: '50%', left: '82%', right: '-6%', bottom: '-6%', rotate: 6, delay: 2.0 }
+    { top: '2%', left: '10%', width: '22%', aspect: 1.3, radius: '26px', rotate: 0, delay: 0.2 },
+    { top: '0%', left: '38%', width: '26%', aspect: 1.1, radius: '32px', rotate: 0, delay: 0.4 },
+    { top: '0%', left: '68%', width: '22%', aspect: 1.4, radius: '32px', rotate: 0, delay: 0.6 },
+    { top: '36%', left: '8%', width: '24%', aspect: 1.3, radius: '28px', rotate: 0, delay: 0.8 },
+    { top: '32%', left: '70%', width: '24%', aspect: 1.3, radius: '24px', rotate: 0, delay: 1.0 },
+    { top: '64%', left: '12%', width: '22%', aspect: 1.2, radius: '24px', rotate: 0, delay: 1.2 },
+    { top: '60%', left: '42%', width: '22%', aspect: 1.0, radius: '28px', rotate: 0, delay: 1.4 },
+    { top: '56%', left: '68%', width: '22%', aspect: 1.2, radius: '24px', rotate: 0, delay: 1.6 }
   ],
   tablet: [
-    { top: '10%', left: '32%', right: '32%', bottom: '14%', rotate: 2, delay: 0.0 },
-    { top: '12%', left: '80%', right: '-8%', bottom: '46%', rotate: 5, delay: 0.4 },
-    { top: '24%', left: '0%', right: '74%', bottom: '24%', rotate: -5, delay: 0.8 },
-    { top: '12%', left: '68%', right: '10%', bottom: '48%', rotate: 3, delay: 1.2 },
-    { top: '64%', left: '64%', right: '14%', bottom: '-18%', rotate: -3, delay: 1.6 },
-    { top: '66%', left: '90%', right: '-12%', bottom: '-18%', rotate: 4, delay: 2.0 }
+    { top: '4%', left: '12%', width: '28%', aspect: 1.2, radius: '24px', rotate: 0, delay: 0.2 },
+    { top: '0%', left: '50%', width: '30%', aspect: 1.1, radius: '28px', rotate: 0, delay: 0.4 },
+    { top: '40%', left: '6%', width: '30%', aspect: 1.2, radius: '24px', rotate: 0, delay: 0.6 },
+    { top: '36%', left: '60%', width: '28%', aspect: 1.2, radius: '22px', rotate: 0, delay: 0.8 },
+    { top: '72%', left: '16%', width: '30%', aspect: 1.1, radius: '24px', rotate: 0, delay: 1.0 },
+    { top: '68%', left: '54%', width: '30%', aspect: 1.1, radius: '24px', rotate: 0, delay: 1.2 }
   ],
   mobile: [
-    { top: '16%', left: '32%', right: '30%', bottom: '20%', rotate: 2, delay: 0.0 },
-    { top: '8%', left: '72%', right: '-18%', bottom: '42%', rotate: 6, delay: 0.4 },
-    { top: '-20%', left: '0%', right: '76%', bottom: '40%', rotate: -6, delay: 0.8 },
-    { top: '36%', left: '70%', right: '6%', bottom: '40%', rotate: 4, delay: 1.2 },
-    { top: '82%', left: '60%', right: '12%', bottom: '-30%', rotate: -4, delay: 1.6 },
-    { top: '78%', left: '88%', right: '-20%', bottom: '-28%', rotate: 5, delay: 2.0 }
+    { top: '14%', left: '18%', width: '52%', aspect: 1.2, radius: '20px', rotate: 0, delay: 0.2 },
+    { top: '0%', left: '48%', width: '50%', aspect: 1.1, radius: '24px', rotate: 0, delay: 0.4 },
+    { top: '46%', left: '6%', width: '56%', aspect: 1.2, radius: '20px', rotate: 0, delay: 0.6 },
+    { top: '42%', left: '54%', width: '50%', aspect: 1.2, radius: '20px', rotate: 0, delay: 0.8 },
+    { top: '84%', left: '14%', width: '56%', aspect: 1.1, radius: '20px', rotate: 0, delay: 1.0 },
+    { top: '80%', left: '54%', width: '50%', aspect: 1.1, radius: '20px', rotate: 0, delay: 1.2 }
   ]
 };
 
@@ -136,8 +138,9 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
                 style={{
                   top: layout.top,
                   left: layout.left,
-                  right: layout.right,
-                  bottom: layout.bottom,
+                  width: layout.width,
+                  aspectRatio: layout.aspect || 1.2,
+                  borderRadius: layout.radius || '24px',
                   '--showcase-initial': `${layout.rotate || 0}deg`,
                   '--showcase-delay': `${layout.delay || 0}s`,
                   '--showcase-duration': `${layout.duration || 15}s`
@@ -168,7 +171,10 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
         .showcase__inner {
           position: relative;
           width: 100%;
-          min-height: 540px;
+          min-height: 720px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .showcase__text {
@@ -213,12 +219,14 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
         .showcase__image {
           position: absolute;
           overflow: hidden;
-          border-radius: 20px;
           box-shadow: 0 35px 60px rgba(0, 0, 0, 0.35);
           pointer-events: none;
           z-index: 1;
           animation: showcase-spin var(--showcase-duration, 18s) linear infinite;
           animation-delay: var(--showcase-delay, 0s);
+          animation-direction: normal;
+          transform-origin: center center;
+          transform: rotate(var(--showcase-initial, 0deg));
         }
 
         .showcase__image img {
@@ -242,7 +250,7 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
             padding: 120px 0;
           }
           .showcase__inner {
-            min-height: 560px;
+            min-height: 640px;
           }
         }
 
@@ -251,7 +259,7 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
             padding: 100px 0;
           }
           .showcase__inner {
-            min-height: 620px;
+            min-height: 720px;
           }
           .showcase__text {
             max-width: 90%;
