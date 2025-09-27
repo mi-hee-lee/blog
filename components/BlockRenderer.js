@@ -5,6 +5,7 @@ import SlideCarousel from './SlideCarousel';
 import FullBleedDivider from './FullBleedDivider';
 import SlideRotation from './SlideRotation';
 import ShowcaseCallout from './ShowcaseCallout';
+import PrototypeWebCallout from './PrototypeWebCallout';
 import { useEffect } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
@@ -840,6 +841,43 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                   ) : null}
                   {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </div>
+              );
+            }
+
+            if (
+              iconText === '#prototyeWeb' ||
+              iconText === '#prototyeweb' ||
+              iconText === '#prototypeWeb' ||
+              iconText === '#prototypeweb'
+            ) {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return (
+                  text !== '#prototyeWeb' &&
+                  text !== '#prototyeweb' &&
+                  text !== '#prototypeWeb' &&
+                  text !== '#prototypeweb'
+                );
+              }) || [];
+
+              const embedBlocks = (b.children || []).filter(child => child.type === 'embed');
+              const remainingChildren = (b.children || []).filter(child => child.type !== 'embed');
+
+              const hasExtraContent = filteredText.length || remainingChildren.length;
+
+              return (
+                <PrototypeWebCallout key={b.id} id={b.id} embeds={embedBlocks}>
+                  {hasExtraContent ? (
+                    <>
+                      {filteredText.length ? (
+                        <p className="prototype-web__text">
+                          <Text rich_text={filteredText} />
+                        </p>
+                      ) : null}
+                      {remainingChildren.length ? renderChildren(remainingChildren, highlightColor) : null}
+                    </>
+                  ) : null}
+                </PrototypeWebCallout>
               );
             }
 
