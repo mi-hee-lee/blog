@@ -58,7 +58,6 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
         .prototype-web {
           width: 100%;
           height: 1280px;
-          padding: 160px 0;
           display: flex;
           justify-content: center;
         }
@@ -93,7 +92,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
           transform-origin: top center;
           border-radius: 0;
           background: #000;
-          box-shadow: 0 35px 60px rgba(0, 0, 0, 0.35);
+          box-shadow: 0 0 0 60px rgba(0, 0, 0, 0.06);
           overflow: hidden;
         }
 
