@@ -76,7 +76,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
           width: 100%;
           max-width: 1440px;
           padding-top: calc((1280 / 1440) * 100%);
-          animation: prototype-web-width 6s ease-in-out infinite;
+          animation: prototype-web-width 10s ease-in-out infinite;
           transition: max-width 0.6s ease-in-out;
           margin: 0 auto;
           overflow: visible;
@@ -130,7 +130,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
             padding: 120px 0;
           }
           .prototype-web__frame {
-            animation-duration: 6s;
+            animation-duration: 10s;
           }
         }
 
