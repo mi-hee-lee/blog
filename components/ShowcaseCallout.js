@@ -2,47 +2,37 @@ import { useEffect, useMemo, useState } from 'react';
 import { buildProxiedImageUrl } from '../lib/notionImage';
 
 function parseSections(richText = []) {
-  const plain = richText.map((t) => t.plain_text || '').join(' ').trim();
-  if (!plain) {
-    return { title: '', subtitle: '', descHeading: '', descDetail: '' };
-  }
+  const result = {
+    title: [],
+    desc: []
+  };
 
-  const lower = plain.toLowerCase();
+  const markers = new Set(['#title', '#desc']);
+  let current = null;
 
-  const getSection = (marker, nextMarker) => {
-    const markerLower = marker.toLowerCase();
-    const start = lower.indexOf(markerLower);
-    if (start === -1) return '';
-    const from = start + markerLower.length;
-    let end = plain.length;
-    if (nextMarker) {
-      const nextLower = nextMarker.toLowerCase();
-      const nextIdx = lower.indexOf(nextLower, from);
-      if (nextIdx !== -1) end = nextIdx;
+  richText.forEach((segment) => {
+    const text = (segment?.plain_text || '').trim();
+    if (!text) return;
+
+    const lower = text.toLowerCase();
+    if (markers.has(lower)) {
+      current = lower === '#title' ? 'title' : 'desc';
+      return;
     }
-    return plain.slice(from, end).trim();
-  };
 
-  const titleRaw = getSection('#Title', '#Desc');
-  const descRaw = getSection('#Desc');
+    if (!current) return;
 
-  const extract = (raw = '') => {
-    const braces = [];
-    const text = raw.replace(/\{([^}]+)\}/g, (_, inner) => {
-      braces.push(inner.trim());
-      return ' ';
-    });
-    return { text: text.trim(), braces };
-  };
-
-  const titleParts = extract(titleRaw);
-  const descParts = extract(descRaw);
+    const matches = [...text.matchAll(/\{([^}]+)\}/g)].map((m) => m[1].trim());
+    if (matches.length) {
+      result[current].push(...matches.filter(Boolean));
+    } else {
+      result[current].push(text);
+    }
+  });
 
   return {
-    title: titleParts.text,
-    subtitle: titleParts.braces[0] || '',
-    descHeading: descParts.text,
-    descDetail: descParts.braces[0] || ''
+    title: result.title.join(' ').trim(),
+    desc: result.desc.join(' ').trim()
   };
 }
 
@@ -145,9 +135,7 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
         <div className="showcase__inner">
           <div className="showcase__text">
             {sections.title && <h2 className="showcase__title">{sections.title}</h2>}
-            {sections.subtitle && <p className="showcase__subtitle">{sections.subtitle}</p>}
-            {sections.descHeading && <p className="showcase__desc">{sections.descHeading}</p>}
-            {sections.descDetail && <p className="showcase__detail">{sections.descDetail}</p>}
+            {sections.desc && <p className="showcase__desc">{sections.desc}</p>}
             {children}
           </div>
         </div>
@@ -163,30 +151,30 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
 
         .showcase__stage {
           position: relative;
-          width: min(960px, 100%);
-          min-height: 760px;
-          --showcase-img-width: 220px;
+          width: min(1040px, 100%);
+          min-height: 860px;
+          --showcase-img-width: 260px;
         }
 
         .showcase__ring {
           position: absolute;
           inset: 0;
           margin: 0 auto;
-          width: clamp(360px, 70vw, 720px);
-          height: clamp(360px, 70vw, 720px);
+          width: clamp(420px, 76vw, 820px);
+          height: clamp(420px, 76vw, 820px);
           animation: showcase-orbit 28s linear infinite;
           transform-origin: center;
           z-index: 1;
         }
 
         .showcase__ring--tablet {
-          width: clamp(320px, 78vw, 640px);
-          height: clamp(320px, 78vw, 640px);
+          width: clamp(360px, 82vw, 720px);
+          height: clamp(360px, 82vw, 720px);
         }
 
         .showcase__ring--mobile {
-          width: clamp(280px, 84vw, 520px);
-          height: clamp(280px, 84vw, 520px);
+          width: clamp(320px, 90vw, 600px);
+          height: clamp(320px, 90vw, 600px);
         }
 
         .showcase__slot {
@@ -221,7 +209,7 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
         .showcase__inner {
           position: relative;
           width: 100%;
-          min-height: 760px;
+          min-height: 860px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -240,31 +228,18 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
         }
 
         .showcase__title {
-          font-size: clamp(28px, 5vw, 48px);
+          font-size: 20px;
+          line-height: 1.5;
           font-weight: 600;
           color: #ffffff;
           margin: 0;
         }
 
-        .showcase__subtitle {
-          margin: 0;
-          font-size: clamp(16px, 3vw, 22px);
-          color: rgba(255, 255, 255, 0.8);
-          letter-spacing: 0.02em;
-        }
-
         .showcase__desc {
-          margin: 12px 0 0;
-          font-size: 15px;
-          font-weight: 500;
-          color: rgba(255, 255, 255, 0.78);
-        }
-
-        .showcase__detail {
           margin: 0;
           font-size: 14px;
-          line-height: 1.8;
-          color: rgba(255, 255, 255, 0.68);
+          line-height: 1.5;
+          color: rgba(255, 255, 255, 0.7);
         }
 
         @keyframes showcase-orbit {
@@ -282,10 +257,10 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
             padding: 120px 0;
           }
           .showcase__inner {
-            min-height: 680px;
+            min-height: 760px;
           }
           .showcase__stage {
-            --showcase-img-width: 190px;
+            --showcase-img-width: 220px;
           }
         }
 
@@ -294,13 +269,13 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
             padding: 100px 0;
           }
           .showcase__inner {
-            min-height: 700px;
+            min-height: 720px;
           }
           .showcase__text {
             max-width: 90%;
           }
           .showcase__stage {
-            --showcase-img-width: 150px;
+            --showcase-img-width: 170px;
           }
         }
       `}</style>
