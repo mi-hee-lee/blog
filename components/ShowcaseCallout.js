@@ -69,30 +69,31 @@ function useViewport() {
 
 const IMAGE_LAYOUTS = {
   desktop: [
-    { top: '2%', left: '10%', width: '22%', aspect: 1.3, radius: '26px', rotate: 0, delay: 0.2 },
-    { top: '0%', left: '38%', width: '26%', aspect: 1.1, radius: '32px', rotate: 0, delay: 0.4 },
-    { top: '0%', left: '68%', width: '22%', aspect: 1.4, radius: '32px', rotate: 0, delay: 0.6 },
-    { top: '36%', left: '8%', width: '24%', aspect: 1.3, radius: '28px', rotate: 0, delay: 0.8 },
-    { top: '32%', left: '70%', width: '24%', aspect: 1.3, radius: '24px', rotate: 0, delay: 1.0 },
-    { top: '64%', left: '12%', width: '22%', aspect: 1.2, radius: '24px', rotate: 0, delay: 1.2 },
-    { top: '60%', left: '42%', width: '22%', aspect: 1.0, radius: '28px', rotate: 0, delay: 1.4 },
-    { top: '56%', left: '68%', width: '22%', aspect: 1.2, radius: '24px', rotate: 0, delay: 1.6 }
+    { top: '14%', left: '25%' },
+    { top: '10%', left: '50%' },
+    { top: '16%', left: '74%' },
+    { top: '44%', left: '18%' },
+    { top: '45%', left: '82%' },
+    { top: '78%', left: '30%' },
+    { top: '76%', left: '56%' },
+    { top: '72%', left: '82%' }
   ],
   tablet: [
-    { top: '4%', left: '12%', width: '28%', aspect: 1.2, radius: '24px', rotate: 0, delay: 0.2 },
-    { top: '0%', left: '50%', width: '30%', aspect: 1.1, radius: '28px', rotate: 0, delay: 0.4 },
-    { top: '40%', left: '6%', width: '30%', aspect: 1.2, radius: '24px', rotate: 0, delay: 0.6 },
-    { top: '36%', left: '60%', width: '28%', aspect: 1.2, radius: '22px', rotate: 0, delay: 0.8 },
-    { top: '72%', left: '16%', width: '30%', aspect: 1.1, radius: '24px', rotate: 0, delay: 1.0 },
-    { top: '68%', left: '54%', width: '30%', aspect: 1.1, radius: '24px', rotate: 0, delay: 1.2 }
+    { top: '18%', left: '30%' },
+    { top: '12%', left: '58%' },
+    { top: '22%', left: '82%' },
+    { top: '48%', left: '18%' },
+    { top: '52%', left: '78%' },
+    { top: '84%', left: '32%' },
+    { top: '82%', left: '60%' }
   ],
   mobile: [
-    { top: '14%', left: '18%', width: '52%', aspect: 1.2, radius: '20px', rotate: 0, delay: 0.2 },
-    { top: '0%', left: '48%', width: '50%', aspect: 1.1, radius: '24px', rotate: 0, delay: 0.4 },
-    { top: '46%', left: '6%', width: '56%', aspect: 1.2, radius: '20px', rotate: 0, delay: 0.6 },
-    { top: '42%', left: '54%', width: '50%', aspect: 1.2, radius: '20px', rotate: 0, delay: 0.8 },
-    { top: '84%', left: '14%', width: '56%', aspect: 1.1, radius: '20px', rotate: 0, delay: 1.0 },
-    { top: '80%', left: '54%', width: '50%', aspect: 1.1, radius: '20px', rotate: 0, delay: 1.2 }
+    { top: '24%', left: '34%' },
+    { top: '18%', left: '70%' },
+    { top: '38%', left: '88%' },
+    { top: '58%', left: '20%' },
+    { top: '68%', left: '70%' },
+    { top: '92%', left: '40%' }
   ]
 };
 
@@ -119,6 +120,28 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
   return (
     <section className="showcase">
       <div className="showcase__stage">
+        <div className={`showcase__ring showcase__ring--${viewport}`}>
+          {normalizedImages.map((img, idx) => {
+            const layout = layouts[idx % layouts.length];
+            if (!layout || !img.url) return null;
+            return (
+              <div
+                key={img.id}
+                className="showcase__slot"
+                style={{
+                  '--slot-top': layout.top,
+                  '--slot-left': layout.left
+                }}
+              >
+                <figure className="showcase__image">
+                  <img src={img.url} alt="" loading="lazy" />
+                  {img.caption ? <figcaption>{img.caption}</figcaption> : null}
+                </figure>
+              </div>
+            );
+          })}
+        </div>
+
         <div className="showcase__inner">
           <div className="showcase__text">
             {sections.title && <h2 className="showcase__title">{sections.title}</h2>}
@@ -127,31 +150,6 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
             {sections.descDetail && <p className="showcase__detail">{sections.descDetail}</p>}
             {children}
           </div>
-
-          {normalizedImages.map((img, idx) => {
-            const layout = layouts[idx % layouts.length];
-            if (!layout || !img.url) return null;
-            return (
-              <figure
-                key={img.id}
-                className="showcase__image"
-                style={{
-                  top: layout.top,
-                  left: layout.left,
-                  width: layout.width,
-                  aspectRatio: layout.aspect || 1.2,
-                  borderRadius: layout.radius || '24px',
-                  '--showcase-initial': `${layout.rotate || 0}deg`,
-                  '--showcase-delay': `${layout.delay || 0}s`,
-                  '--showcase-duration': `${layout.duration || 15}s`
-                }}
-                aria-hidden="true"
-              >
-                <img src={img.url} alt="" loading="lazy" />
-                {img.caption ? <figcaption>{img.caption}</figcaption> : null}
-              </figure>
-            );
-          })}
         </div>
       </div>
 
@@ -166,15 +164,68 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
         .showcase__stage {
           position: relative;
           width: min(960px, 100%);
+          min-height: 760px;
+          --showcase-img-width: 220px;
+        }
+
+        .showcase__ring {
+          position: absolute;
+          inset: 0;
+          margin: 0 auto;
+          width: clamp(360px, 70vw, 720px);
+          height: clamp(360px, 70vw, 720px);
+          animation: showcase-orbit 28s linear infinite;
+          transform-origin: center;
+          z-index: 1;
+        }
+
+        .showcase__ring--tablet {
+          width: clamp(320px, 78vw, 640px);
+          height: clamp(320px, 78vw, 640px);
+        }
+
+        .showcase__ring--mobile {
+          width: clamp(280px, 84vw, 520px);
+          height: clamp(280px, 84vw, 520px);
+        }
+
+        .showcase__slot {
+          position: absolute;
+          top: var(--slot-top);
+          left: var(--slot-left);
+          transform: translate(-50%, -50%);
+          width: var(--showcase-img-width);
+        }
+
+        .showcase__image {
+          width: 100%;
+          border-radius: 6px;
+          overflow: hidden;
+          box-shadow: 0 35px 60px rgba(0, 0, 0, 0.35);
+          pointer-events: none;
+          animation: showcase-counter 28s linear infinite;
+          transform-origin: center;
+        }
+
+        .showcase__slot img {
+          display: block;
+          width: 100%;
+          height: auto;
+          object-fit: cover;
+        }
+
+        .showcase__slot figcaption {
+          display: none;
         }
 
         .showcase__inner {
           position: relative;
           width: 100%;
-          min-height: 720px;
+          min-height: 760px;
           display: flex;
           align-items: center;
           justify-content: center;
+          z-index: 2;
         }
 
         .showcase__text {
@@ -216,33 +267,14 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
           color: rgba(255, 255, 255, 0.68);
         }
 
-        .showcase__image {
-          position: absolute;
-          overflow: hidden;
-          box-shadow: 0 35px 60px rgba(0, 0, 0, 0.35);
-          pointer-events: none;
-          z-index: 1;
-          animation: showcase-spin var(--showcase-duration, 18s) linear infinite;
-          animation-delay: var(--showcase-delay, 0s);
-          animation-direction: normal;
-          transform-origin: center center;
-          transform: rotate(var(--showcase-initial, 0deg));
+        @keyframes showcase-orbit {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
 
-        .showcase__image img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          display: block;
-        }
-
-        .showcase__image figcaption {
-          display: none;
-        }
-
-        @keyframes showcase-spin {
-          from { transform: rotate(var(--showcase-initial, 0deg)); }
-          to { transform: rotate(calc(var(--showcase-initial, 0deg) + 360deg)); }
+        @keyframes showcase-counter {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(-360deg); }
         }
 
         @media (max-width: 960px) {
@@ -250,7 +282,10 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
             padding: 120px 0;
           }
           .showcase__inner {
-            min-height: 640px;
+            min-height: 680px;
+          }
+          .showcase__stage {
+            --showcase-img-width: 190px;
           }
         }
 
@@ -259,10 +294,13 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
             padding: 100px 0;
           }
           .showcase__inner {
-            min-height: 720px;
+            min-height: 700px;
           }
           .showcase__text {
             max-width: 90%;
+          }
+          .showcase__stage {
+            --showcase-img-width: 150px;
           }
         }
       `}</style>
