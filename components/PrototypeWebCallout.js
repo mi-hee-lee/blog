@@ -74,7 +74,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
           position: relative;
           width: 100%;
           max-width: 1440px;
-          padding-top: calc(56.25% * 0.75);
+          padding-top: 56.25%;
           animation: prototype-web-width 18s ease-in-out infinite;
           transition: max-width 0.6s ease-in-out;
           margin: 0 auto;
@@ -85,7 +85,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
           position: absolute;
           top: 0;
           left: 50%;
-          width: 100%;
+          width: calc(100% / 0.75);
           height: calc(100% / 0.75);
           transform: translateX(-50%) scale(0.75);
           transform-origin: top center;
