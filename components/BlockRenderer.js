@@ -359,12 +359,12 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
   const hasRenderableBlocks = Array.isArray(blocks) && blocks.length > skipUntil;
 
   if (!hasRenderableBlocks) {
-    return globalCss ? <style jsx global>{globalCss}</style> : null;
+    return globalCss ? <style dangerouslySetInnerHTML={{ __html: globalCss }} /> : null;
   }
 
   return (
     <div className={`n-content ${!isNested ? 'n-content-root' : ''}`}>
-      {globalCss ? <style jsx global>{globalCss}</style> : null}
+      {globalCss ? <style dangerouslySetInnerHTML={{ __html: globalCss }} /> : null}
       {blocks.map((b, index) => {
         if (index < skipUntil) return null;
         const t = b.type;
