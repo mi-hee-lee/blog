@@ -57,6 +57,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
       <style jsx>{`
         .prototype-web {
           width: 100%;
+          height: 1280px;
           padding: 160px 0;
           display: flex;
           justify-content: center;
@@ -121,11 +122,9 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
 
         @keyframes prototype-web-width {
           0% { max-width: 1440px; }
-          20% { max-width: 1440px; }
           35% { max-width: 800px; }
           50% { max-width: 400px; }
           65% { max-width: 800px; }
-          80% { max-width: 1440px; }
           100% { max-width: 1440px; }
         }
 
@@ -143,7 +142,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
             padding: 100px 0;
           }
           .prototype-web__frame {
-            animation-duration: 14s;
+            animation-duration: 10s;
           }
         }
       `}</style>
