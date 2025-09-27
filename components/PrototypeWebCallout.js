@@ -76,7 +76,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
           width: 100%;
           max-width: 1440px;
           padding-top: calc((1280 / 1440) * 100%);
-          animation: prototype-web-width 10s ease-in-out infinite;
+          animation: prototype-web-width 10s cubic-bezier(0.4, 0, 0.2, 1) infinite;
           transition: max-width 0.6s ease-in-out;
           margin: 0 auto;
           overflow: visible;
@@ -118,10 +118,15 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
         }
 
         @keyframes prototype-web-width {
-          0% { max-width: 1440px; }
-          35% { max-width: 800px; }
-          50% { max-width: 400px; }
-          65% { max-width: 800px; }
+          0%,
+          12% { max-width: 1440px; }
+          25% { max-width: 1100px; }
+          38% { max-width: 800px; }
+          48% { max-width: 560px; }
+          52% { max-width: 400px; }
+          62% { max-width: 560px; }
+          72% { max-width: 800px; }
+          85% { max-width: 1100px; }
           100% { max-width: 1440px; }
         }
 
