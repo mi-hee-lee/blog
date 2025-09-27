@@ -175,6 +175,37 @@ function getBlockPlainText(block) {
 }
 
 export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3', isNested = false }) {
+  let globalCss = '';
+  let skipUntil = 0;
+
+  if (!isNested && Array.isArray(blocks) && blocks.length) {
+    const collectedStyles = [];
+    const allowedLanguages = new Set(['', 'css', 'scss', 'less', 'plain text', 'plain_text', 'plaintext']);
+
+    for (let i = 0; i < blocks.length; i += 1) {
+      const block = blocks[i];
+      if (block?.type !== 'code') break;
+
+      const language = (block.code?.language || '').toLowerCase();
+      if (!allowedLanguages.has(language)) break;
+
+      const codeText = (block.code?.rich_text || [])
+        .map((t) => t.plain_text || '')
+        .join('');
+
+      if (codeText.trim()) {
+        collectedStyles.push(codeText);
+      }
+
+      skipUntil = i + 1;
+    }
+
+    if (collectedStyles.length) {
+      globalCss = collectedStyles.join('\n');
+    } else {
+      skipUntil = 0;
+    }
+  }
   useEffect(() => {
     // As-Is, To-Be 카드의 strong 요소 체크 및 클래스 추가
     const handleCardAlignment = () => {
@@ -325,11 +356,17 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
       window.removeEventListener('resize', handleResize);
     };
   }, [blocks]);
-  if (!Array.isArray(blocks) || !blocks.length) return null;
+  const hasRenderableBlocks = Array.isArray(blocks) && blocks.length > skipUntil;
+
+  if (!hasRenderableBlocks) {
+    return globalCss ? <style jsx global>{globalCss}</style> : null;
+  }
 
   return (
     <div className={`n-content ${!isNested ? 'n-content-root' : ''}`}>
+      {globalCss ? <style jsx global>{globalCss}</style> : null}
       {blocks.map((b, index) => {
+        if (index < skipUntil) return null;
         const t = b.type;
 
         switch (t) {
