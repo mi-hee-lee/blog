@@ -63,7 +63,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
         }
 
         .prototype-web__inner {
-          width: min(1240px, 100%);
+          width: min(1440px, 100%);
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -73,7 +73,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
         .prototype-web__frame {
           position: relative;
           width: 100%;
-          max-width: 1280px;
+          max-width: 1440px;
           padding-top: calc(56.25% * 0.75);
           animation: prototype-web-width 18s ease-in-out infinite;
           transition: max-width 0.6s ease-in-out;
@@ -119,13 +119,13 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
         }
 
         @keyframes prototype-web-width {
-          0% { max-width: 1280px; }
-          20% { max-width: 1280px; }
+          0% { max-width: 1440px; }
+          20% { max-width: 1440px; }
           35% { max-width: 800px; }
           50% { max-width: 400px; }
           65% { max-width: 800px; }
-          80% { max-width: 1280px; }
-          100% { max-width: 1280px; }
+          80% { max-width: 1440px; }
+          100% { max-width: 1440px; }
         }
 
         @media (max-width: 960px) {
