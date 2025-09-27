@@ -89,7 +89,7 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
           height: calc(100% / 0.75);
           transform: translateX(-50%) scale(0.75);
           transform-origin: top center;
-          border-radius: 16px;
+          border-radius: 0;
           background: #000;
           box-shadow: 0 35px 60px rgba(0, 0, 0, 0.35);
           overflow: hidden;
