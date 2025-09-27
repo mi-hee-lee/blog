@@ -91,8 +91,6 @@ function PrototypeWebCallout({ id, embeds = [], children }) {
           transform: translateX(-50%) scale(0.75);
           transform-origin: top center;
           border-radius: 0;
-          background: #000;
-          box-shadow: 0 0 0 60px rgba(0, 0, 0, 0.06);
           overflow: hidden;
         }
 
