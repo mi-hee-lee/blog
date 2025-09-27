@@ -2,37 +2,48 @@ import { useEffect, useMemo, useState } from 'react';
 import { buildProxiedImageUrl } from '../lib/notionImage';
 
 function parseSections(richText = []) {
-  const result = {
-    title: [],
-    desc: []
-  };
+  const joined = richText
+    .map((segment) => (segment?.plain_text || '').replace(/\r/g, ''))
+    .join('\n');
 
-  const markers = new Set(['#title', '#desc']);
+  const lines = joined.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+
+  const state = { title: [], desc: [] };
   let current = null;
 
-  richText.forEach((segment) => {
-    const text = (segment?.plain_text || '').trim();
-    if (!text) return;
-
-    const lower = text.toLowerCase();
-    if (markers.has(lower)) {
-      current = lower === '#title' ? 'title' : 'desc';
+  const pushContent = (bucket, raw) => {
+    if (!raw) return;
+    const matches = [...raw.matchAll(/\{([^}]+)\}/g)].map((m) => m[1].trim()).filter(Boolean);
+    const parenMatches = [...raw.matchAll(/\(([^)]+)\)/g)].map((m) => m[1].trim()).filter(Boolean);
+    const collected = [...matches, ...parenMatches];
+    if (collected.length) {
+      bucket.push(...collected);
       return;
     }
+    bucket.push(raw.replace(/^#?[A-Za-z]+/, '').trim());
+  };
 
-    if (!current) return;
-
-    const matches = [...text.matchAll(/\{([^}]+)\}/g)].map((m) => m[1].trim());
-    if (matches.length) {
-      result[current].push(...matches.filter(Boolean));
-    } else {
-      result[current].push(text);
+  for (const line of lines) {
+    const lower = line.toLowerCase();
+    if (lower.startsWith('#title')) {
+      current = 'title';
+      const rest = line.slice(6).trim();
+      pushContent(state.title, rest);
+      continue;
     }
-  });
+    if (lower.startsWith('#desc')) {
+      current = 'desc';
+      const rest = line.slice(5).trim();
+      pushContent(state.desc, rest);
+      continue;
+    }
+    if (!current) continue;
+    pushContent(state[current], line);
+  }
 
   return {
-    title: result.title.join(' ').trim(),
-    desc: result.desc.join(' ').trim()
+    title: state.title.join(' ').trim(),
+    desc: state.desc.join(' ').trim()
   };
 }
 
@@ -151,30 +162,30 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
 
         .showcase__stage {
           position: relative;
-          width: min(1040px, 100%);
-          min-height: 860px;
-          --showcase-img-width: 260px;
+          width: min(1240px, 100%);
+          min-height: 1000px;
+          --showcase-img-width: 300px;
         }
 
         .showcase__ring {
           position: absolute;
           inset: 0;
           margin: 0 auto;
-          width: clamp(420px, 76vw, 820px);
-          height: clamp(420px, 76vw, 820px);
+          width: clamp(520px, 80vw, 980px);
+          height: clamp(520px, 80vw, 980px);
           animation: showcase-orbit 28s linear infinite;
           transform-origin: center;
           z-index: 1;
         }
 
         .showcase__ring--tablet {
-          width: clamp(360px, 82vw, 720px);
-          height: clamp(360px, 82vw, 720px);
+          width: clamp(420px, 88vw, 820px);
+          height: clamp(420px, 88vw, 820px);
         }
 
         .showcase__ring--mobile {
-          width: clamp(320px, 90vw, 600px);
-          height: clamp(320px, 90vw, 600px);
+          width: clamp(360px, 96vw, 680px);
+          height: clamp(360px, 96vw, 680px);
         }
 
         .showcase__slot {
@@ -209,7 +220,7 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
         .showcase__inner {
           position: relative;
           width: 100%;
-          min-height: 860px;
+          min-height: 1000px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -257,10 +268,10 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
             padding: 120px 0;
           }
           .showcase__inner {
-            min-height: 760px;
+            min-height: 860px;
           }
           .showcase__stage {
-            --showcase-img-width: 220px;
+            --showcase-img-width: 240px;
           }
         }
 
@@ -269,13 +280,13 @@ function ShowcaseCallout({ id, richText = [], images = [], children }) {
             padding: 100px 0;
           }
           .showcase__inner {
-            min-height: 720px;
+            min-height: 780px;
           }
           .showcase__text {
             max-width: 90%;
           }
           .showcase__stage {
-            --showcase-img-width: 170px;
+            --showcase-img-width: 180px;
           }
         }
       `}</style>
