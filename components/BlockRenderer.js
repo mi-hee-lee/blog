@@ -160,6 +160,19 @@ function splitCircleCalloutRichText(richText = []) {
   };
 }
 
+function getBlockPlainText(block) {
+  if (!block || !block.type) return '';
+  const payload = block[block.type];
+  if (!payload || typeof payload !== 'object') return '';
+
+  const collect = [];
+  if (Array.isArray(payload.rich_text)) collect.push(...payload.rich_text);
+  if (Array.isArray(payload.title)) collect.push(...payload.title);
+  if (Array.isArray(payload.caption)) collect.push(...payload.caption);
+
+  return collect.map((segment) => segment?.plain_text || '').join('');
+}
+
 export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3', isNested = false }) {
   useEffect(() => {
     // As-Is, To-Be 카드의 strong 요소 체크 및 클래스 추가
@@ -837,16 +850,51 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               }) || [];
 
               const images = (b.children || []).filter(child => child.type === 'image');
-              const others = (b.children || []).filter(child => child.type !== 'image');
+              const nonImageChildren = (b.children || []).filter(child => child.type !== 'image');
+
+              const showcaseLines = [];
+              const remainingChildren = [];
+              let pendingMarker = null;
+
+              nonImageChildren.forEach(child => {
+                const rawText = getBlockPlainText(child);
+                const text = (rawText || '').trim();
+
+                if (!text) {
+                  remainingChildren.push(child);
+                  pendingMarker = null;
+                  return;
+                }
+
+                const markerMatch = text.match(/^#(title|desc)/i);
+                if (markerMatch) {
+                  showcaseLines.push(text);
+                  pendingMarker = markerMatch[1];
+                  return;
+                }
+
+                if (pendingMarker && /^\s*[({]/.test(text)) {
+                  showcaseLines.push(text);
+                  return;
+                }
+
+                pendingMarker = null;
+                remainingChildren.push(child);
+              });
+
+              const combinedRichText = [
+                ...filteredText,
+                ...showcaseLines.map(line => ({ plain_text: line }))
+              ];
 
               return (
                 <ShowcaseCallout
                   key={b.id}
                   id={b.id}
-                  richText={filteredText}
+                  richText={combinedRichText}
                   images={images}
                 >
-                  {others.length ? renderChildren(others, highlightColor) : null}
+                  {remainingChildren.length ? renderChildren(remainingChildren, highlightColor) : null}
                 </ShowcaseCallout>
               );
             }
