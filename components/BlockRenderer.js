@@ -7,7 +7,7 @@ import SlideRotation from './SlideRotation';
 import ShowcaseCallout from './ShowcaseCallout';
 import PrototypeBreakpointCallout from './PrototypeBreakpointCallout';
 import PrototypeDesktopCallout from './PrototypeDesktopCallout';
-import CircleCarousel from './CircleCarousel';
+import CircleRotator from './CircleRotator';
 import { useEffect } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
@@ -996,7 +996,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               if (!items.length) return null;
 
               return (
-                <CircleCarousel
+                <CircleRotator
                   key={b.id}
                   items={items}
                   highlightColor={highlightColor}
