@@ -1321,6 +1321,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                 key={b.id}
                 className="n-cols"
                 data-cols={columnMeta.length}
+                data-has-custom-grid={hasWeightedCols ? '1' : undefined}
                 style={gridTemplateColumns ? { '--n-cols-template': gridTemplateColumns } : undefined}
               >
                 {columnMeta.map((meta) => (
@@ -2021,6 +2022,10 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           gap: 16px;
           margin: 0;
           grid-template-columns: var(--n-cols-template, 1fr);
+        }
+
+        .n-cols[data-has-custom-grid="1"] {
+          grid-template-columns: var(--n-cols-template, 1fr) !important;
         }
 
         /* 2열 */
