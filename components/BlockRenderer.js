@@ -1006,7 +1006,32 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                 return collected;
               };
 
-              const carouselChildren = gatherCalloutItems(Array.isArray(b.children) ? b.children : []);
+              let carouselChildren = gatherCalloutItems(Array.isArray(b.children) ? b.children : []);
+
+              if (!carouselChildren.length) {
+                const lookAhead = [];
+                for (let i = index + 1; i < blocks.length; i += 1) {
+                  const sibling = blocks[i];
+                  if (!sibling || sibling.__circleCarouselConsumed) continue;
+                  if (sibling.type !== 'callout') break;
+
+                  const siblingText = (sibling.callout?.rich_text?.[0]?.plain_text || '').trim();
+                  const siblingIcon = (sibling.callout?.icon?.emoji || '').trim();
+                  const lowerText = siblingText.toLowerCase();
+                  const lowerIcon = siblingIcon.toLowerCase();
+
+                  const isItemByText = /^#circleitem-\d+/i.test(lowerText);
+                  const isItemByIcon = /^#circleitem-\d+/i.test(lowerIcon);
+
+                  if (isItemByText || isItemByIcon) {
+                    lookAhead.push(sibling);
+                    sibling.__circleCarouselConsumed = true;
+                    continue;
+                  }
+                  break;
+                }
+                carouselChildren = lookAhead;
+              }
 
               const items = carouselChildren
                 .map((child, index) => {
