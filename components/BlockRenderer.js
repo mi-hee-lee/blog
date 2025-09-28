@@ -917,10 +917,23 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
             }
 
             if (iconText === '#CircleCarousel' || iconText === '#circlecarousel') {
-              const carouselChildren = Array.isArray(b.children) ? b.children : [];
+              const gatherCalloutItems = (nodes = []) => {
+                const collected = [];
+                nodes.forEach((node) => {
+                  if (!node) return;
+                  if (node.type === 'callout') {
+                    collected.push(node);
+                  }
+                  if (Array.isArray(node.children) && node.children.length) {
+                    collected.push(...gatherCalloutItems(node.children));
+                  }
+                });
+                return collected;
+              };
+
+              const carouselChildren = gatherCalloutItems(Array.isArray(b.children) ? b.children : []);
 
               const items = carouselChildren
-                .filter((child) => child?.type === 'callout')
                 .map((child, index) => {
                   const rawText = (child.callout?.rich_text || [])
                     .map((t) => t.plain_text || '')
