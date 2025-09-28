@@ -89,6 +89,7 @@ function PrototypeDesktopCallout({ id, embeds = [], children }) {
           transform-origin: top center;
           border-radius: 0;
           overflow: hidden;
+          max-height: 960px;
         }
 
         .prototype-desktop__frame-layer iframe {
