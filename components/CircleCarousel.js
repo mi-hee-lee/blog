@@ -154,7 +154,6 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
           position: absolute;
           inset: clamp(14px, 3vw, 26px);
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.08);
         }
 
         .circle-carousel__face--back {
