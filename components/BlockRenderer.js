@@ -965,13 +965,24 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
             const firstTextValue = (b.callout?.rich_text?.[0]?.plain_text || '').trim();
             const normalizedIcon = (iconText || '').trim().toLowerCase();
-            const normalizedFirstLine = (firstTextValue || '').trim().toLowerCase();
+            let normalizedDirective = (firstTextValue || '').trim().toLowerCase();
+
+            if (!normalizedDirective && Array.isArray(b.children)) {
+              const firstChild = b.children.find((node) => node && node.type === 'paragraph');
+              if (firstChild) {
+                const text = getBlockPlainText(firstChild).trim().toLowerCase();
+                if (text.startsWith('#circlecarousel')) {
+                  normalizedDirective = '#circlecarousel';
+                  firstChild.__circleCarouselConsumed = true;
+                }
+              }
+            }
 
             if (b.__circleCarouselConsumed) {
               return null;
             }
 
-            if (normalizedIcon === '#circlecarousel' || normalizedFirstLine === '#circlecarousel') {
+            if (normalizedIcon === '#circlecarousel' || normalizedDirective === '#circlecarousel') {
               const gatherCalloutItems = (nodes = []) => {
                 const collected = [];
                 nodes.forEach((node) => {
@@ -1029,6 +1040,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                         const matchLine = text.match(/^#circleitem-(\d+)/i);
                         if (matchLine) {
                           directiveLine = matchLine[0];
+                          sub.__circleCarouselConsumed = true;
                           return;
                         }
                       }
