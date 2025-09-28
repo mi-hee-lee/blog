@@ -963,7 +963,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               );
             }
 
-            if (iconText === '#CircleCarousel' || iconText === '#circlecarousel') {
+            const normalizedIcon = (iconText || '').trim().toLowerCase();
+
+            if (normalizedIcon === '#circlecarousel') {
               const gatherCalloutItems = (nodes = []) => {
                 const collected = [];
                 nodes.forEach((node) => {
