@@ -77,8 +77,8 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
 
   return (
     <section className="circle-carousel" style={{ '--circle-accent': highlightColor }}>
-      <div className="circle-carousel__track">
-        {[0, 1, 2].map((slot) => {
+      <div className={`circle-carousel__track ${isFlipping ? 'is-shifting' : ''}`}>
+        {[0, 1, 2, 3].map((slot) => {
           const current = getItem(slot);
           const next = getNextItem(slot);
           const typeClass = `circle-carousel__item circle-carousel__item--${current?.type || 'text'}`;
@@ -88,10 +88,10 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
               key={slot}
               className="circle-carousel__item-wrapper"
               data-slot={slot}
+              style={{ '--slot-index': slot }}
             >
               <div
                 className={`circle-carousel__item ${typeClass} ${isFlipping ? 'is-flipping' : ''} ${hasStarted ? 'is-active' : ''}`}
-                style={{ '--slot-index': slot }}
               >
                 <div className="circle-carousel__face circle-carousel__face--front">
                   {renderFace(current)}
@@ -107,6 +107,9 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
 
       <style jsx>{`
         .circle-carousel {
+          --circle-size: clamp(220px, 36vw, 360px);
+          --circle-gap: clamp(24px, 8vw, 64px);
+          --circle-offset: calc(var(--circle-size) + var(--circle-gap));
           width: 100%;
           padding: 140px 0;
           display: flex;
@@ -114,16 +117,24 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
         }
 
         .circle-carousel__track {
+          position: relative;
           display: flex;
-          gap: clamp(24px, 8vw, 64px);
           align-items: center;
+          overflow: hidden;
+          --shift-step: 0;
+        }
+
+        .circle-carousel__track.is-shifting {
+          --shift-step: 1;
         }
 
         .circle-carousel__item-wrapper {
           position: relative;
-          width: var(--circle-size, clamp(220px, 36vw, 360px));
-          height: var(--circle-size, clamp(220px, 36vw, 360px));
+          width: var(--circle-size);
+          height: var(--circle-size);
           perspective: 1400px;
+          transition: transform 0.9s cubic-bezier(0.55, 0.06, 0.46, 1.3);
+          transform: translateX(calc((var(--slot-index) - 1 - var(--shift-step)) * var(--circle-offset)));
         }
 
         .circle-carousel__item {
@@ -173,6 +184,7 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
           position: absolute;
           inset: clamp(14px, 3vw, 26px);
           border-radius: 50%;
+          background: rgba(255, 255, 255, 0.08);
         }
 
         .circle-carousel__face--back {
