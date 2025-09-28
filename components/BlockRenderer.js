@@ -963,13 +963,15 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               );
             }
 
+            const firstTextValue = (b.callout?.rich_text?.[0]?.plain_text || '').trim();
             const normalizedIcon = (iconText || '').trim().toLowerCase();
+            const normalizedFirstLine = (firstTextValue || '').trim().toLowerCase();
 
             if (b.__circleCarouselConsumed) {
               return null;
             }
 
-            if (normalizedIcon === '#circlecarousel') {
+            if (normalizedIcon === '#circlecarousel' || normalizedFirstLine === '#circlecarousel') {
               const gatherCalloutItems = (nodes = []) => {
                 const collected = [];
                 nodes.forEach((node) => {
