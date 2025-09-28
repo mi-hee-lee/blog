@@ -96,7 +96,9 @@ function CircleRotator({ items = [], highlightColor = '#4A7BFF', duration = TICK
 
     tickTimer.current = setTimeout(() => {
       setHasStarted(true);
-      startLoop();
+      if (!reduceMotion) {
+        startLoop();
+      }
     }, pause);
 
     return () => {

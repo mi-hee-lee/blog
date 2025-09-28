@@ -8,7 +8,7 @@ import ShowcaseCallout from './ShowcaseCallout';
 import PrototypeBreakpointCallout from './PrototypeBreakpointCallout';
 import PrototypeDesktopCallout from './PrototypeDesktopCallout';
 import CircleRotator from './CircleRotator';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
 function rtToHtml(rich = []) {
@@ -177,6 +177,7 @@ function getBlockPlainText(block) {
 }
 
 export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3', isNested = false }) {
+  const contentRef = useRef(null);
   let globalCss = '';
   let skipUntil = 0;
 
@@ -358,6 +359,49 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
       window.removeEventListener('resize', handleResize);
     };
   }, [blocks]);
+
+  useEffect(() => {
+    if (isNested) return;
+    const container = contentRef.current;
+    if (!container) return;
+
+    const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const elements = Array.from(container.children).filter((node) => node instanceof HTMLElement);
+    if (!elements.length) return;
+
+    elements.forEach((el) => {
+      el.classList.add('n-reveal-target');
+      if (reduceMotion) {
+        el.classList.add('n-reveal-visible');
+      }
+    });
+
+    if (reduceMotion) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('n-reveal-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '0px 0px -10%'
+      }
+    );
+
+    elements.forEach((el) => {
+      if (!el.classList.contains('n-reveal-visible')) {
+        observer.observe(el);
+      }
+    });
+
+    return () => observer.disconnect();
+  }, [blocks, isNested]);
   const hasRenderableBlocks = Array.isArray(blocks) && blocks.length > skipUntil;
 
   if (!hasRenderableBlocks) {
@@ -365,7 +409,10 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
   }
 
   return (
-    <div className={`n-content ${!isNested ? 'n-content-root' : ''}`}>
+    <div
+      className={`n-content ${!isNested ? 'n-content-root' : ''}`}
+      {...(!isNested ? { ref: contentRef } : {})}
+    >
       {globalCss ? <style dangerouslySetInnerHTML={{ __html: globalCss }} /> : null}
       {blocks.map((b, index) => {
         if (index < skipUntil) return null;
@@ -2118,6 +2165,24 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           .n-video video {
             width: 100% !important;
             height: auto !important;
+          }
+        }
+
+        .n-content-root > .n-reveal-target {
+          opacity: 0;
+          transform: translateY(24px);
+          transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .n-content-root > .n-reveal-target.n-reveal-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .n-content-root > .n-reveal-target {
+            opacity: 1 !important;
+            transform: none !important;
           }
         }
 
