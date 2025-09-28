@@ -7,6 +7,7 @@ import SlideRotation from './SlideRotation';
 import ShowcaseCallout from './ShowcaseCallout';
 import PrototypeBreakpointCallout from './PrototypeBreakpointCallout';
 import PrototypeDesktopCallout from './PrototypeDesktopCallout';
+import CircleCarousel from './CircleCarousel';
 import { useEffect } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
@@ -912,6 +913,94 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                     </>
                   ) : null}
                 </PrototypeBreakpointCallout>
+              );
+            }
+
+            if (iconText === '#CircleCarousel' || iconText === '#circlecarousel') {
+              const carouselChildren = Array.isArray(b.children) ? b.children : [];
+
+              const items = carouselChildren
+                .filter((child) => child?.type === 'callout')
+                .map((child, index) => {
+                  const rawText = (child.callout?.rich_text || [])
+                    .map((t) => t.plain_text || '')
+                    .join('')
+                    .replace(/\r/g, '');
+
+                  const textLines = rawText
+                    .split(/\n+/)
+                    .map((line) => line.trim())
+                    .filter(Boolean);
+
+                  let directive = textLines[0] || '';
+                  const match = directive.match(/^#circleitem-(\d+)/i);
+                  if (!match) return null;
+
+                  const order = parseInt(match[1], 10) || index + 1;
+                  const contentLines = textLines.slice(1);
+
+                  let title = contentLines[0] || '';
+                  let desc = contentLines.slice(1).join('\n').trim();
+
+                  const childTexts = [];
+                  const imageBlocks = [];
+
+                  (child.children || []).forEach((sub) => {
+                    if (sub.type === 'image') {
+                      imageBlocks.push(sub);
+                      return;
+                    }
+                    if (sub.type === 'paragraph' || sub.type === 'heading_2' || sub.type === 'heading_3' || sub.type === 'heading_1') {
+                      const text = getBlockPlainText(sub).trim();
+                      if (text) childTexts.push(text);
+                    }
+                  });
+
+                  if (!title && childTexts.length) {
+                    title = childTexts.shift();
+                  }
+                  if (!desc && childTexts.length) {
+                    desc = childTexts.join('\n').trim();
+                  }
+
+                  const imageBlock = imageBlocks[0];
+                  let image = null;
+                  if (imageBlock) {
+                    const src = imageBlock?.image?.file?.url || imageBlock?.image?.external?.url || '';
+                    const caption = (imageBlock?.image?.caption || []).map((c) => c.plain_text || '').join('');
+                    const { finalUrl } = buildProxiedImageUrl(src, imageBlock?.id);
+                    image = {
+                      id: imageBlock?.id,
+                      url: finalUrl || src,
+                      caption,
+                      alt: caption || `circle-item-${order}`
+                    };
+                  }
+
+                  const type = image ? 'image' : 'text';
+
+                  if (type === 'text' && !title && !desc) return null;
+
+                  return {
+                    id: child.id,
+                    order,
+                    type,
+                    title: title || '',
+                    desc: desc || '',
+                    image
+                  };
+                })
+                .filter(Boolean)
+                .sort((a, b) => a.order - b.order);
+
+              if (!items.length) return null;
+
+              return (
+                <CircleCarousel
+                  key={b.id}
+                  items={items}
+                  highlightColor={highlightColor}
+                />
               );
             }
 
