@@ -965,6 +965,10 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
             const normalizedIcon = (iconText || '').trim().toLowerCase();
 
+            if (b.__circleCarouselConsumed) {
+              return null;
+            }
+
             if (normalizedIcon === '#circlecarousel') {
               const gatherCalloutItems = (nodes = []) => {
                 const collected = [];
@@ -1059,7 +1063,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
                   if (type === 'text' && !title && !desc) return null;
 
-                  return {
+                  const item = {
                     id: child.id,
                     order,
                     type,
@@ -1067,6 +1071,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                     desc: desc || '',
                     image
                   };
+
+                  child.__circleCarouselConsumed = true;
+                  return item;
                 })
                 .filter(Boolean)
                 .sort((a, b) => a.order - b.order);
