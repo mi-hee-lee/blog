@@ -984,25 +984,29 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
               const items = carouselChildren
                 .map((child, index) => {
-                  const rawText = (child.callout?.rich_text || [])
+                  const primaryText = (child.callout?.rich_text || [])
                     .map((t) => t.plain_text || '')
-                    .join('')
+                    .join('\n')
                     .replace(/\r/g, '');
 
-                  const textLines = rawText
+                  const initialLines = primaryText
                     .split(/\n+/)
                     .map((line) => line.trim())
                     .filter(Boolean);
 
-                  let directive = textLines[0] || '';
-                  const match = directive.match(/^#circleitem-(\d+)/i);
-                  if (!match) return null;
+                  let directiveLine = null;
+                  const remainingPrimary = [];
 
-                  const order = parseInt(match[1], 10) || index + 1;
-                  const contentLines = textLines.slice(1);
-
-                  let title = contentLines[0] || '';
-                  let desc = contentLines.slice(1).join('\n').trim();
+                  initialLines.forEach((line) => {
+                    if (!directiveLine) {
+                      const matchLine = line.match(/^#circleitem-(\d+)/i);
+                      if (matchLine) {
+                        directiveLine = matchLine[0];
+                        return;
+                      }
+                    }
+                    remainingPrimary.push(line);
+                  });
 
                   const childTexts = [];
                   const imageBlocks = [];
@@ -1014,16 +1018,28 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                     }
                     if (sub.type === 'paragraph' || sub.type === 'heading_2' || sub.type === 'heading_3' || sub.type === 'heading_1') {
                       const text = getBlockPlainText(sub).trim();
-                      if (text) childTexts.push(text);
+                      if (!text) return;
+                      if (!directiveLine) {
+                        const matchLine = text.match(/^#circleitem-(\d+)/i);
+                        if (matchLine) {
+                          directiveLine = matchLine[0];
+                          return;
+                        }
+                      }
+                      childTexts.push(text);
                     }
                   });
 
-                  if (!title && childTexts.length) {
-                    title = childTexts.shift();
-                  }
-                  if (!desc && childTexts.length) {
-                    desc = childTexts.join('\n').trim();
-                  }
+                  if (!directiveLine) return null;
+
+                  const match = directiveLine.match(/^#circleitem-(\d+)/i);
+                  if (!match) return null;
+
+                  const order = parseInt(match[1], 10) || index + 1;
+
+                  const allContent = [...remainingPrimary, ...childTexts];
+                  const title = allContent.shift() || '';
+                  const desc = allContent.join('\n').trim();
 
                   const imageBlock = imageBlocks[0];
                   let image = null;
