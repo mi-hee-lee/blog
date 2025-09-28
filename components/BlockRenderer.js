@@ -983,6 +983,15 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
             }
 
             if (normalizedIcon === '#circlecarousel' || normalizedDirective === '#circlecarousel') {
+              if (process.env.NODE_ENV !== 'production') {
+                console.log('[CircleCarousel] detected block', {
+                  id: b.id,
+                  normalizedIcon,
+                  normalizedDirective,
+                  childCount: Array.isArray(b.children) ? b.children.length : 0
+                });
+              }
+
               const gatherCalloutItems = (nodes = []) => {
                 const collected = [];
                 nodes.forEach((node) => {
@@ -1092,7 +1101,16 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                 .filter(Boolean)
                 .sort((a, b) => a.order - b.order);
 
-              if (!items.length) return null;
+              if (!items.length) {
+                if (process.env.NODE_ENV !== 'production') {
+                  console.log('[CircleCarousel] no valid items', { id: b.id, rawCount: carouselChildren.length });
+                }
+                return null;
+              }
+
+              if (process.env.NODE_ENV !== 'production') {
+                console.log('[CircleCarousel] items parsed', items);
+              }
 
               return (
                 <CircleRotator
