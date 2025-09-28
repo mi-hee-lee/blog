@@ -1197,11 +1197,46 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
             // column_list 의 children 들이 각각 "column" 블록
             const cols = (b.children || []).filter((c) => c.type === 'column');
             if (!cols.length) return null;
+
+            const columnMeta = cols.map((col) => {
+              const rawChildren = Array.isArray(col.children) ? col.children : [];
+              let weight = 1;
+              let filteredChildren = rawChildren;
+
+              if (rawChildren.length) {
+                const directiveBlock = rawChildren[0];
+                const directiveText = (getBlockPlainText(directiveBlock) || '').trim();
+                const match = directiveText.match(/^#col-(\d+(?:\.\d+)?)$/i);
+
+                if (match) {
+                  const parsed = parseFloat(match[1]);
+                  weight = Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+                  filteredChildren = rawChildren.slice(1);
+                }
+              }
+
+              return {
+                id: col.id,
+                weight,
+                children: filteredChildren
+              };
+            });
+
+            const hasWeightedCols = columnMeta.some((meta) => meta.weight !== 1);
+            const gridTemplateColumns = hasWeightedCols
+              ? columnMeta.map((meta) => `${meta.weight}fr`).join(' ')
+              : undefined;
+
             return (
-              <div key={b.id} className="n-cols" data-cols={cols.length}>
-                {cols.map((col) => (
-                  <div key={col.id} className="n-col">
-                    {col.children?.length ? renderChildren(col.children, highlightColor) : null}
+              <div
+                key={b.id}
+                className="n-cols"
+                data-cols={columnMeta.length}
+                style={gridTemplateColumns ? { gridTemplateColumns } : undefined}
+              >
+                {columnMeta.map((meta) => (
+                  <div key={meta.id} className="n-col" data-col-weight={meta.weight}>
+                    {meta.children?.length ? renderChildren(meta.children, highlightColor) : null}
                   </div>
                 ))}
               </div>
