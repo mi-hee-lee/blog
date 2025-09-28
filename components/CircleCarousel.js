@@ -21,6 +21,7 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
   const loopLength = loopItems.length;
   const [baseIndex, setBaseIndex] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const timerRef = useRef(null);
   const flipTimerRef = useRef(null);
 
@@ -39,7 +40,10 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
       }, flipDuration);
     };
 
-    timerRef.current = setTimeout(scheduleFlip, pauseDuration + 700);
+    timerRef.current = setTimeout(() => {
+      setHasStarted(true);
+      scheduleFlip();
+    }, 900);
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -85,7 +89,10 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
               className="circle-carousel__item-wrapper"
               data-slot={slot}
             >
-              <div className={`${typeClass} ${isFlipping ? 'is-flipping' : ''}`}>
+              <div
+                className={`circle-carousel__item ${typeClass} ${isFlipping ? 'is-flipping' : ''} ${hasStarted ? 'is-active' : ''}`}
+                style={{ '--slot-index': slot }}
+              >
                 <div className="circle-carousel__face circle-carousel__face--front">
                   {renderFace(current)}
                 </div>
@@ -127,6 +134,17 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
           transform-style: preserve-3d;
           transition: transform 0.9s cubic-bezier(0.55, 0.06, 0.46, 1.3);
           transform: rotateY(0deg);
+          opacity: 0;
+          transform: translateY(24px) scale(0.92) rotateY(0deg);
+          transition:
+            transform 0.9s cubic-bezier(0.55, 0.06, 0.46, 1.3),
+            opacity 0.9s cubic-bezier(0.55, 0.06, 0.46, 1.3);
+        }
+
+        .circle-carousel__item.is-active {
+          opacity: 1;
+          transform: translateY(0) scale(1) rotateY(0deg);
+          transition-delay: calc(var(--slot-index) * 0.2s);
         }
 
         .circle-carousel__item.is-flipping {
@@ -142,6 +160,7 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
           border-radius: 50%;
           backface-visibility: hidden;
           background: transparent;
+          overflow: hidden;
         }
 
         .circle-carousel__item--text .circle-carousel__face {
@@ -160,14 +179,14 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
           transform: rotateY(180deg);
         }
 
-        .circle-carousel__image,
-        .circle-carousel__image img {
+        .circle-carousel__image {
           width: 100%;
           height: 100%;
-          border-radius: 50%;
         }
 
         .circle-carousel__image img {
+          width: 100%;
+          height: 100%;
           object-fit: cover;
           display: block;
         }
