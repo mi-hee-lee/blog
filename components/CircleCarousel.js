@@ -1,48 +1,97 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 
-function normalizeItems(items = []) {
+function extendItems(items = []) {
   if (!Array.isArray(items)) return [];
-  const filtered = items.filter(Boolean);
-  if (!filtered.length) return [];
-  if (filtered.length >= 3) return filtered.slice(0, 3);
+  const cleaned = items.filter(Boolean);
+  if (!cleaned.length) return [];
+  if (cleaned.length >= 3) return cleaned;
 
-  const filled = [...filtered];
-  let pointer = 0;
-  while (filled.length < 3 && filtered.length) {
-    filled.push({ ...filtered[pointer % filtered.length], id: `${filtered[pointer % filtered.length].id}-dup-${pointer}` });
-    pointer += 1;
+  const duplicated = [...cleaned];
+  let cursor = 0;
+  while (duplicated.length < 3 && cleaned.length) {
+    const source = cleaned[cursor % cleaned.length];
+    duplicated.push({ ...source, id: `${source.id || source.order}-clone-${cursor}` });
+    cursor += 1;
   }
-  return filled.slice(0, 3);
+  return duplicated;
 }
 
 function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
-  const displayItems = useMemo(() => normalizeItems(items), [items]);
+  const loopItems = useMemo(() => extendItems(items), [items]);
+  const loopLength = loopItems.length;
+  const [baseIndex, setBaseIndex] = useState(0);
+  const [isFlipping, setIsFlipping] = useState(false);
+  const timerRef = useRef(null);
+  const flipTimerRef = useRef(null);
 
-  if (!displayItems.length) return null;
+  useEffect(() => {
+    if (!loopLength) return () => {};
+
+    const flipDuration = 900;
+    const pauseDuration = 500;
+
+    const scheduleFlip = () => {
+      setIsFlipping(true);
+      flipTimerRef.current = setTimeout(() => {
+        setBaseIndex((prev) => (prev + 1) % loopLength);
+        setIsFlipping(false);
+        timerRef.current = setTimeout(scheduleFlip, pauseDuration);
+      }, flipDuration);
+    };
+
+    timerRef.current = setTimeout(scheduleFlip, pauseDuration + 700);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (flipTimerRef.current) clearTimeout(flipTimerRef.current);
+    };
+  }, [loopLength]);
+
+  if (!loopLength) return null;
+
+  const getItem = (offset = 0) => loopItems[(baseIndex + offset) % loopLength];
+  const getNextItem = (offset = 0) => loopItems[(baseIndex + offset + 1) % loopLength];
+
+  const renderFace = (item) => {
+    if (!item) return null;
+    if (item.type === 'image' && item.image) {
+      const { url, alt, caption } = item.image;
+      return (
+        <div className="circle-carousel__image">
+          <img src={url} alt={alt || caption || ''} loading="lazy" />
+        </div>
+      );
+    }
+
+    return (
+      <div className="circle-carousel__text">
+        {item.title ? <strong>{item.title}</strong> : null}
+        {item.desc ? <p>{item.desc}</p> : null}
+      </div>
+    );
+  };
 
   return (
     <section className="circle-carousel" style={{ '--circle-accent': highlightColor }}>
       <div className="circle-carousel__track">
-        {displayItems.map((item, idx) => {
-          const baseClass = `circle-carousel__item circle-carousel__item--${item.type}`;
-          const delayStyle = { '--item-index': idx };
-
-          if (item.type === 'image' && item.image) {
-            const { url, caption, alt } = item.image;
-            return (
-              <div key={item.id || idx} className={baseClass} style={delayStyle}>
-                <div className="circle-carousel__image">
-                  <img src={url} alt={alt || caption || ''} loading="lazy" />
-                </div>
-              </div>
-            );
-          }
+        {[0, 1, 2].map((slot) => {
+          const current = getItem(slot);
+          const next = getNextItem(slot);
+          const typeClass = `circle-carousel__item circle-carousel__item--${current?.type || 'text'}`;
 
           return (
-            <div key={item.id || idx} className={baseClass} style={delayStyle}>
-              <div className="circle-carousel__text">
-                {item.title ? <strong>{item.title}</strong> : null}
-                {item.desc ? <p>{item.desc}</p> : null}
+            <div
+              key={slot}
+              className="circle-carousel__item-wrapper"
+              data-slot={slot}
+            >
+              <div className={`${typeClass} ${isFlipping ? 'is-flipping' : ''}`}>
+                <div className="circle-carousel__face circle-carousel__face--front">
+                  {renderFace(current)}
+                </div>
+                <div className="circle-carousel__face circle-carousel__face--back">
+                  {renderFace(next)}
+                </div>
               </div>
             </div>
           );
@@ -58,49 +107,58 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
         }
 
         .circle-carousel__track {
+          display: flex;
+          gap: clamp(24px, 8vw, 64px);
+          align-items: center;
+        }
+
+        .circle-carousel__item-wrapper {
           position: relative;
-          width: min(980px, 92vw);
-          height: var(--circle-size, clamp(220px, 38vw, 360px));
+          width: var(--circle-size, clamp(220px, 36vw, 360px));
+          height: var(--circle-size, clamp(220px, 36vw, 360px));
+          perspective: 1400px;
         }
 
         .circle-carousel__item {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: var(--circle-size, clamp(220px, 38vw, 360px));
-          height: var(--circle-size, clamp(220px, 38vw, 360px));
+          position: relative;
+          width: 100%;
+          height: 100%;
           border-radius: 50%;
+          transform-style: preserve-3d;
+          transition: transform 0.9s cubic-bezier(0.55, 0.06, 0.46, 1.3);
+          transform: rotateY(0deg);
+        }
+
+        .circle-carousel__item.is-flipping {
+          transform: rotateY(180deg);
+        }
+
+        .circle-carousel__face {
+          position: absolute;
+          inset: 0;
           display: flex;
-          justify-content: center;
           align-items: center;
-          background: var(--circle-accent, #4A7BFF);
-          color: #ffffff;
-          text-align: center;
-          padding: clamp(24px, 5vw, 48px);
-          box-shadow: 0 35px 60px rgba(0, 0, 0, 0.28);
-          transform-origin: center;
-          transform: translate(-50%, -50%) translateX(260%) scale(0.82);
-          animation: circle-carousel-loop 9s cubic-bezier(0.65, 0, 0.35, 1) infinite;
-          animation-delay: calc(var(--item-index) * 3s);
+          justify-content: center;
+          border-radius: 50%;
           backface-visibility: hidden;
-        }
-
-        .circle-carousel__item--image {
           background: transparent;
-          padding: 0;
-          box-shadow: none;
         }
 
-        .circle-carousel__item--text {
+        .circle-carousel__item--text .circle-carousel__face {
           background: var(--circle-accent, #4A7BFF);
+          color: #fff;
         }
 
-        .circle-carousel__item--text::before {
+        .circle-carousel__item--text .circle-carousel__face::after {
           content: '';
           position: absolute;
-          inset: clamp(12px, 2.5vw, 22px);
+          inset: clamp(14px, 3vw, 26px);
           border-radius: 50%;
           background: rgba(255, 255, 255, 0.08);
+        }
+
+        .circle-carousel__face--back {
+          transform: rotateY(180deg);
         }
 
         .circle-carousel__image,
@@ -113,7 +171,6 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
         .circle-carousel__image img {
           object-fit: cover;
           display: block;
-          backface-visibility: hidden;
         }
 
         .circle-carousel__text {
@@ -124,6 +181,7 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
           align-items: center;
           justify-content: center;
           gap: 16px;
+          padding: 0 clamp(8px, 2vw, 20px);
         }
 
         .circle-carousel__text strong {
@@ -139,54 +197,6 @@ function CircleCarousel({ items = [], highlightColor = '#4A7BFF' }) {
           line-height: 1.55;
           font-weight: 400;
           white-space: pre-line;
-        }
-
-        @keyframes circle-carousel-loop {
-          0%,
-          10% {
-            transform: translate(-50%, -50%) translateX(260%) scale(0.8) rotateY(0deg);
-            opacity: 0;
-            z-index: 1;
-          }
-          18% {
-            transform: translate(-50%, -50%) translateX(140%) scale(0.88) rotateY(0deg);
-            opacity: 0.75;
-            z-index: 2;
-          }
-          30%,
-          38% {
-            transform: translate(-50%, -50%) translateX(0%) scale(1) rotateY(0deg);
-            opacity: 1;
-            z-index: 3;
-          }
-          44% {
-            transform: translate(-50%, -50%) translateX(0%) scale(1) rotateY(180deg);
-          }
-          50% {
-            transform: translate(-50%, -50%) translateX(0%) scale(1) rotateY(360deg);
-          }
-          55% {
-            transform: translate(-50%, -50%) translateX(0%) scale(1) rotateY(360deg);
-            opacity: 1;
-            z-index: 3;
-          }
-          62% {
-            transform: translate(-50%, -50%) translateX(-140%) scale(0.9) rotateY(360deg);
-            opacity: 0.75;
-            z-index: 2;
-          }
-          70%,
-          75% {
-            transform: translate(-50%, -50%) translateX(-260%) scale(0.78) rotateY(360deg);
-            opacity: 0;
-            z-index: 1;
-          }
-          90%,
-          100% {
-            transform: translate(-50%, -50%) translateX(260%) scale(0.8) rotateY(360deg);
-            opacity: 0;
-            z-index: 1;
-          }
         }
 
         @media (max-width: 960px) {
