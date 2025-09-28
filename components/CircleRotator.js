@@ -32,19 +32,20 @@ function useRotatorQueue(items = []) {
   const [head, setHead] = useState(0);
   const length = items.length;
 
-  const slots = useMemo(() => {
-    return [0, 1, 2].map((offset) => items[(head + offset) % length]);
-  }, [head, items, length]);
+  const getItem = (offset) => items[(head + offset + length) % length];
 
-  const nextSlots = useMemo(() => {
-    return [1, 2, 3].map((offset) => items[(head + offset) % length]);
-  }, [head, items, length]);
+  const slots = useMemo(() => [0, 1, 2].map(getItem), [head, items, length]);
+
+  const nextSlots = useMemo(() => [1, 2, 3].map(getItem), [head, items, length]);
+
+  const futureFront = useMemo(() => getItem(3), [head, items, length]);
+  const futureBack = useMemo(() => getItem(4), [head, items, length]);
 
   const advance = () => {
     setHead((prev) => (prev + 1) % length);
   };
 
-  return { slots, nextSlots, advance, length };
+  return { slots, nextSlots, futureFront, futureBack, advance, length };
 }
 
 function prefersReducedMotion() {
@@ -74,7 +75,7 @@ function CircleFace({ item }) {
 function CircleRotator({ items = [], highlightColor = '#4A7BFF', duration = TICK_DURATION, pause = PAUSE_DURATION }) {
   const preparedItems = useMemo(() => duplicateToMinimum(sanitizeItems(items), 3), [items]);
   const reduceMotion = prefersReducedMotion();
-  const { slots, nextSlots, advance, length } = useRotatorQueue(preparedItems);
+  const { slots, nextSlots, futureFront, futureBack, advance, length } = useRotatorQueue(preparedItems);
 
   const [isFlipping, setIsFlipping] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -95,9 +96,7 @@ function CircleRotator({ items = [], highlightColor = '#4A7BFF', duration = TICK
 
     tickTimer.current = setTimeout(() => {
       setHasStarted(true);
-      if (!reduceMotion) {
-        startLoop();
-      }
+      startLoop();
     }, pause);
 
     return () => {
@@ -108,10 +107,8 @@ function CircleRotator({ items = [], highlightColor = '#4A7BFF', duration = TICK
 
   if (!length) return null;
 
-  const renderSlot = (slotIndex) => {
-    const current = slots[slotIndex];
-    const next = nextSlots[slotIndex];
-    const type = current?.type || 'text';
+  const renderSlot = (slotIndex, current, next, isGhost = false) => {
+    const type = (current || next)?.type || 'text';
 
     if (reduceMotion) {
       const fallback = current || next;
@@ -123,7 +120,11 @@ function CircleRotator({ items = [], highlightColor = '#4A7BFF', duration = TICK
     }
 
     return (
-      <div key={slotIndex} className="circle-slot" data-slot={slotIndex}>
+      <div
+        key={slotIndex}
+        className={`circle-slot ${isGhost ? 'circle-slot--ghost' : ''}`}
+        data-slot={slotIndex}
+      >
         <div
           className={`circle-item circle-item--${type} ${hasStarted ? 'is-ready' : ''} ${isFlipping ? 'is-animating' : ''}`}
           style={{ '--slot-index': slotIndex }}
@@ -139,6 +140,18 @@ function CircleRotator({ items = [], highlightColor = '#4A7BFF', duration = TICK
     );
   };
 
+  const visibleSlots = reduceMotion
+    ? slots
+    : isFlipping
+      ? [...slots, futureFront]
+      : slots;
+
+  const visibleNextSlots = reduceMotion
+    ? nextSlots
+    : isFlipping
+      ? [...nextSlots, futureBack]
+      : nextSlots;
+
   return (
     <section
       className={`circle-rotator ${reduceMotion ? 'reduce-motion' : ''}`}
@@ -151,9 +164,13 @@ function CircleRotator({ items = [], highlightColor = '#4A7BFF', duration = TICK
         '--accent': highlightColor
       }}
     >
-      {renderSlot(0)}
-      {renderSlot(1)}
-      {renderSlot(2)}
+      <div className={`circle-rotator__rail ${isFlipping ? 'is-moving' : ''}`}>
+        {visibleSlots.map((current, index) => {
+          const next = visibleNextSlots[index];
+          const isGhost = !reduceMotion && isFlipping && index === visibleSlots.length - 1;
+          return renderSlot(index, current, next, isGhost);
+        })}
+      </div>
 
       <style jsx>{`
         .circle-rotator {
@@ -161,8 +178,19 @@ function CircleRotator({ items = [], highlightColor = '#4A7BFF', duration = TICK
           padding: 140px 0;
           display: flex;
           justify-content: center;
-          gap: var(--gap);
           perspective: 1000px;
+        }
+
+        .circle-rotator__rail {
+          position: relative;
+          display: flex;
+          gap: var(--gap);
+          transform: translateX(0);
+          transition: transform var(--duration) var(--easing);
+        }
+
+        .circle-rotator__rail.is-moving {
+          transform: translateX(calc(-1 * (var(--circle-size) + var(--gap))));
         }
 
         .circle-slot {
@@ -171,6 +199,11 @@ function CircleRotator({ items = [], highlightColor = '#4A7BFF', duration = TICK
           border-radius: 9999px;
           overflow: hidden;
           position: relative;
+          flex-shrink: 0;
+        }
+
+        .circle-slot--ghost {
+          opacity: 0;
         }
 
         .circle-item {
@@ -264,6 +297,15 @@ function CircleRotator({ items = [], highlightColor = '#4A7BFF', duration = TICK
 
         .reduce-motion .circle-item.is-animating {
           opacity: 0;
+        }
+
+        .reduce-motion .circle-rotator__rail {
+          transform: none !important;
+          transition: none !important;
+        }
+
+        .reduce-motion .circle-slot--ghost {
+          display: none;
         }
 
         @media (max-width: 960px) {
