@@ -369,10 +369,15 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
     const elements = Array.from(container.children).filter((node) => node instanceof HTMLElement);
     if (!elements.length) return;
 
+    const BASE_CLASS = 'scroll-transition-fade';
+    const BELOW_CLASS = 'below-viewport';
+
     elements.forEach((el) => {
-      el.classList.add('n-reveal-target');
+      el.classList.add(BASE_CLASS);
       if (reduceMotion) {
-        el.classList.add('n-reveal-visible');
+        el.classList.remove(BELOW_CLASS);
+      } else {
+        el.classList.add(BELOW_CLASS);
       }
     });
 
@@ -382,7 +387,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add('n-reveal-visible');
+            entry.target.classList.remove(BELOW_CLASS);
             observer.unobserve(entry.target);
           }
         });
@@ -394,7 +399,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
     );
 
     elements.forEach((el) => {
-      if (!el.classList.contains('n-reveal-visible')) {
+      if (el.classList.contains(BELOW_CLASS)) {
         observer.observe(el);
       }
     });
@@ -2066,21 +2071,20 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           }
         }
 
-        .n-content-root > .n-reveal-target {
-          opacity: 0;
-          transform: translateY(24px);
-          transition: opacity 0.7s ease, transform 0.7s ease;
+        .n-content-root .scroll-transition-fade {
+          transition: transform 1s ease-in-out, opacity 0.8s ease-in-out;
         }
 
-        .n-content-root > .n-reveal-target.n-reveal-visible {
-          opacity: 1;
-          transform: translateY(0);
+        .n-content-root .scroll-transition-fade.below-viewport {
+          opacity: 0;
+          transform: translateY(40px);
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .n-content-root > .n-reveal-target {
+          .n-content-root .scroll-transition-fade {
             opacity: 1 !important;
             transform: none !important;
+            transition: none !important;
           }
         }
         /* ==== Slide Carousel ==== */
