@@ -2083,7 +2083,6 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
             transform: none !important;
           }
         }
-
         /* ==== Slide Carousel ==== */
         .n-slide-carousel {
           margin: 24px 0;
