@@ -366,6 +366,10 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
     const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[Reveal] init', { reduceMotion });
+    }
+
     const elements = Array.from(container.children).filter((node) => node instanceof HTMLElement);
     if (!elements.length) return;
 
@@ -384,6 +388,10 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
       }
     };
 
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[Reveal] preparing elements', elements.length);
+    }
+
     elements.forEach(prepareElement);
 
     if (reduceMotion) return;
@@ -393,6 +401,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.remove(BELOW_CLASS);
+            if (process.env.NODE_ENV !== 'production') {
+              console.log('[Reveal] shown', entry.target.className);
+            }
             observer.unobserve(entry.target);
           }
         });
