@@ -372,14 +372,19 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
     const BASE_CLASS = 'scroll-transition-fade';
     const BELOW_CLASS = 'below-viewport';
 
-    elements.forEach((el) => {
-      el.classList.add(BASE_CLASS);
+    const prepareElement = (el) => {
+      if (!(el instanceof HTMLElement)) return;
+      if (!el.classList.contains(BASE_CLASS)) {
+        el.classList.add(BASE_CLASS);
+      }
       if (reduceMotion) {
         el.classList.remove(BELOW_CLASS);
       } else {
         el.classList.add(BELOW_CLASS);
       }
-    });
+    };
+
+    elements.forEach(prepareElement);
 
     if (reduceMotion) return;
 
@@ -404,7 +409,39 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
       }
     });
 
-    return () => observer.disconnect();
+    const mutationObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          Array.from(mutation.addedNodes).forEach((node) => {
+            if (node instanceof HTMLElement && node.parentElement === container) {
+              prepareElement(node);
+              observer.observe(node);
+            }
+          });
+        }
+        if (mutation.type === 'attributes') {
+          const target = mutation.target;
+          if (target instanceof HTMLElement && target.parentElement === container) {
+            prepareElement(target);
+            if (target.classList.contains(BELOW_CLASS)) {
+              observer.observe(target);
+            }
+          }
+        }
+      });
+    });
+
+    mutationObserver.observe(container, {
+      childList: true,
+      attributes: true,
+      attributeFilter: ['class'],
+      subtree: false
+    });
+
+    return () => {
+      observer.disconnect();
+      mutationObserver.disconnect();
+    };
   }, [blocks, isNested]);
   const hasRenderableBlocks = Array.isArray(blocks) && blocks.length > skipUntil;
 
