@@ -175,8 +175,51 @@ function getBlockPlainText(block) {
   return collect.map((segment) => segment?.plain_text || '').join('');
 }
 
+function ScrollReveal({ children }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    element.classList.add('scroll-transition-fade');
+
+    const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      element.classList.remove('below-viewport');
+      return;
+    }
+
+    element.classList.add('below-viewport');
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.remove('below-viewport');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '0px 0px -10%'
+      }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="scroll-transition-fade below-viewport">
+      {children}
+    </div>
+  );
+}
+
 export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3', isNested = false }) {
-  const contentRef = useRef(null);
   let globalCss = '';
   let skipUntil = 0;
 
@@ -359,101 +402,6 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
     };
   }, [blocks]);
 
-  useEffect(() => {
-    if (isNested) return;
-    const container = contentRef.current;
-    if (!container) return;
-
-    const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[Reveal] init', { reduceMotion });
-    }
-
-    const elements = Array.from(container.children).filter((node) => node instanceof HTMLElement);
-    if (!elements.length) return;
-
-    const BASE_CLASS = 'scroll-transition-fade';
-    const BELOW_CLASS = 'below-viewport';
-
-    const prepareElement = (el) => {
-      if (!(el instanceof HTMLElement)) return;
-      if (!el.classList.contains(BASE_CLASS)) {
-        el.classList.add(BASE_CLASS);
-      }
-      if (reduceMotion) {
-        el.classList.remove(BELOW_CLASS);
-      } else {
-        el.classList.add(BELOW_CLASS);
-      }
-    };
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[Reveal] preparing elements', elements.length);
-    }
-
-    elements.forEach(prepareElement);
-
-    if (reduceMotion) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.remove(BELOW_CLASS);
-            if (process.env.NODE_ENV !== 'production') {
-              console.log('[Reveal] shown', entry.target.className);
-            }
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.2,
-        rootMargin: '0px 0px -10%'
-      }
-    );
-
-    elements.forEach((el) => {
-      if (el.classList.contains(BELOW_CLASS)) {
-        observer.observe(el);
-      }
-    });
-
-    const mutationObserver = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'childList') {
-          Array.from(mutation.addedNodes).forEach((node) => {
-            if (node instanceof HTMLElement && node.parentElement === container) {
-              prepareElement(node);
-              observer.observe(node);
-            }
-          });
-        }
-        if (mutation.type === 'attributes') {
-          const target = mutation.target;
-          if (target instanceof HTMLElement && target.parentElement === container) {
-            prepareElement(target);
-            if (target.classList.contains(BELOW_CLASS)) {
-              observer.observe(target);
-            }
-          }
-        }
-      });
-    });
-
-    mutationObserver.observe(container, {
-      childList: true,
-      attributes: true,
-      attributeFilter: ['class'],
-      subtree: false
-    });
-
-    return () => {
-      observer.disconnect();
-      mutationObserver.disconnect();
-    };
-  }, [blocks, isNested]);
   const hasRenderableBlocks = Array.isArray(blocks) && blocks.length > skipUntil;
 
   if (!hasRenderableBlocks) {
@@ -461,16 +409,14 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
   }
 
   return (
-    <div
-      className={`n-content ${!isNested ? 'n-content-root' : ''}`}
-      {...(!isNested ? { ref: contentRef } : {})}
-    >
+    <div className={`n-content ${!isNested ? 'n-content-root' : ''}`}>
       {globalCss ? <style dangerouslySetInnerHTML={{ __html: globalCss }} /> : null}
       {blocks.map((b, index) => {
         if (index < skipUntil) return null;
         const t = b.type;
 
-        switch (t) {
+        const rendered = (() => {
+          switch (t) {
           // ===== 헤딩/문단 =====
           case 'heading_1':
             return (
@@ -1374,7 +1320,17 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
           default:
             return null;
-        }
+          }
+        })();
+
+        if (!rendered) return null;
+        if (isNested) return rendered;
+
+        return (
+          <ScrollReveal key={b.id}>
+            {rendered}
+          </ScrollReveal>
+        );
       })}
 
       {/* 스타일 */}
