@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 
 function resolveEmbedUrl(url = '') {
   if (!url) return '';
@@ -31,67 +31,20 @@ function PrototypeDesktopFix({ id, embeds = [], children }) {
   const captionText = Array.isArray(primaryEmbed?.embed?.caption)
     ? primaryEmbed.embed.caption.map((c) => c?.plain_text || '').join('').trim()
     : '';
-  const shieldRef = useRef(null);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-
-    const shield = shieldRef.current;
-    if (!shield) return undefined;
-
-    const blockScroll = (event) => {
-      event.preventDefault();
-    };
-
-    const passiveFalse = { passive: false };
-    shield.addEventListener('wheel', blockScroll, passiveFalse);
-    shield.addEventListener('touchmove', blockScroll, passiveFalse);
-
-    let reenableTimer = null;
-
-    const enableShield = () => {
-      if (!shield) return;
-      if (reenableTimer) {
-        clearTimeout(reenableTimer);
-        reenableTimer = null;
-      }
-      shield.style.pointerEvents = 'auto';
-      window.removeEventListener('pointerup', enableShield, true);
-      window.removeEventListener('pointercancel', enableShield, true);
-      window.removeEventListener('blur', enableShield, true);
-    };
-
-    const handlePointerDown = () => {
-      shield.style.pointerEvents = 'none';
-      window.addEventListener('pointerup', enableShield, true);
-      window.addEventListener('pointercancel', enableShield, true);
-      window.addEventListener('blur', enableShield, true);
-      reenableTimer = window.setTimeout(enableShield, 350);
-    };
-
-    shield.addEventListener('pointerdown', handlePointerDown);
-
-    return () => {
-      shield.removeEventListener('wheel', blockScroll, passiveFalse);
-      shield.removeEventListener('touchmove', blockScroll, passiveFalse);
-      shield.removeEventListener('pointerdown', handlePointerDown);
-      enableShield();
-    };
-  }, []);
 
   return (
-    <section className="prototype-desktop prototype-desktop--fix" id={id}>
+    <section className="prototype-desktop" id={id}>
       <div className="prototype-desktop__inner">
         {embedUrl ? (
           <div className="prototype-desktop__frame">
             <div className="prototype-desktop__frame-layer">
-              <div className="prototype-desktop__input-shield" ref={shieldRef} />
               <iframe
                 src={embedUrl}
-                title={captionText || 'prototype-desktop-fix-embed'}
+                title={captionText || 'prototype-desktop-embed'}
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 allowFullScreen
+                scrolling="no"
               />
             </div>
           </div>
@@ -132,12 +85,11 @@ function PrototypeDesktopFix({ id, embeds = [], children }) {
           left: 50%;
           width: calc(100% / 0.75);
           height: calc(100% / 0.75);
-          max-height: calc(1280px / 0.75);
           transform: translateX(-50%) scale(0.75);
           transform-origin: top center;
           border-radius: 0;
           overflow: hidden;
-          touch-action: none;
+          max-height: 960px;
         }
 
         .prototype-desktop__frame-layer iframe {
@@ -146,14 +98,6 @@ function PrototypeDesktopFix({ id, embeds = [], children }) {
           border: none;
           pointer-events: auto;
           overflow: hidden;
-        }
-
-        .prototype-desktop__input-shield {
-          position: absolute;
-          inset: 0;
-          z-index: 2;
-          pointer-events: auto;
-          background: transparent;
         }
 
         .prototype-desktop__extra {
