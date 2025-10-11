@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 function resolveEmbedUrl(url = '') {
   if (!url) return '';
@@ -31,13 +31,43 @@ function PrototypeDesktopFix({ id, embeds = [], children }) {
   const captionText = Array.isArray(primaryEmbed?.embed?.caption)
     ? primaryEmbed.embed.caption.map((c) => c?.plain_text || '').join('').trim()
     : '';
+  const frameLayerRef = useRef(null);
+
+  useEffect(() => {
+    const layer = frameLayerRef.current;
+    if (!layer) return undefined;
+
+    const blockScroll = (event) => {
+      event.preventDefault();
+    };
+
+    const layerOptions = { passive: false };
+    const iframeOptions = { passive: false, capture: true };
+    layer.addEventListener('wheel', blockScroll, layerOptions);
+    layer.addEventListener('touchmove', blockScroll, layerOptions);
+
+    const iframe = layer.querySelector('iframe');
+    if (iframe) {
+      iframe.addEventListener('wheel', blockScroll, iframeOptions);
+      iframe.addEventListener('touchmove', blockScroll, iframeOptions);
+    }
+
+    return () => {
+      layer.removeEventListener('wheel', blockScroll, layerOptions);
+      layer.removeEventListener('touchmove', blockScroll, layerOptions);
+      if (iframe) {
+        iframe.removeEventListener('wheel', blockScroll, iframeOptions);
+        iframe.removeEventListener('touchmove', blockScroll, iframeOptions);
+      }
+    };
+  }, []);
 
   return (
     <section className="prototype-desktop prototype-desktop--fix" id={id}>
       <div className="prototype-desktop__inner">
         {embedUrl ? (
           <div className="prototype-desktop__frame">
-            <div className="prototype-desktop__frame-layer">
+            <div className="prototype-desktop__frame-layer" ref={frameLayerRef}>
               <iframe
                 src={embedUrl}
                 title={captionText || 'prototype-desktop-fix-embed'}
@@ -89,6 +119,7 @@ function PrototypeDesktopFix({ id, embeds = [], children }) {
           transform-origin: top center;
           border-radius: 0;
           overflow: hidden;
+          touch-action: none;
         }
 
         .prototype-desktop__frame-layer iframe {
