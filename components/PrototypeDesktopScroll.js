@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 function resolveEmbedUrl(url = '') {
   if (!url) return '';
@@ -37,7 +37,6 @@ function PrototypeDesktopScroll({ id, embeds = [], children }) {
   const timerRef = useRef(null);
   const observerRef = useRef(null);
   const iframeLoadedRef = useRef(false);
-  const [fallbackTranslate, setFallbackTranslate] = useState(false);
   const revealWrapperRef = useRef(null);
   const transitionCompletedRef = useRef(false);
   const isInViewRef = useRef(false);
@@ -56,7 +55,6 @@ function PrototypeDesktopScroll({ id, embeds = [], children }) {
 
     const resetScroll = () => {
       clearTimer();
-      setFallbackTranslate(false);
       const iframeEl = iframeRef.current;
       if (!iframeEl) return;
       try {
@@ -81,15 +79,12 @@ function PrototypeDesktopScroll({ id, embeds = [], children }) {
             return true;
           }
         } catch {
-          // Cross-origin, fallback below
+          // Cross-origin, cannot auto-scroll
         }
         return false;
       };
 
-      const succeeded = attemptScroll();
-      if (!succeeded) {
-        setFallbackTranslate(true);
-      }
+      attemptScroll();
     };
 
     const scheduleScroll = () => {
@@ -170,10 +165,7 @@ function PrototypeDesktopScroll({ id, embeds = [], children }) {
       <div className="prototype-desktop__inner">
         {embedUrl ? (
           <div className="prototype-desktop__frame">
-            <div
-              className="prototype-desktop__frame-layer"
-              data-fallback-scrolled={fallbackTranslate ? '1' : undefined}
-            >
+            <div className="prototype-desktop__frame-layer">
               <iframe
                 ref={iframeRef}
                 src={embedUrl}
@@ -227,11 +219,6 @@ function PrototypeDesktopScroll({ id, embeds = [], children }) {
           border-radius: 0;
           overflow: hidden;
           max-height: 960px;
-          transition: transform 0.8s ease;
-        }
-
-        .prototype-desktop__frame-layer[data-fallback-scrolled='1'] {
-          transform: translateX(-50%) scale(0.75) translateY(-500px);
         }
 
         .prototype-desktop__frame-layer iframe {
