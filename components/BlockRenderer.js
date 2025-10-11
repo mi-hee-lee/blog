@@ -5,6 +5,7 @@ import SlideCarousel from './SlideCarousel';
 import FullBleedDivider from './FullBleedDivider';
 import ShowcaseCallout from './ShowcaseCallout';
 import PrototypeDesktopCallout from './PrototypeDesktopCallout';
+import PrototypeDesktopFix from './PrototypeDesktopFix';
 import { useEffect, useRef } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
@@ -864,14 +865,40 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               );
             }
 
-            if (
-              iconText === '#PrototypeDesktop' ||
-              iconText === '#prototypedesktop'
-            ) {
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return text !== '#PrototypeDesktop' && text !== '#prototypedesktop';
-              }) || [];
+            const iconTextLower = (iconText || '').trim().toLowerCase();
+
+            if (iconTextLower === '#prototypedesktopfix') {
+              const filteredText = (b.callout?.rich_text || []).filter((segment) => {
+                const text = (segment?.plain_text || '').trim().toLowerCase();
+                return text !== '#prototypedesktopfix';
+              });
+
+              const embedBlocks = (b.children || []).filter(child => child.type === 'embed');
+              const remainingChildren = (b.children || []).filter(child => child.type !== 'embed');
+
+              const hasExtraContent = filteredText.length || remainingChildren.length;
+
+              return (
+                <PrototypeDesktopFix key={b.id} id={b.id} embeds={embedBlocks}>
+                  {hasExtraContent ? (
+                    <>
+                      {filteredText.length ? (
+                        <p className="prototype-callout__text">
+                          <Text rich_text={filteredText} />
+                        </p>
+                      ) : null}
+                      {remainingChildren.length ? renderChildren(remainingChildren, highlightColor) : null}
+                    </>
+                  ) : null}
+                </PrototypeDesktopFix>
+              );
+            }
+
+            if (iconTextLower === '#prototypedesktop') {
+              const filteredText = (b.callout?.rich_text || []).filter((segment) => {
+                const text = (segment?.plain_text || '').trim().toLowerCase();
+                return text !== '#prototypedesktop';
+              });
 
               const embedBlocks = (b.children || []).filter(child => child.type === 'embed');
               const remainingChildren = (b.children || []).filter(child => child.type !== 'embed');

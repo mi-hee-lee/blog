@@ -25,7 +25,7 @@ function resolveEmbedUrl(url = '') {
   return url;
 }
 
-function PrototypeDesktopCallout({ id, embeds = [], children }) {
+function PrototypeDesktopFix({ id, embeds = [], children }) {
   const primaryEmbed = embeds[0];
   const embedUrl = resolveEmbedUrl(primaryEmbed?.embed?.url || '');
   const captionText = Array.isArray(primaryEmbed?.embed?.caption)
@@ -33,14 +33,14 @@ function PrototypeDesktopCallout({ id, embeds = [], children }) {
     : '';
 
   return (
-    <section className="prototype-desktop" id={id}>
+    <section className="prototype-desktop prototype-desktop--fix" id={id}>
       <div className="prototype-desktop__inner">
         {embedUrl ? (
           <div className="prototype-desktop__frame">
             <div className="prototype-desktop__frame-layer">
               <iframe
                 src={embedUrl}
-                title={captionText || 'prototype-desktop-embed'}
+                title={captionText || 'prototype-desktop-fix-embed'}
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 allowFullScreen
@@ -58,9 +58,6 @@ function PrototypeDesktopCallout({ id, embeds = [], children }) {
           padding: 160px 0;
           display: flex;
           justify-content: center;
-          --prototype-scale: 0.75;
-          --prototype-max-width: 1440px;
-          --prototype-max-height: 1280px;
         }
 
         .prototype-desktop__inner {
@@ -75,7 +72,7 @@ function PrototypeDesktopCallout({ id, embeds = [], children }) {
         .prototype-desktop__frame {
           position: relative;
           width: 100%;
-          max-width: var(--prototype-max-width);
+          max-width: 1440px;
           padding-top: calc((1280 / 1440) * 100%);
           margin: 0 auto;
           overflow: visible;
@@ -85,14 +82,16 @@ function PrototypeDesktopCallout({ id, embeds = [], children }) {
           position: absolute;
           top: 0;
           left: 50%;
-          width: calc(100% / var(--prototype-scale));
-          height: calc(100% / var(--prototype-scale));
-          max-width: calc(var(--prototype-max-width) / var(--prototype-scale));
-          max-height: calc(var(--prototype-max-height) / var(--prototype-scale));
-          transform: translateX(-50%) scale(var(--prototype-scale));
+          width: calc(100% / 0.75);
+          height: calc(100% / 0.75);
+          max-height: calc(1280px / 0.75);
+          transform: translateX(-50%) scale(0.75);
           transform-origin: top center;
           border-radius: 0;
-          overflow: hidden;
+          overflow-x: hidden;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
         }
 
         .prototype-desktop__frame-layer iframe {
@@ -100,7 +99,7 @@ function PrototypeDesktopCallout({ id, embeds = [], children }) {
           height: 100%;
           border: none;
           pointer-events: auto;
-          overflow: hidden;
+          overflow: auto;
         }
 
         .prototype-desktop__extra {
@@ -136,4 +135,4 @@ function PrototypeDesktopCallout({ id, embeds = [], children }) {
   );
 }
 
-export default PrototypeDesktopCallout;
+export default PrototypeDesktopFix;
