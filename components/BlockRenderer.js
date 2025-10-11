@@ -3,7 +3,6 @@
 
 import SlideCarousel from './SlideCarousel';
 import FullBleedDivider from './FullBleedDivider';
-import SlideRotation from './SlideRotation';
 import ShowcaseCallout from './ShowcaseCallout';
 import PrototypeDesktopCallout from './PrototypeDesktopCallout';
 import { useEffect, useRef } from 'react';
@@ -865,68 +864,6 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               );
             }
 
-            // #CircleBorder callout 처리 (겹치는 서클 보더 카드)
-            if (iconText === '#CircleBorder' || iconText === '#circleborder') {
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return text !== '#CircleBorder' && text !== '#circleborder';
-              }) || [];
-
-              const { title, body } = splitCircleCalloutRichText(filteredText);
-              const circleColorStyle = { '--circle-color': highlightColor };
-
-              return (
-                <div
-                  key={b.id}
-                  className="n-circle-card n-circle-card--border"
-                  style={circleColorStyle}
-                >
-                  {title.length ? (
-                    <div className="n-circle-card__title">
-                      <Text rich_text={title} />
-                    </div>
-                  ) : null}
-                  {body.length ? (
-                    <div className="n-circle-card__body">
-                      <Text rich_text={body} />
-                    </div>
-                  ) : null}
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
-                </div>
-              );
-            }
-
-            // #CircleFill callout 처리 (겹치는 서클 필 카드)
-            if (iconText === '#CircleFill' || iconText === '#circlefill') {
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return text !== '#CircleFill' && text !== '#circlefill';
-              }) || [];
-
-              const { title, body } = splitCircleCalloutRichText(filteredText);
-              const circleColorStyle = { '--circle-color': highlightColor };
-
-              return (
-                <div
-                  key={b.id}
-                  className="n-circle-card n-circle-card--fill"
-                  style={circleColorStyle}
-                >
-                  {title.length ? (
-                    <div className="n-circle-card__title">
-                      <Text rich_text={title} />
-                    </div>
-                  ) : null}
-                  {body.length ? (
-                    <div className="n-circle-card__body">
-                      <Text rich_text={body} />
-                    </div>
-                  ) : null}
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
-                </div>
-              );
-            }
-
             if (
               iconText === '#PrototypeDesktop' ||
               iconText === '#prototypedesktop'
@@ -1030,27 +967,6 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                   text={filteredText}
                   images={images}
                 />
-              );
-            }
-
-            if (iconText === '#slideRotation' || iconText === '#sliderotation') {
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return text !== '#slideRotation' && text !== '#sliderotation';
-              }) || [];
-
-              const images = (b.children || []).filter(child => child.type === 'image');
-              const others = (b.children || []).filter(child => child.type !== 'image');
-
-              return (
-                <SlideRotation
-                  key={b.id}
-                  id={b.id}
-                  text={filteredText}
-                  images={images}
-                >
-                  {others.length ? renderChildren(others, highlightColor) : null}
-                </SlideRotation>
               );
             }
 
@@ -1290,10 +1206,9 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         })();
 
         if (!rendered) return null;
-        if (isNested) return rendered;
 
         return (
-          <ScrollReveal key={b.id}>
+          <ScrollReveal key={b.id || `${index}`}>
             {rendered}
           </ScrollReveal>
         );
