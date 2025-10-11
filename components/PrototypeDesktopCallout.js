@@ -85,14 +85,16 @@ function PrototypeDesktopCallout({ id, embeds = [], children }) {
           position: absolute;
           top: 0;
           left: 50%;
-          width: calc(100% / var(--prototype-scale));
-          height: calc(100% / var(--prototype-scale));
-          max-width: calc(var(--prototype-max-width) / var(--prototype-scale));
+          width: min(calc(100% / var(--prototype-scale)), calc(var(--prototype-max-width) / var(--prototype-scale)));
+          height: min(calc(100% / var(--prototype-scale)), calc(var(--prototype-max-height) / var(--prototype-scale)));
           max-height: calc(var(--prototype-max-height) / var(--prototype-scale));
           transform: translateX(-50%) scale(var(--prototype-scale));
           transform-origin: top center;
           border-radius: 0;
-          overflow: hidden;
+          overflow-x: hidden;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
         }
 
         .prototype-desktop__frame-layer iframe {
@@ -100,7 +102,7 @@ function PrototypeDesktopCallout({ id, embeds = [], children }) {
           height: 100%;
           border: none;
           pointer-events: auto;
-          overflow: hidden;
+          overflow: auto;
         }
 
         .prototype-desktop__extra {

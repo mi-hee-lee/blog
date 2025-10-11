@@ -88,10 +88,7 @@ function PrototypeDesktopFix({ id, embeds = [], children }) {
           transform: translateX(-50%) scale(0.75);
           transform-origin: top center;
           border-radius: 0;
-          overflow-x: hidden;
-          overflow-y: auto;
-          overscroll-behavior: contain;
-          -webkit-overflow-scrolling: touch;
+          overflow: hidden;
         }
 
         .prototype-desktop__frame-layer iframe {
@@ -99,7 +96,7 @@ function PrototypeDesktopFix({ id, embeds = [], children }) {
           height: 100%;
           border: none;
           pointer-events: auto;
-          overflow: auto;
+          overflow: hidden;
         }
 
         .prototype-desktop__extra {
