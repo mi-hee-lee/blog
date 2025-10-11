@@ -6,7 +6,7 @@ import FullBleedDivider from './FullBleedDivider';
 import ShowcaseCallout from './ShowcaseCallout';
 import PrototypeDesktopCallout from './PrototypeDesktopCallout';
 import PrototypeDesktopFix from './PrototypeDesktopFix';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
 function rtToHtml(rich = []) {
@@ -176,25 +176,20 @@ function getBlockPlainText(block) {
 
 function ScrollReveal({ children }) {
   const ref = useRef(null);
+  const revealedRef = useRef(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const element = ref.current;
     if (!element) return undefined;
 
-    element.classList.add('scroll-transition-fade');
-
-    let revealed = false;
-    const log = (...args) => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(...args);
-      }
-    };
-
     const reveal = (reason = 'manual') => {
-      if (revealed) return;
-      revealed = true;
-      element.classList.remove('below-viewport');
-      log(`[ScrollReveal] reveal (${reason})`, element);
+      if (revealedRef.current) return;
+      revealedRef.current = true;
+      setIsVisible(true);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[ScrollReveal] reveal (${reason})`, element);
+      }
     };
 
     if (typeof window === 'undefined') {
@@ -226,13 +221,15 @@ function ScrollReveal({ children }) {
       );
 
       observer.observe(element);
-      log('[ScrollReveal] observe', element);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[ScrollReveal] observe', element);
+      }
 
       return () => observer.disconnect();
     }
 
     const handleVisibility = () => {
-      if (revealed) return;
+      if (revealedRef.current) return;
       const rect = element.getBoundingClientRect();
       const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
       const inView = rect.top <= viewportHeight * 0.9 && rect.bottom >= viewportHeight * -0.1;
@@ -250,7 +247,9 @@ function ScrollReveal({ children }) {
     window.addEventListener('scroll', scheduleCheck, { passive: true });
     window.addEventListener('resize', scheduleCheck, { passive: true });
 
-    log('[ScrollReveal] fallback-listeners', element);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[ScrollReveal] fallback-listeners', element);
+    }
 
     return () => {
       window.removeEventListener('scroll', scheduleCheck);
@@ -259,7 +258,15 @@ function ScrollReveal({ children }) {
   }, []);
 
   return (
-    <div ref={ref} className="scroll-transition-fade below-viewport">
+    <div
+      ref={ref}
+      className="scroll-transition-fade"
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0px)' : 'translateY(40px)',
+        transition: 'transform 1s ease-in-out, opacity 0.8s ease-in-out'
+      }}
+    >
       {children}
     </div>
   );
@@ -2032,20 +2039,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         }
 
         .scroll-transition-fade {
-          transition: transform 1s ease-in-out, opacity 0.8s ease-in-out;
-        }
-
-        .scroll-transition-fade.below-viewport {
-          opacity: 0;
-          transform: translateY(40px);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .scroll-transition-fade {
-            opacity: 1 !important;
-            transform: none !important;
-            transition: none !important;
-          }
+          will-change: transform, opacity;
         }
         /* ==== Slide Carousel ==== */
         .n-slide-carousel {
