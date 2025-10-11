@@ -192,11 +192,18 @@ function ScrollReveal({ children }) {
       return undefined;
     }
 
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('[ScrollReveal] observe', element);
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
           entry.target.classList.remove('below-viewport');
+          if (process.env.NODE_ENV !== 'production') {
+            console.debug('[ScrollReveal] reveal', entry.target);
+          }
           observer.unobserve(entry.target);
         });
       },
