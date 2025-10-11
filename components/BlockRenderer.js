@@ -181,41 +181,81 @@ function ScrollReveal({ children }) {
     const element = ref.current;
     if (!element) return undefined;
 
-    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
+    element.classList.add('scroll-transition-fade');
+
+    let revealed = false;
+    const log = (...args) => {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(...args);
+      }
+    };
+
+    const reveal = (reason = 'manual') => {
+      if (revealed) return;
+      revealed = true;
       element.classList.remove('below-viewport');
+      log(`[ScrollReveal] reveal (${reason})`, element);
+    };
+
+    if (typeof window === 'undefined') {
+      reveal('ssr');
       return undefined;
     }
 
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (motionQuery.matches) {
-      element.classList.remove('below-viewport');
+      reveal('prefers-reduced-motion');
       return undefined;
     }
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.debug('[ScrollReveal] observe', element);
+    const supportsIO = 'IntersectionObserver' in window;
+
+    if (supportsIO) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            reveal('observer');
+            observer.unobserve(entry.target);
+          });
+        },
+        {
+          threshold: 0.2,
+          rootMargin: '0px 0px -10%'
+        }
+      );
+
+      observer.observe(element);
+      log('[ScrollReveal] observe', element);
+
+      return () => observer.disconnect();
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.remove('below-viewport');
-          if (process.env.NODE_ENV !== 'production') {
-            console.debug('[ScrollReveal] reveal', entry.target);
-          }
-          observer.unobserve(entry.target);
-        });
-      },
-      {
-        threshold: 0.2,
-        rootMargin: '0px 0px -10%'
+    const handleVisibility = () => {
+      if (revealed) return;
+      const rect = element.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+      const inView = rect.top <= viewportHeight * 0.9 && rect.bottom >= viewportHeight * -0.1;
+      if (inView) {
+        reveal('fallback');
       }
-    );
+    };
 
-    observer.observe(element);
+    const scheduleCheck = () => {
+      if (revealed) return;
+      window.requestAnimationFrame(handleVisibility);
+    };
 
-    return () => observer.disconnect();
+    handleVisibility();
+    window.addEventListener('scroll', scheduleCheck, { passive: true });
+    window.addEventListener('resize', scheduleCheck, { passive: true });
+
+    log('[ScrollReveal] fallback-listeners', element);
+
+    return () => {
+      window.removeEventListener('scroll', scheduleCheck);
+      window.removeEventListener('resize', scheduleCheck);
+    };
   }, []);
 
   return (
