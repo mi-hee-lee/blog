@@ -31,34 +31,51 @@ function PrototypeDesktopFix({ id, embeds = [], children }) {
   const captionText = Array.isArray(primaryEmbed?.embed?.caption)
     ? primaryEmbed.embed.caption.map((c) => c?.plain_text || '').join('').trim()
     : '';
-  const frameLayerRef = useRef(null);
+  const shieldRef = useRef(null);
 
   useEffect(() => {
-    const layer = frameLayerRef.current;
-    if (!layer) return undefined;
+    if (typeof window === 'undefined') return undefined;
+
+    const shield = shieldRef.current;
+    if (!shield) return undefined;
 
     const blockScroll = (event) => {
       event.preventDefault();
     };
 
-    const layerOptions = { passive: false };
-    const iframeOptions = { passive: false, capture: true };
-    layer.addEventListener('wheel', blockScroll, layerOptions);
-    layer.addEventListener('touchmove', blockScroll, layerOptions);
+    const passiveFalse = { passive: false };
+    shield.addEventListener('wheel', blockScroll, passiveFalse);
+    shield.addEventListener('touchmove', blockScroll, passiveFalse);
 
-    const iframe = layer.querySelector('iframe');
-    if (iframe) {
-      iframe.addEventListener('wheel', blockScroll, iframeOptions);
-      iframe.addEventListener('touchmove', blockScroll, iframeOptions);
-    }
+    let reenableTimer = null;
+
+    const enableShield = () => {
+      if (!shield) return;
+      if (reenableTimer) {
+        clearTimeout(reenableTimer);
+        reenableTimer = null;
+      }
+      shield.style.pointerEvents = 'auto';
+      window.removeEventListener('pointerup', enableShield, true);
+      window.removeEventListener('pointercancel', enableShield, true);
+      window.removeEventListener('blur', enableShield, true);
+    };
+
+    const handlePointerDown = () => {
+      shield.style.pointerEvents = 'none';
+      window.addEventListener('pointerup', enableShield, true);
+      window.addEventListener('pointercancel', enableShield, true);
+      window.addEventListener('blur', enableShield, true);
+      reenableTimer = window.setTimeout(enableShield, 350);
+    };
+
+    shield.addEventListener('pointerdown', handlePointerDown);
 
     return () => {
-      layer.removeEventListener('wheel', blockScroll, layerOptions);
-      layer.removeEventListener('touchmove', blockScroll, layerOptions);
-      if (iframe) {
-        iframe.removeEventListener('wheel', blockScroll, iframeOptions);
-        iframe.removeEventListener('touchmove', blockScroll, iframeOptions);
-      }
+      shield.removeEventListener('wheel', blockScroll, passiveFalse);
+      shield.removeEventListener('touchmove', blockScroll, passiveFalse);
+      shield.removeEventListener('pointerdown', handlePointerDown);
+      enableShield();
     };
   }, []);
 
@@ -67,7 +84,8 @@ function PrototypeDesktopFix({ id, embeds = [], children }) {
       <div className="prototype-desktop__inner">
         {embedUrl ? (
           <div className="prototype-desktop__frame">
-            <div className="prototype-desktop__frame-layer" ref={frameLayerRef}>
+            <div className="prototype-desktop__frame-layer">
+              <div className="prototype-desktop__input-shield" ref={shieldRef} />
               <iframe
                 src={embedUrl}
                 title={captionText || 'prototype-desktop-fix-embed'}
@@ -128,6 +146,14 @@ function PrototypeDesktopFix({ id, embeds = [], children }) {
           border: none;
           pointer-events: auto;
           overflow: hidden;
+        }
+
+        .prototype-desktop__input-shield {
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          pointer-events: auto;
+          background: transparent;
         }
 
         .prototype-desktop__extra {
