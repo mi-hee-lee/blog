@@ -6,7 +6,7 @@ import FullBleedDivider from './FullBleedDivider';
 import ShowcaseCallout from './ShowcaseCallout';
 import PrototypeDesktopCallout from './PrototypeDesktopCallout';
 import PrototypeDesktopFix from './PrototypeDesktopFix';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
 function rtToHtml(rich = []) {
@@ -174,23 +174,26 @@ function getBlockPlainText(block) {
   return collect.map((segment) => segment?.plain_text || '').join('');
 }
 
-function ScrollReveal({ children }) {
+function ScrollReveal({ children, shareId, syncWithId }) {
   const ref = useRef(null);
   const revealedRef = useRef(false);
   const [isVisible, setIsVisible] = useState(false);
 
+  const reveal = useCallback((reason = 'manual') => {
+    if (revealedRef.current) return;
+    revealedRef.current = true;
+    setIsVisible(true);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[ScrollReveal] reveal (${reason})`, ref.current);
+    }
+    if (shareId && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent(`scrollreveal:${shareId}`));
+    }
+  }, [shareId]);
+
   useEffect(() => {
     const element = ref.current;
     if (!element) return undefined;
-
-    const reveal = (reason = 'manual') => {
-      if (revealedRef.current) return;
-      revealedRef.current = true;
-      setIsVisible(true);
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`[ScrollReveal] reveal (${reason})`, element);
-      }
-    };
 
     if (typeof window === 'undefined') {
       reveal('ssr');
@@ -255,12 +258,26 @@ function ScrollReveal({ children }) {
       window.removeEventListener('scroll', scheduleCheck);
       window.removeEventListener('resize', scheduleCheck);
     };
-  }, []);
+  }, [reveal]);
+
+  useEffect(() => {
+    if (!syncWithId || typeof window === 'undefined') return undefined;
+
+    const handleSync = () => {
+      reveal(`sync:${syncWithId}`);
+    };
+
+    window.addEventListener(`scrollreveal:${syncWithId}`, handleSync);
+    return () => {
+      window.removeEventListener(`scrollreveal:${syncWithId}`, handleSync);
+    };
+  }, [syncWithId, reveal]);
 
   return (
     <div
       ref={ref}
       className="scroll-transition-fade"
+      data-scroll-reveal-id={shareId}
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0px)' : 'translateY(40px)',
@@ -462,11 +479,14 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
     return globalCss ? <style dangerouslySetInnerHTML={{ __html: globalCss }} /> : null;
   }
 
+  let lastRevealId = null;
+
   return (
     <div className={`n-content ${!isNested ? 'n-content-root' : ''}`}>
       {globalCss ? <style dangerouslySetInnerHTML={{ __html: globalCss }} /> : null}
       {blocks.map((b, index) => {
         if (index < skipUntil) return null;
+        let syncWithPrevious = false;
         const t = b.type;
 
         const rendered = (() => {
@@ -875,6 +895,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                 return text !== '#gradient-bottom-md' && text !== '#Gradient-Bottom-Md';
               }) || [];
 
+              syncWithPrevious = true;
               return (
                 <div key={b.id} className="n-gradient-bottom-md">
                 </div>
@@ -888,6 +909,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                 return text !== '#gradient-bottom-sm' && text !== '#Gradient-Bottom-Sm';
               }) || [];
 
+              syncWithPrevious = true;
               return (
                 <div key={b.id} className="n-gradient-bottom-sm">
                 </div>
@@ -901,6 +923,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                 return text !== '#gradient-bottom-md-full' && text !== '#Gradient-Bottom-Md-Full';
               }) || [];
 
+              syncWithPrevious = true;
               return (
                 <div key={b.id} className="n-gradient-bottom-md-full">
                 </div>
@@ -914,6 +937,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                 return text !== '#gradient-bottom-sm-full' && text !== '#Gradient-Bottom-Sm-Full';
               }) || [];
 
+              syncWithPrevious = true;
               return (
                 <div key={b.id} className="n-gradient-bottom-sm-full">
                 </div>
@@ -1289,11 +1313,23 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
 
         if (!rendered) return null;
 
-        return (
-          <ScrollReveal key={b.id || `${index}`}>
+        const scrollId = b.id || `idx-${index}`;
+        const syncTargetId = syncWithPrevious && lastRevealId ? lastRevealId : undefined;
+        const node = (
+          <ScrollReveal
+            key={scrollId}
+            shareId={scrollId}
+            syncWithId={syncTargetId}
+          >
             {rendered}
           </ScrollReveal>
         );
+
+        if (!syncWithPrevious) {
+          lastRevealId = scrollId;
+        }
+
+        return node;
       })}
 
       {/* 스타일 */}
