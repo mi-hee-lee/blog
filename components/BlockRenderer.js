@@ -5,7 +5,6 @@ import SlideCarousel from './SlideCarousel';
 import FullBleedDivider from './FullBleedDivider';
 import SlideRotation from './SlideRotation';
 import ShowcaseCallout from './ShowcaseCallout';
-import PrototypeBreakpointCallout from './PrototypeBreakpointCallout';
 import PrototypeDesktopCallout from './PrototypeDesktopCallout';
 import { useEffect, useRef } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
@@ -925,39 +924,6 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                   ) : null}
                   {b.children?.length ? renderChildren(b.children, highlightColor) : null}
                 </div>
-              );
-            }
-
-            if (
-              iconText === '#PrototypeBreakpoint' ||
-              iconText === '#prototypebreakpoint'
-            ) {
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return (
-                  text !== '#PrototypeBreakpoint' &&
-                  text !== '#prototypebreakpoint'
-                );
-              }) || [];
-
-              const embedBlocks = (b.children || []).filter(child => child.type === 'embed');
-              const remainingChildren = (b.children || []).filter(child => child.type !== 'embed');
-
-              const hasExtraContent = filteredText.length || remainingChildren.length;
-
-              return (
-                <PrototypeBreakpointCallout key={b.id} id={b.id} embeds={embedBlocks}>
-                  {hasExtraContent ? (
-                    <>
-                      {filteredText.length ? (
-                        <p className="prototype-callout__text">
-                          <Text rich_text={filteredText} />
-                        </p>
-                      ) : null}
-                      {remainingChildren.length ? renderChildren(remainingChildren, highlightColor) : null}
-                    </>
-                  ) : null}
-                </PrototypeBreakpointCallout>
               );
             }
 
