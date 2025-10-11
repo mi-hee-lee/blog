@@ -175,61 +175,14 @@ function getBlockPlainText(block) {
 }
 
 function ScrollReveal({ children }) {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    element.classList.add('scroll-transition-fade');
-
-    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
-      element.classList.remove('below-viewport');
-      return;
-    }
-
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion) {
-      element.classList.remove('below-viewport');
-      return;
-    }
-
-    element.classList.add('below-viewport');
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.remove('below-viewport');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      {
-        threshold: 0.2,
-        rootMargin: '0px 0px -10%'
-      }
-    );
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.debug('[ScrollReveal] observe', element);
-    }
-
-    observer.observe(element);
-
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div ref={ref} className="scroll-transition-fade below-viewport">
-      {children}
-    </div>
-  );
+  return <div className="scroll-transition-fade below-viewport">{children}</div>;
 }
 
 export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3', isNested = false }) {
   let globalCss = '';
   let skipUntil = 0;
+  const contentRef = useRef(null);
+  const revealObserverRef = useRef(null);
 
   if (!isNested && Array.isArray(blocks) && blocks.length) {
     const collectedStyles = [];
@@ -410,6 +363,66 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
     };
   }, [blocks]);
 
+  useEffect(() => {
+    const root = contentRef.current;
+    if (!root) return undefined;
+
+    const elements = Array.from(root.querySelectorAll('.scroll-transition-fade'));
+    if (!elements.length) return undefined;
+
+    const applyImmediateReveal = () => {
+      elements.forEach((el) => {
+        el.classList.remove('below-viewport');
+        el.dataset.scrollRevealShown = '1';
+      });
+    };
+
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
+      applyImmediateReveal();
+      return undefined;
+    }
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (motionQuery.matches) {
+      applyImmediateReveal();
+      return undefined;
+    }
+
+    if (!revealObserverRef.current) {
+      revealObserverRef.current = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            const target = entry.target;
+            target.classList.remove('below-viewport');
+            target.dataset.scrollRevealShown = '1';
+            revealObserverRef.current?.unobserve(target);
+          });
+        },
+        {
+          threshold: 0.2,
+          rootMargin: '0px 0px -10%'
+        }
+      );
+    }
+
+    const observer = revealObserverRef.current;
+    const toObserve = [];
+
+    elements.forEach((el) => {
+      if (!el.dataset.scrollRevealShown) {
+        el.classList.add('below-viewport');
+      }
+      toObserve.push(el);
+    });
+
+    toObserve.forEach((el) => observer.observe(el));
+
+    return () => {
+      toObserve.forEach((el) => observer.unobserve(el));
+    };
+  }, [blocks]);
+
   const hasRenderableBlocks = Array.isArray(blocks) && blocks.length > skipUntil;
 
   if (!hasRenderableBlocks) {
@@ -417,7 +430,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
   }
 
   return (
-    <div className={`n-content ${!isNested ? 'n-content-root' : ''}`}>
+    <div ref={contentRef} className={`n-content ${!isNested ? 'n-content-root' : ''}`}>
       {globalCss ? <style dangerouslySetInnerHTML={{ __html: globalCss }} /> : null}
       {blocks.map((b, index) => {
         if (index < skipUntil) return null;
