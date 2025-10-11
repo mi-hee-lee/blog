@@ -4,9 +4,7 @@
 import SlideCarousel from './SlideCarousel';
 import FullBleedDivider from './FullBleedDivider';
 import ShowcaseCallout from './ShowcaseCallout';
-import PrototypeDesktopCallout from './PrototypeDesktopCallout';
 import PrototypeDesktopFix from './PrototypeDesktopFix';
-import PrototypeDesktopScroll from './PrototypeDesktopScroll';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { buildProxiedImageUrl, buildProxiedFileUrl } from '../lib/notionImage';
 
@@ -974,57 +972,20 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               );
             }
 
-            if (iconTextLower === '#prototypedesktopscroll') {
-              const filteredText = (b.callout?.rich_text || []).filter((segment) => {
-                const text = (segment?.plain_text || '').trim().toLowerCase();
-                return text !== '#prototypedesktopscroll';
-              });
-
-              const embedBlocks = (b.children || []).filter(child => child.type === 'embed');
-              const remainingChildren = (b.children || []).filter(child => child.type !== 'embed');
-
-              const hasExtraContent = filteredText.length || remainingChildren.length;
-
-              return (
-                <PrototypeDesktopScroll key={b.id} id={b.id} embeds={embedBlocks}>
-                  {hasExtraContent ? (
-                    <>
-                      {filteredText.length ? (
-                        <p className="prototype-callout__text">
-                          <Text rich_text={filteredText} />
-                        </p>
-                      ) : null}
-                      {remainingChildren.length ? renderChildren(remainingChildren, highlightColor) : null}
-                    </>
-                  ) : null}
-                </PrototypeDesktopScroll>
-              );
-            }
-
             if (iconTextLower === '#prototypedesktop') {
               const filteredText = (b.callout?.rich_text || []).filter((segment) => {
                 const text = (segment?.plain_text || '').trim().toLowerCase();
                 return text !== '#prototypedesktop';
               });
 
-              const embedBlocks = (b.children || []).filter(child => child.type === 'embed');
-              const remainingChildren = (b.children || []).filter(child => child.type !== 'embed');
-
-              const hasExtraContent = filteredText.length || remainingChildren.length;
-
               return (
-                <PrototypeDesktopCallout key={b.id} id={b.id} embeds={embedBlocks}>
-                  {hasExtraContent ? (
-                    <>
-                      {filteredText.length ? (
-                        <p className="prototype-callout__text">
-                          <Text rich_text={filteredText} />
-                        </p>
-                      ) : null}
-                      {remainingChildren.length ? renderChildren(remainingChildren, highlightColor) : null}
-                    </>
-                  ) : null}
-                </PrototypeDesktopCallout>
+                <div key={b.id} className="n-callout">
+                  <span className="n-callout-ico" aria-hidden>{icon}</span>
+                  <div className="n-callout-body">
+                    <Text rich_text={filteredText} />
+                    {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  </div>
+                </div>
               );
             }
 
