@@ -175,14 +175,52 @@ function getBlockPlainText(block) {
 }
 
 function ScrollReveal({ children }) {
-  return <div className="scroll-transition-fade below-viewport">{children}</div>;
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return undefined;
+
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
+      element.classList.remove('below-viewport');
+      return undefined;
+    }
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (motionQuery.matches) {
+      element.classList.remove('below-viewport');
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.remove('below-viewport');
+          observer.unobserve(entry.target);
+        });
+      },
+      {
+        threshold: 0.2,
+        rootMargin: '0px 0px -10%'
+      }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className="scroll-transition-fade below-viewport">
+      {children}
+    </div>
+  );
 }
 
 export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3', isNested = false }) {
   let globalCss = '';
   let skipUntil = 0;
-  const contentRef = useRef(null);
-  const revealObserverRef = useRef(null);
 
   if (!isNested && Array.isArray(blocks) && blocks.length) {
     const collectedStyles = [];
@@ -363,65 +401,6 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
     };
   }, [blocks]);
 
-  useEffect(() => {
-    const root = contentRef.current;
-    if (!root) return undefined;
-
-    const elements = Array.from(root.querySelectorAll('.scroll-transition-fade'));
-    if (!elements.length) return undefined;
-
-    const applyImmediateReveal = () => {
-      elements.forEach((el) => {
-        el.classList.remove('below-viewport');
-        el.dataset.scrollRevealShown = '1';
-      });
-    };
-
-    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
-      applyImmediateReveal();
-      return undefined;
-    }
-
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (motionQuery.matches) {
-      applyImmediateReveal();
-      return undefined;
-    }
-
-    if (!revealObserverRef.current) {
-      revealObserverRef.current = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            const target = entry.target;
-            target.classList.remove('below-viewport');
-            target.dataset.scrollRevealShown = '1';
-            revealObserverRef.current?.unobserve(target);
-          });
-        },
-        {
-          threshold: 0.2,
-          rootMargin: '0px 0px -10%'
-        }
-      );
-    }
-
-    const observer = revealObserverRef.current;
-    const toObserve = [];
-
-    elements.forEach((el) => {
-      if (!el.dataset.scrollRevealShown) {
-        el.classList.add('below-viewport');
-      }
-      toObserve.push(el);
-    });
-
-    toObserve.forEach((el) => observer.observe(el));
-
-    return () => {
-      toObserve.forEach((el) => observer.unobserve(el));
-    };
-  }, [blocks]);
 
   const hasRenderableBlocks = Array.isArray(blocks) && blocks.length > skipUntil;
 
@@ -430,7 +409,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
   }
 
   return (
-    <div ref={contentRef} className={`n-content ${!isNested ? 'n-content-root' : ''}`}>
+    <div className={`n-content ${!isNested ? 'n-content-root' : ''}`}>
       {globalCss ? <style dangerouslySetInnerHTML={{ __html: globalCss }} /> : null}
       {blocks.map((b, index) => {
         if (index < skipUntil) return null;
