@@ -183,7 +183,12 @@ function ScrollReveal({ children }) {
 
     element.classList.add('scroll-transition-fade');
 
-    const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
+      element.classList.remove('below-viewport');
+      return;
+    }
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion) {
       element.classList.remove('below-viewport');
       return;
@@ -205,6 +210,10 @@ function ScrollReveal({ children }) {
         rootMargin: '0px 0px -10%'
       }
     );
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('[ScrollReveal] observe', element);
+    }
 
     observer.observe(element);
 
@@ -1983,17 +1992,17 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
           }
         }
 
-        .n-content-root .scroll-transition-fade {
+        .scroll-transition-fade {
           transition: transform 1s ease-in-out, opacity 0.8s ease-in-out;
         }
 
-        .n-content-root .scroll-transition-fade.below-viewport {
+        .scroll-transition-fade.below-viewport {
           opacity: 0;
           transform: translateY(40px);
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .n-content-root .scroll-transition-fade {
+          .scroll-transition-fade {
             opacity: 1 !important;
             transform: none !important;
             transition: none !important;
