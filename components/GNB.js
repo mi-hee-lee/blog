@@ -25,9 +25,15 @@ export default function GNB() {
               >
                 <img src="/assets/ic-back.svg" alt="Back" />
               </button>
-              <Link href="/" className="iconbtn" aria-label="Home">
+
+              <button
+                className="iconbtn"
+                aria-label="Home"
+                >
+                <a href="/" > </a>
                 <img src="/assets/ic-home.svg" alt="Home" />
-              </Link>
+              </button>
+              
             </>
           ) : (
             <>
