@@ -29,8 +29,8 @@ export default function GNB() {
               <button
                 className="iconbtn"
                 aria-label="Home"
-                >
-                <a href="https://mihee.xyz/"> </a>
+                onClick={() => router.push('/')}
+              >
                 <img src="/assets/ic-home.svg" alt="Home" />
               </button>
               
