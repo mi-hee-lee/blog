@@ -30,7 +30,7 @@ export default function GNB() {
                 className="iconbtn"
                 aria-label="Home"
                 >
-                <a href="/" > </a>
+                <a href="https://mihee.xyz/"> </a>
                 <img src="/assets/ic-home.svg" alt="Home" />
               </button>
               
