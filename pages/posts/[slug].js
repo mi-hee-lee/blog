@@ -31,6 +31,7 @@ const hexToRgba = (hex, a = 0.3) => {
   const b = parseInt(h.slice(4, 6), 16);
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
+const SCROLL_REVEAL_DISABLED_VALUES = new Set(['none', 'off', 'disable', 'disabled', 'false', '0', 'no']);
 
 /** Overview 문자열에서 { … } 구간만 하이라이트 span으로 래핑 */
 function renderOverview(text, hlColor) {
@@ -80,12 +81,14 @@ export default function PostPage({ meta, blocks }) {
   const highlightHex = p.OverviewHighlight;
   const hlRgba = isHex6(highlightHex) ? hexToRgba(highlightHex, 0.3) : 'rgba(33,137,255,0.3)';
   const hlSolid = isHex6(highlightHex) ? highlightHex : '#4A7BFF';
+  const scrollRevealRaw = (p['Scroll Reveal'] || '').toString().trim().toLowerCase().replace(/;+$/g, '').trim();
+  const scrollRevealEnabled = scrollRevealRaw ? !SCROLL_REVEAL_DISABLED_VALUES.has(scrollRevealRaw) : true;
 
   // 1) Desc
   const descText = p.Desc;
 
   // 2) 메타 박스(제외 목록: Desc / Overview / Overveiw / OverviewHighlight / Slug / Category / Order / Name)
-  const HIDE = new Set(['Desc', 'Overview', 'Overveiw', 'OverviewHighlight', 'Slug', 'Category', 'Order', 'Name']);
+  const HIDE = new Set(['Desc', 'Overview', 'Overveiw', 'OverviewHighlight', 'Slug', 'Category', 'Order', 'Name', 'Scroll Reveal']);
   // 표시 순서(필요 속성만 표시, 비어있으면 자동 생략)
   const ORDER = [
     'Working Duration', // ← 요청: 이 값 노출
@@ -192,7 +195,11 @@ export default function PostPage({ meta, blocks }) {
       )}
 
       {/* 본문 블록 */}
-      <BlockRenderer blocks={blocks} highlightColor={isHex6(highlightHex) ? highlightHex : '#00A1F3'} />
+      <BlockRenderer
+        blocks={blocks}
+        highlightColor={isHex6(highlightHex) ? highlightHex : '#00A1F3'}
+        scrollRevealEnabled={scrollRevealEnabled}
+      />
 
       <style jsx>{`
         .wrap {

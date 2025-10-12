@@ -115,8 +115,15 @@ function Bullet({ children }) {
   return <li>{children}</li>;
 }
 
-function renderChildren(children = [], highlightColor) {
-  return <BlockRenderer blocks={children} highlightColor={highlightColor} isNested={true} />;
+function renderChildren(children = [], highlightColor, scrollRevealEnabled) {
+  return (
+    <BlockRenderer
+      blocks={children}
+      highlightColor={highlightColor}
+      isNested={true}
+      scrollRevealEnabled={scrollRevealEnabled}
+    />
+  );
 }
 
 function cloneRichTextWithContent(rt, content) {
@@ -288,7 +295,12 @@ function ScrollReveal({ children, shareId, syncWithId }) {
   );
 }
 
-export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3', isNested = false }) {
+export default function BlockRenderer({
+  blocks = [],
+  highlightColor = '#00A1F3',
+  isNested = false,
+  scrollRevealEnabled = true
+}) {
   let globalCss = '';
   let skipUntil = 0;
 
@@ -529,7 +541,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               <ul key={b.id} className="n-ul">
                 <Bullet>
                   <Text rich_text={b.bulleted_list_item?.rich_text} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </Bullet>
               </ul>
             );
@@ -539,7 +551,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               <ol key={b.id} className="n-ol">
                 <li>
                   <Text rich_text={b.numbered_list_item?.rich_text} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </li>
               </ol>
             );
@@ -759,7 +771,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                   <Text rich_text={b.toggle?.rich_text} />
                 </summary>
                 <div className="n-toggle-content">
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               </details>
             );
@@ -807,7 +819,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               return (
                 <div key={b.id} className="n-desktop-only">
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
@@ -822,7 +834,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               return (
                 <div key={b.id} className="n-mobile-only">
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
@@ -837,7 +849,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               return (
                 <div key={b.id} className="n-as-is-card">
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
@@ -852,7 +864,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               return (
                 <div key={b.id} className="n-to-be-card" style={{ '--highlight-color': highlightColor }}>
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
@@ -867,7 +879,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               return (
                 <div key={b.id} className="n-small-image">
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
@@ -882,7 +894,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               return (
                 <div key={b.id} className="n-medium-image">
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
@@ -965,7 +977,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                           <Text rich_text={filteredText} />
                         </p>
                       ) : null}
-                      {remainingChildren.length ? renderChildren(remainingChildren, highlightColor) : null}
+                      {remainingChildren.length ? renderChildren(remainingChildren, highlightColor, scrollRevealEnabled) : null}
                     </>
                   ) : null}
                 </PrototypeDesktopFix>
@@ -983,7 +995,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                   <span className="n-callout-ico" aria-hidden>{icon}</span>
                   <div className="n-callout-body">
                     <Text rich_text={filteredText} />
-                    {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                    {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                   </div>
                 </div>
               );
@@ -1040,7 +1052,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                   richText={combinedRichText}
                   images={images}
                 >
-                  {remainingChildren.length ? renderChildren(remainingChildren, highlightColor) : null}
+                  {remainingChildren.length ? renderChildren(remainingChildren, highlightColor, scrollRevealEnabled) : null}
                 </ShowcaseCallout>
               );
             }
@@ -1075,7 +1087,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               return (
                 <div key={b.id} className="n-step-arrow">
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                   <svg width="20" height="40" viewBox="0 0 20 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="step-arrow-svg">
                     <path d="M2 30L10 38L18 30" stroke={highlightColor || '#00A1F3'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
                     <path opacity="0.5" d="M2 16L10 24L18 16" stroke={highlightColor || '#00A1F3'} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1095,7 +1107,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               return (
                 <div key={b.id} className="n-fullbleed">
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
@@ -1110,7 +1122,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               return (
                 <div key={b.id} className="n-headline-text-lg">
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
@@ -1164,7 +1176,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               return (
                 <div key={b.id} className="n-margin-bottom-120">
                   <Text rich_text={filteredText} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
@@ -1209,7 +1221,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
                 <span className="n-callout-ico" aria-hidden>{icon}</span>
                 <div className="n-callout-body">
                   <Text rich_text={b.callout?.rich_text} />
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               </div>
             );
@@ -1260,7 +1272,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
               >
                 {columnMeta.map((meta) => (
                   <div key={meta.id} className="n-col" data-col-weight={meta.weight}>
-                    {meta.children?.length ? renderChildren(meta.children, highlightColor) : null}
+                    {meta.children?.length ? renderChildren(meta.children, highlightColor, scrollRevealEnabled) : null}
                   </div>
                 ))}
               </div>
@@ -1272,7 +1284,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
             return (
               <div key={b.id} className="n-cols">
                 <div className="n-col">
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               </div>
             );
@@ -1283,7 +1295,7 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
             if (b.synced_block && !b.synced_block.synced_from) {
               return (
                 <div key={b.id} className="n-synced">
-                  {b.children?.length ? renderChildren(b.children, highlightColor) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
@@ -1303,6 +1315,14 @@ export default function BlockRenderer({ blocks = [], highlightColor = '#00A1F3',
         if (!rendered) return null;
 
         const scrollId = b.id || `idx-${index}`;
+
+        if (!scrollRevealEnabled) {
+          if (!syncWithPrevious) {
+            lastRevealId = scrollId;
+          }
+          return rendered;
+        }
+
         const syncTargetId = syncWithPrevious && lastRevealId ? lastRevealId : undefined;
         const node = (
           <ScrollReveal
