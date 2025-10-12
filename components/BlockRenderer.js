@@ -301,6 +301,41 @@ export default function BlockRenderer({
   isNested = false,
   scrollRevealEnabled = true
 }) {
+  const usedAnchorIds = new Set();
+
+  const makeAnchorId = (raw, fallback) => {
+    const base = String(raw || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, ' ')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+
+    const candidateBase = base || (fallback
+      ? String(fallback)
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '')
+      : '');
+
+    if (!candidateBase) return null;
+
+    let candidate = candidateBase;
+    if (!/^[a-z]/.test(candidate)) {
+      candidate = `section-${candidate}`;
+    }
+
+    let finalId = candidate;
+    let counter = 1;
+    while (usedAnchorIds.has(finalId)) {
+      finalId = `${candidate}-${counter}`;
+      counter += 1;
+    }
+    usedAnchorIds.add(finalId);
+    return finalId;
+  };
+
   let globalCss = '';
   let skipUntil = 0;
 
@@ -875,9 +910,11 @@ export default function BlockRenderer({
                 const text = (t.plain_text || '').trim();
                 return text !== '#small' && text !== '#Small';
               }) || [];
+              const anchorSource = filteredText.map((t) => t.plain_text || '').join(' ').trim();
+              const anchorId = anchorSource ? makeAnchorId(anchorSource, b.id) : null;
 
               return (
-                <div key={b.id} className="n-small-image">
+                <div key={b.id} id={anchorId || undefined} className="n-small-image">
                   <Text rich_text={filteredText} />
                   {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
@@ -890,9 +927,11 @@ export default function BlockRenderer({
                 const text = (t.plain_text || '').trim();
                 return text !== '#medium' && text !== '#Medium';
               }) || [];
+              const anchorSource = filteredText.map((t) => t.plain_text || '').join(' ').trim();
+              const anchorId = anchorSource ? makeAnchorId(anchorSource, b.id) : null;
 
               return (
-                <div key={b.id} className="n-medium-image">
+                <div key={b.id} id={anchorId || undefined} className="n-medium-image">
                   <Text rich_text={filteredText} />
                   {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
