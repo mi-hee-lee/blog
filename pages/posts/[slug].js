@@ -236,7 +236,7 @@ export default function PostPage({ meta, blocks }) {
           margin: 0 0 32px 0;
         }
         .overview-text :global(.hl) {
-          --hl: rgba(33, 137, 255, 0.3);  /* fallback, 실제 색은 style로 주입 */
+          --hl: rgba(255, 255, 255, 1);  /* fallback, 실제 색은 style로 주입 */
           padding: 0;
           border-radius: 4px;
           background-image: linear-gradient(var(--hl), var(--hl));
