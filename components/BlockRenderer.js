@@ -135,6 +135,39 @@ function cloneRichTextWithContent(rt, content) {
   return clone;
 }
 
+function extractCalloutDirectives(richText = []) {
+  const directives = new Set();
+  const cleaned = [];
+
+  for (const segment of Array.isArray(richText) ? richText : []) {
+    if (!segment) continue;
+    const original = segment?.plain_text || '';
+    let remaining = original;
+    let consumed = false;
+
+    while (true) {
+      const match = remaining.match(/^\s*#([A-Za-z0-9-]+)\b/);
+      if (!match) break;
+      directives.add(`#${match[1]}`.toLowerCase());
+      consumed = true;
+      remaining = remaining.slice(match[0].length);
+    }
+
+    if (!consumed) {
+      cleaned.push(segment);
+      continue;
+    }
+
+    const trimmed = remaining.replace(/^\s+/, '');
+    if (!trimmed) continue;
+
+    const updated = cloneRichTextWithContent(segment, trimmed);
+    cleaned.push(updated || segment);
+  }
+
+  return { directives, richText: cleaned };
+}
+
 function splitCircleCalloutRichText(richText = []) {
   if (!Array.isArray(richText) || !richText.length) {
     return { title: [], body: [] };
@@ -844,117 +877,132 @@ export default function BlockRenderer({
             const iconText = icon === '💡' ? firstText : icon;
             const iconTextLower = (iconText || '').trim().toLowerCase();
 
+            const {
+              directives: calloutDirectives,
+              richText: calloutRichText
+            } = extractCalloutDirectives(b.callout?.rich_text);
+
+            const hasDirective = (token) => calloutDirectives.has(String(token).toLowerCase());
+            const calloutPlainText = calloutRichText
+              .map((segment) => (segment?.plain_text || '').trim())
+              .join(' ')
+              .trim();
+
+            let anchorIdResolved = false;
+            let anchorIdValue = null;
+            const ensureAnchorId = () => {
+              if (!anchorIdResolved) {
+                anchorIdValue = makeAnchorId(calloutPlainText, b.id);
+                anchorIdResolved = true;
+              }
+              return anchorIdValue;
+            };
+
+            const hasScrollAnchor = iconTextLower === '#scrollanchor' || hasDirective('#scrollanchor');
+            const anchorDirectiveProps = hasScrollAnchor
+              ? { id: ensureAnchorId() || undefined, 'data-scroll-anchor': '1' }
+              : {};
+
             // 반응형 조건부 렌더링: #desktop, #mobile 아이콘 처리
-            if (iconText === '#Desktop' || iconText === '#desktop') {
-              // #Desktop 텍스트 제거
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return text !== '#Desktop' && text !== '#desktop';
-              }) || [];
+            if (iconTextLower === '#desktop' || hasDirective('#desktop')) {
+              const filteredText = calloutRichText;
 
               return (
-                <div key={b.id} className="n-desktop-only">
-                  <Text rich_text={filteredText} />
+                <div key={b.id} className="n-desktop-only" {...anchorDirectiveProps}>
+                  {filteredText.length ? <Text rich_text={filteredText} /> : null}
                   {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
 
-            if (iconText === '#Mobile' || iconText === '#mobile') {
-              // #Mobile 텍스트 제거
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return text !== '#Mobile' && text !== '#mobile';
-              }) || [];
+            if (iconTextLower === '#mobile' || hasDirective('#mobile')) {
+              const filteredText = calloutRichText;
 
               return (
-                <div key={b.id} className="n-mobile-only">
-                  <Text rich_text={filteredText} />
+                <div key={b.id} className="n-mobile-only" {...anchorDirectiveProps}>
+                  {filteredText.length ? <Text rich_text={filteredText} /> : null}
                   {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
 
             // #As-Is callout 처리
-            if (iconText === '#As-Is' || iconText === '#as-is') {
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return text !== '#As-Is' && text !== '#as-is';
-              }) || [];
+            if (iconTextLower === '#as-is' || hasDirective('#as-is')) {
+              const filteredText = calloutRichText;
 
               return (
-                <div key={b.id} className="n-as-is-card">
-                  <Text rich_text={filteredText} />
+                <div key={b.id} className="n-as-is-card" {...anchorDirectiveProps}>
+                  {filteredText.length ? <Text rich_text={filteredText} /> : null}
                   {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
 
             // #To-Be callout 처리 (overview highlight 색상 사용)
-            if (iconText === '#To-Be' || iconText === '#to-be') {
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return text !== '#To-Be' && text !== '#to-be';
-              }) || [];
+            if (iconTextLower === '#to-be' || hasDirective('#to-be')) {
+              const filteredText = calloutRichText;
 
               return (
-                <div key={b.id} className="n-to-be-card" style={{ '--highlight-color': highlightColor }}>
-                  <Text rich_text={filteredText} />
+                <div
+                  key={b.id}
+                  className="n-to-be-card"
+                  style={{ '--highlight-color': highlightColor }}
+                  {...anchorDirectiveProps}
+                >
+                  {filteredText.length ? <Text rich_text={filteredText} /> : null}
                   {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
 
             // #small callout 처리 (이미지 크기 400px 제한)
-            if (iconText === '#small' || iconText === '#Small') {
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return text !== '#small' && text !== '#Small';
-              }) || [];
-              const anchorSource = filteredText.map((t) => t.plain_text || '').join(' ').trim();
-              const anchorId = anchorSource ? makeAnchorId(anchorSource, b.id) : null;
+            if (iconTextLower === '#small' || hasDirective('#small')) {
+              const filteredText = calloutRichText;
+              const containerId = ensureAnchorId();
 
               return (
-                <div key={b.id} id={anchorId || undefined} className="n-small-image">
-                  <Text rich_text={filteredText} />
+                <div
+                  key={b.id}
+                  id={containerId || undefined}
+                  className="n-small-image"
+                  {...(hasScrollAnchor ? { 'data-scroll-anchor': '1' } : {})}
+                >
+                  {filteredText.length ? <Text rich_text={filteredText} /> : null}
                   {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
 
             // #medium callout 처리 (이미지 크기 640px 제한)
-            if (iconText === '#medium' || iconText === '#Medium') {
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return text !== '#medium' && text !== '#Medium';
-              }) || [];
-              const anchorSource = filteredText.map((t) => t.plain_text || '').join(' ').trim();
-              const anchorId = anchorSource ? makeAnchorId(anchorSource, b.id) : null;
+            if (iconTextLower === '#medium' || hasDirective('#medium')) {
+              const filteredText = calloutRichText;
+              const containerId = ensureAnchorId();
 
               return (
-                <div key={b.id} id={anchorId || undefined} className="n-medium-image">
-                  <Text rich_text={filteredText} />
+                <div
+                  key={b.id}
+                  id={containerId || undefined}
+                  className="n-medium-image"
+                  {...(hasScrollAnchor ? { 'data-scroll-anchor': '1' } : {})}
+                >
+                  {filteredText.length ? <Text rich_text={filteredText} /> : null}
                   {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
                 </div>
               );
             }
 
-            // #scrollAnchor callout 처리 (화면에 노출되지 않는 앵커)
-            if (iconTextLower === '#scrollanchor') {
-              const filteredText = b.callout?.rich_text?.filter(t => {
-                const text = (t.plain_text || '').trim();
-                return text !== '#scrollAnchor' && text !== '#scrollanchor';
-              }) || [];
-              const anchorSource = filteredText.map((t) => t.plain_text || '').join(' ').trim();
-              const anchorId = makeAnchorId(anchorSource, b.id);
+            // #scrollAnchor callout 처리 (앵커 전용 블록)
+            if (hasScrollAnchor) {
+              const filteredText = calloutRichText;
+              const anchorId = ensureAnchorId();
 
               return (
-                <div key={b.id} className="n-scroll-anchor">
-                  <div
-                    id={anchorId || undefined}
-                    className="n-scroll-anchor__marker"
-                    aria-hidden="true"
-                  />
+                <div
+                  key={b.id}
+                  id={anchorId || undefined}
+                  className="n-scroll-anchor"
+                  data-scroll-anchor="1"
+                >
                   {filteredText.length ? (
                     <div className="n-scroll-anchor__label">
                       <Text rich_text={filteredText} />
@@ -1709,21 +1757,14 @@ export default function BlockRenderer({
           position: relative;
           display: block;
         }
-        .n-scroll-anchor__marker {
-          position: relative;
-          display: block;
-          width: 100%;
-          height: 0;
-          margin: 0;
-          padding: 0;
-          scroll-margin-top: 120px;
-          pointer-events: none;
-        }
         .n-scroll-anchor__label {
           margin: 0 0 12px 0;
           font-size: 14px;
           line-height: 1.6;
           color: rgba(255, 255, 255, 0.6);
+        }
+        [data-scroll-anchor="1"] {
+          scroll-margin-top: 120px;
         }
 
         /* Gradient bottom overlay - medium size (400px) */
