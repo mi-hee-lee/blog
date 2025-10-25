@@ -842,6 +842,7 @@ export default function BlockRenderer({
             // rich_text에서 첫 번째 텍스트도 확인 (아이콘이 텍스트로 들어있을 수 있음)
             const firstText = (b.callout?.rich_text?.[0]?.plain_text || '').trim();
             const iconText = icon === '💡' ? firstText : icon;
+            const iconTextLower = (iconText || '').trim().toLowerCase();
 
             // 반응형 조건부 렌더링: #desktop, #mobile 아이콘 처리
             if (iconText === '#Desktop' || iconText === '#desktop') {
@@ -938,6 +939,26 @@ export default function BlockRenderer({
               );
             }
 
+            // #scrollAnchor callout 처리 (화면에 노출되지 않는 앵커)
+            if (iconTextLower === '#scrollanchor') {
+              const filteredText = b.callout?.rich_text?.filter(t => {
+                const text = (t.plain_text || '').trim();
+                return text !== '#scrollAnchor' && text !== '#scrollanchor';
+              }) || [];
+              const anchorSource = filteredText.map((t) => t.plain_text || '').join(' ').trim();
+              const anchorId = makeAnchorId(anchorSource, b.id);
+
+              syncWithPrevious = true;
+              return (
+                <div
+                  key={b.id}
+                  id={anchorId || undefined}
+                  className="n-scroll-anchor"
+                  aria-hidden="true"
+                />
+              );
+            }
+
             // #gradient-bottom-md callout 처리 (이전 콘텐츠 하단에 그라데이션 오버레이 - 중간 크기)
             if (iconText === '#gradient-bottom-md' || iconText === '#Gradient-Bottom-Md') {
               const filteredText = b.callout?.rich_text?.filter(t => {
@@ -993,8 +1014,6 @@ export default function BlockRenderer({
                 </div>
               );
             }
-
-            const iconTextLower = (iconText || '').trim().toLowerCase();
 
             if (iconTextLower === '#prototypedesktopfix') {
               const filteredText = (b.callout?.rich_text || []).filter((segment) => {
@@ -1678,6 +1697,17 @@ export default function BlockRenderer({
           max-width: 640px !important;
           width: 100%;
           height: auto;
+        }
+
+        .n-scroll-anchor {
+          position: relative;
+          display: block;
+          width: 100%;
+          height: 0;
+          margin: 0;
+          padding: 0;
+          scroll-margin-top: 120px;
+          pointer-events: none;
         }
 
         /* Gradient bottom overlay - medium size (400px) */
