@@ -948,14 +948,20 @@ export default function BlockRenderer({
               const anchorSource = filteredText.map((t) => t.plain_text || '').join(' ').trim();
               const anchorId = makeAnchorId(anchorSource, b.id);
 
-              syncWithPrevious = true;
               return (
-                <div
-                  key={b.id}
-                  id={anchorId || undefined}
-                  className="n-scroll-anchor"
-                  aria-hidden="true"
-                />
+                <div key={b.id} className="n-scroll-anchor">
+                  <div
+                    id={anchorId || undefined}
+                    className="n-scroll-anchor__marker"
+                    aria-hidden="true"
+                  />
+                  {filteredText.length ? (
+                    <div className="n-scroll-anchor__label">
+                      <Text rich_text={filteredText} />
+                    </div>
+                  ) : null}
+                  {b.children?.length ? renderChildren(b.children, highlightColor, scrollRevealEnabled) : null}
+                </div>
               );
             }
 
@@ -1702,12 +1708,22 @@ export default function BlockRenderer({
         .n-scroll-anchor {
           position: relative;
           display: block;
+        }
+        .n-scroll-anchor__marker {
+          position: relative;
+          display: block;
           width: 100%;
           height: 0;
           margin: 0;
           padding: 0;
           scroll-margin-top: 120px;
           pointer-events: none;
+        }
+        .n-scroll-anchor__label {
+          margin: 0 0 12px 0;
+          font-size: 14px;
+          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.6);
         }
 
         /* Gradient bottom overlay - medium size (400px) */
